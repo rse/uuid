@@ -1,7 +1,7 @@
 TODO
-- in-depth code review
-- at least minimum test suite
+- <none>
 CANDO
+- a more sophisticated test suite
 - more platform support in uuid_mac.c?!
 - global locking according to standard?
 - persistent/non-volatile state writing?

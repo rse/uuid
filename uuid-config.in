@@ -81,7 +81,7 @@ do
             exit 0
             ;;
         --version|-v)
-            echo "OSSP sa $uuid_version"
+            echo "OSSP uuid $uuid_version"
             exit 0
             ;;
         --all)

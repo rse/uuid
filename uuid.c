@@ -847,7 +847,7 @@ uuid_rc_t uuid_dump(uuid_t *uuid, char **str)
         /* decode clock sequence */
         tmp32 = ((uuid->obj.clock_seq_hi_and_reserved & BM_MASK(5,0)) << 8)
                 + uuid->obj.clock_seq_low;
-        str_rsprintf(str, "         clock: %ld (usually random)\n", (unsigned long)tmp32);
+        str_rsprintf(str, "         clock: %ld (usually random)\n", (long)tmp32);
 
         /* decode node MAC address */
         str_rsprintf(str, "         node:  %02x:%02x:%02x:%02x:%02x:%02x (%s %s)\n",

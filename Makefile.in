@@ -123,6 +123,9 @@ check: $(PRG_NAME)
 	$(LIBTOOL) --mode=execute ./$(PRG_NAME) -v4 -n 8 -1
 	@echo "==== UUID version 4 (random data based): 16 subsequent iterations"; \
 	$(LIBTOOL) --mode=execute ./$(PRG_NAME) -v4 -n 8
+	@echo "==== UUID version 1 generation and decoding"; \
+	$(LIBTOOL) --mode=execute ./$(PRG_NAME) -d `$(LIBTOOL) --mode=execute ./$(PRG_NAME) -v1`; \
+	$(LIBTOOL) --mode=execute ./$(PRG_NAME) -d `$(LIBTOOL) --mode=execute ./$(PRG_NAME) -v1 -m`
 
 install:
 	$(SHTOOL) mkdir -f -p -m 755 $(DESTDIR)$(prefix)

@@ -74,7 +74,7 @@ AC_DEFUN(UUID_CHECK_ALL,[
     AC_ARG_WITH(rfc2518,
         AC_HELP_STRING([--with-rfc2518], [use incorrect generation of IEEE 802 multicast addresses according to RFC2518]),
         [ac_cv_with_rfc2518=$withval], [ac_cv_with_rfc2518=no])
-    if test ".$ac_cv_with_rfc2518" == .yes; then
+    if test ".$ac_cv_with_rfc2518" = ".yes"; then
         AC_DEFINE(WITH_RFC2518, 1, [whether to use incorrect generation of IEEE 802 multicast addresses according to RFC2518])
     fi
 ])

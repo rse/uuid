@@ -22976,7 +22976,7 @@ if test "${with_rfc2518+set}" = set; then
 else
   ac_cv_with_rfc2518=no
 fi;
-    if test ".$ac_cv_with_rfc2518" == .yes; then
+    if test ".$ac_cv_with_rfc2518" = ".yes"; then
 
 cat >>confdefs.h <<\_ACEOF
 #define WITH_RFC2518 1
