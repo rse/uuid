@@ -11,6 +11,12 @@
   This is a list of all changes to OSSP uuid.
   For a more brief summary please have a look at the NEWS file.
 
+  Changes between 0.9.5 and 0.9.6 (06-Feb-2004 to 11-Feb-2004)
+
+   o Added an experimental additional DCE 1.1 API for backward
+     compatibility with existing applications.
+     [Ralf S. Engelschall]
+
   Changes between 0.9.4 and 0.9.5 (19-Jan-2004 to 06-Feb-2004)
 
    o Fixed filedescriptor leak in the PRNG sub-API.
