@@ -29,9 +29,10 @@ dnl ##
 
 AC_PREREQ(2.53)
 AC_INIT
-UUID_VERSION_STR=`./shtool version -l c -d long uuid_vers.h`
-UUID_VERSION_HEX=`./shtool version -l c -d hex  uuid_vers.h`
-./shtool echo -e "Configuring %BOSSP uuid%b (Universally Unique Identifier), version %B${UUID_VERSION_STR}%b"
+UUID_VERSION_STR=`$ac_confdir/shtool version -l c -d long uuid_vers.h`
+UUID_VERSION_HEX=`$ac_confdir/shtool version -l c -d hex  uuid_vers.h`
+$ac_confdir/shtool echo -e \
+    "Configuring %BOSSP uuid%b (Universally Unique Identifier), version %B${UUID_VERSION_STR}%b"
 AC_SUBST(UUID_VERSION_STR)
 AC_SUBST(UUID_VERSION_HEX)
 
@@ -39,9 +40,6 @@ AC_PROG_MAKE_SET
 AC_PROG_CC
 AC_CHECK_DEBUGGING
 
-m4_defun([AC_PROG_CXX])
-m4_defun([AC_PROG_CXXCPP])
-m4_defun([AC_PROG_F77])
 with_tags=""
 sinclude(libtool.m4)
 AC_PROG_LIBTOOL

@@ -1,0 +1,25 @@
+   _        ___  ____ ____  ____                _     _
+  |_|_ _   / _ \/ ___/ ___||  _ \   _   _ _   _(_) __| |
+  _|_||_| | | | \___ \___ \| |_) | | | | | | | | |/ _` |
+ |_||_|_| | |_| |___) |__) |  __/  | |_| | |_| | | (_| |
+  |_|_|_|  \___/|____/____/|_|      \__,_|\__,_|_|\__,_|
+
+  OSSP uuid - Universally Unique Identifier
+
+  USERS
+
+  OSSP uuid is known to be used by at least the following
+  Open Source software packages:
+
+  o Aegis
+    Software Configuration Management (SCM) System
+    http://aegis.sourceforge.net/
+
+  o Heartbeat
+    Core component of the High-Availability Linux (Linux-HA) project
+    http://linux-ha.org/heartbeat/
+
+  o GAT
+    Grid Application Toolkit (GAT) 
+    https://www.gridlab.org/WorkPackages/wp-1/ 
+
