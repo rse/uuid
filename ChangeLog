@@ -11,6 +11,11 @@
   This is a list of all changes to OSSP uuid.
   For a more brief summary please have a look at the NEWS file.
 
+  Changes between 1.0.1 and 1.0.2 (16-Jul-2004 to 12-Sep-2004)
+
+   o Upgrade build environment to GNU libtool 1.5.8 and GNU shtool 2.0.1
+     [Ralf S. Engelschall]
+
   Changes between 1.0.0 and 1.0.1 (16-Feb-2004 to 16-Jul-2004)
 
    o Made documentation of uuid_export() more clear.

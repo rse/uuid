@@ -6,7 +6,7 @@
 ##  See http://www.gnu.org/software/shtool/ for more information.
 ##  See ftp://ftp.gnu.org/gnu/shtool/ for latest version.
 ##
-##  Version:  2.0.0 (02-Jul-2004)
+##  Version:  2.0.1 (11-Aug-2004)
 ##  Contents: all available modules
 ##
 
@@ -65,7 +65,7 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 if [ ".$1" = ".-h" ] || [ ".$1" = ".--help" ]; then
-    echo "This is GNU shtool, version 2.0.0 (02-Jul-2004)"
+    echo "This is GNU shtool, version 2.0.1 (11-Aug-2004)"
     echo "Copyright (c) 1994-2004 Ralf S. Engelschall <rse@engelschall.com>"
     echo "Report bugs to <bug-shtool@gnu.org>"
     echo ''
@@ -132,7 +132,7 @@ if [ ".$1" = ".-h" ] || [ ".$1" = ".--help" ]; then
     exit 0
 fi
 if [ ".$1" = ".-v" ] || [ ".$1" = ".--version" ]; then
-    echo "GNU shtool 2.0.0 (02-Jul-2004)"
+    echo "GNU shtool 2.0.1 (11-Aug-2004)"
     exit 0
 fi
 if [ ".$1" = ".-r" ] || [ ".$1" = ".--recreate" ]; then
@@ -3734,6 +3734,22 @@ version )
                 echo >>$file "};"
                 echo >>$file ""
                 echo >>$file "#endif /* _${filestr}_AS_HEADER_ */"
+                echo >>$file ""
+                ;;
+            m4 )
+                echo >>$file "##"
+                echo >>$file "##  ${file} -- Version Information for ${name} (syntax: M4)"
+                echo >>$file "##  [automatically generated and maintained by GNU shtool]"
+                echo >>$file "##"
+                echo >>$file ""
+                echo >>$file "m4_define([v_hex],   [${vHex}])"
+                echo >>$file "m4_define([v_short], [${vShort}])"
+                echo >>$file "m4_define([v_long],  [${vLong}])"
+                echo >>$file "m4_define([v_tex],   [${vTeX}])"
+                echo >>$file "m4_define([v_gnu],   [${vGNU}])"
+                echo >>$file "m4_define([v_web],   [${vWeb}])"
+                echo >>$file "m4_define([v_sccs],  [${vSCCS}])"
+                echo >>$file "m4_define([v_rcs],   [${vRCS}])"
                 echo >>$file ""
                 ;;
             perl )

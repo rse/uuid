@@ -425,7 +425,7 @@ http://www.ietf.org/internet-drafts/draft-mealling-uuid-urn-03.txt
 
 B<DCE 1.1 compliant UUID functions>,
 FreeBSD manual pages uuid(3) and uuidgen(2),
-http://www.freebsd.org/cgi/man.cgi?query=uuid&manpath=FreeBSD+5.2-RELEASE
+http://www.freebsd.org/cgi/man.cgi?query=uuid&manpath=FreeBSD+6.0-current
 
 =back
 
