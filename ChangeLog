@@ -11,6 +11,14 @@
   This is a list of all changes to OSSP uuid.
   For a more brief summary please have a look at the NEWS file.
 
+  Changes between 0.9.4 and 0.9.5 (19-Jan-2004 to 06-Feb-2004)
+
+   o Fixed filedescriptor leak in the PRNG sub-API.
+     [Guerry Semones <guerry@tsunamiresearch.com>]
+
+   o Upgraded build environment to GNU libtool 1.5.2.
+     [Ralf S. Engelschall]
+
   Changes between 0.9.3 and 0.9.4 (16-Jan-2004 to 19-Jan-2004)
 
    o Include <string.h> in uuid.h because of size_t usage.

@@ -45,7 +45,7 @@
 DECLARATION_BEGIN
 
 /* OSSP uuid version (compile-time information) */
-#define UUID_VERSION  0x009204
+#define UUID_VERSION  0x009205
 
 /* encoding octet stream lengths */
 #define UUID_LEN_BIN  (128 /*bit*/ / 8 /*bytes*/)

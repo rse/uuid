@@ -124,6 +124,10 @@ prng_rc_t prng_destroy(prng_t *prng)
     if (prng == NULL)
         return PRNG_RC_ARG;
 
+    /* close PRNG device */
+    if (prng->devfd != -1)
+        close(prng->devfd);
+
     /* free object */
     free(prng);
 
