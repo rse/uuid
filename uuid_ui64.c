@@ -149,7 +149,7 @@ char *ui64_i2s(ui64_t x, char *str, size_t len, int base)
 		str[i++] = map[r];
 		while (n > 1 && x.x[n-1] == 0)
 			n--;
-	} while (i < (len-1) && (n > 1 || x.x[0] != 0));
+	} while (i < ((int)len-1) && (n > 1 || x.x[0] != 0));
 	str[i] = '\0';
     for (j = 0; j < --i; j++) {
         c = str[j];

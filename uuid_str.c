@@ -557,7 +557,7 @@ fmtfp(
 
     if (fracpart >= pow10(max)) {
         intpart++;
-        fracpart -= pow10(max);
+        fracpart -= (long)pow10(max);
     }
 
     /* convert integer part */
@@ -689,7 +689,7 @@ str_vasprintf(
     char *rv;
     int n;
 
-    n = str_vsnprintf(NULL, -1, fmt, ap);
+    n = str_vsnprintf(NULL, 0, fmt, ap);
     if ((rv = (char *)malloc(n+1)) == NULL)
         return NULL;
     str_vsnprintf(rv, n+1, fmt, ap);
@@ -727,7 +727,7 @@ str_vrsprintf(
     }
     else {
         n = strlen(*str);
-        rv = str_vsnprintf(NULL, -1, fmt, ap);
+        rv = str_vsnprintf(NULL, 0, fmt, ap);
         if ((*str = (char *)realloc(*str, n+rv+1)) == NULL)
             return -1;
         str_vsnprintf((*str)+n, rv+1, fmt, ap);

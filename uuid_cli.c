@@ -71,6 +71,7 @@ usage(const char *str, ...)
 int main(int argc, char *argv[])
 {
     uuid_t *uuid;
+    uuid_t *uuid_ns;
     uuid_rc_t rc;
     FILE *fp;
     char *p;
@@ -80,8 +81,8 @@ int main(int argc, char *argv[])
     int iterate;
     int raw;
     int decode;
-    char *cp;
     void *vp;
+    size_t n;
     unsigned int version;
 
     /* command line parsing */
@@ -90,7 +91,7 @@ int main(int argc, char *argv[])
     iterate = 0;    /* not one at a time */
     raw = 0;        /* default is ASCII output */
     decode = 0;     /* default is to encode */
-    version = UUID_VERSION1;
+    version = UUID_MAKE_V1;
     while ((ch = getopt(argc, argv, "1n:rdmo:v:")) != -1) {
         switch (ch) {
             case '1':
@@ -116,16 +117,16 @@ int main(int argc, char *argv[])
                     error(1, "fopen: %s", strerror(errno));
                 break;
             case 'm':
-                version |= UUID_MCASTRND;
+                version |= UUID_MAKE_MC;
                 break;
             case 'v':
                 i = strtol(optarg, &p, 10);
                 if (*p != '\0')
                     usage("invalid argument to option 'v'");
                 switch (i) {
-                    case 1: version = UUID_VERSION1; break;;
-                    case 3: version = UUID_VERSION3; break;;
-                    case 4: version = UUID_VERSION4; break;;
+                    case 1: version = UUID_MAKE_V1; break;;
+                    case 3: version = UUID_MAKE_V3; break;;
+                    case 4: version = UUID_MAKE_V4; break;;
                     default:
                         usage("invalid version on option 'v'");
                         break;
@@ -148,20 +149,21 @@ int main(int argc, char *argv[])
             error(1, "uuid_create: %s", uuid_error(rc));
         if (strlen(argv[0]) != UUID_LEN_STR)
             error(1, "invalid length of UUID string representation");
-        if ((rc = uuid_parse(uuid, argv[0])) != UUID_RC_OK)
-            error(1, "uuid_parse: %s", uuid_error(rc));
-        if ((rc = uuid_dump(uuid, &cp)) != UUID_RC_OK)
-            error(1, "uuid_dump: %s", uuid_error(rc));
-        fprintf(stdout, "%s", cp);
-        free(cp);
+        if ((rc = uuid_import(uuid, UUID_FMT_STR, argv[0], strlen(argv[0]))) != UUID_RC_OK)
+            error(1, "uuid_import: %s", uuid_error(rc));
+        vp = NULL;
+        if ((rc = uuid_export(uuid, UUID_FMT_TXT, &vp, NULL)) != UUID_RC_OK)
+            error(1, "uuid_export: %s", uuid_error(rc));
+        fprintf(stdout, "%s", (char *)vp);
+        free(vp);
         if ((rc = uuid_destroy(uuid)) != UUID_RC_OK)
             error(1, "uuid_destroy: %s", uuid_error(rc));
     }
     else {
         /* encoding */
-        if (   (version == UUID_VERSION1 && argc != 0)
-            || (version == UUID_VERSION3 && argc != 2)
-            || (version == UUID_VERSION4 && argc != 0))
+        if (   (version == UUID_MAKE_V1 && argc != 0)
+            || (version == UUID_MAKE_V3 && argc != 2)
+            || (version == UUID_MAKE_V4 && argc != 0))
             usage("invalid number of arguments");
         if ((rc = uuid_create(&uuid)) != UUID_RC_OK)
             error(1, "uuid_create: %s", uuid_error(rc));
@@ -169,33 +171,43 @@ int main(int argc, char *argv[])
             /* load initial UUID for setting old generator state */
             if (strlen(argv[0]) != UUID_LEN_STR)
                 error(1, "invalid length of UUID string representation");
-            if ((rc = uuid_parse(uuid, argv[0])) != UUID_RC_OK)
-                error(1, "uuid_parse: %s", uuid_error(rc));
+            if ((rc = uuid_import(uuid, UUID_FMT_STR, argv[0], strlen(argv[0]))) != UUID_RC_OK)
+                error(1, "uuid_import: %s", uuid_error(rc));
         }
         for (i = 0; i < count; i++) {
             if (iterate) {
-                if ((rc = uuid_nil(uuid)) != UUID_RC_OK)
-                    error(1, "uuid_nil: %s", uuid_error(rc));
+                if ((rc = uuid_load(uuid, "nil")) != UUID_RC_OK)
+                    error(1, "uuid_load: %s", uuid_error(rc));
             }
-            if (version == UUID_VERSION3)
-                rc = uuid_generate(uuid, version, argv[0], argv[1]);
-            else
-                rc = uuid_generate(uuid, version);
-            if (rc != UUID_RC_OK)
-                error(1, "uuid_generate: %s", uuid_error(rc));
+            if (version == UUID_MAKE_V3) {
+                if ((rc = uuid_create(&uuid_ns)) != UUID_RC_OK)
+                    error(1, "uuid_create: %s", uuid_error(rc));
+                if ((rc = uuid_load(uuid_ns, argv[0])) != UUID_RC_OK) {
+                    if ((rc = uuid_import(uuid_ns, UUID_FMT_STR, argv[0], strlen(argv[0]))) != UUID_RC_OK)
+                        error(1, "uuid_import: %s", uuid_error(rc));
+                }
+                if ((rc = uuid_make(uuid, version, uuid_ns, argv[1])) != UUID_RC_OK)
+                    error(1, "uuid_make: %s", uuid_error(rc));
+                if ((rc = uuid_destroy(uuid_ns)) != UUID_RC_OK)
+                    error(1, "uuid_destroy: %s", uuid_error(rc));
+            }
+            else {
+                if ((rc = uuid_make(uuid, version)) != UUID_RC_OK)
+                    error(1, "uuid_make: %s", uuid_error(rc));
+            }
             if (raw) {
                 vp = NULL;
-                if ((rc = uuid_pack(uuid, &vp)) != UUID_RC_OK)
-                    error(1, "uuid_pack: %s", uuid_error(rc));
-                fwrite(vp, UUID_LEN_BIN, 1, fp);
+                if ((rc = uuid_export(uuid, UUID_FMT_BIN, &vp, &n)) != UUID_RC_OK)
+                    error(1, "uuid_export: %s", uuid_error(rc));
+                fwrite(vp, n, 1, fp);
                 free(vp);
             }
             else {
-                cp = NULL;
-                if ((rc = uuid_format(uuid, &cp)) != UUID_RC_OK)
-                    error(1, "uuid_format: %s", uuid_error(rc));
-                fprintf(fp, "%s\n", cp);
-                free(cp);
+                vp = NULL;
+                if ((rc = uuid_export(uuid, UUID_FMT_STR, &vp, &n)) != UUID_RC_OK)
+                    error(1, "uuid_export: %s", uuid_error(rc));
+                fprintf(fp, "%s\n", (char *)vp);
+                free(vp);
             }
         }
         if ((rc = uuid_destroy(uuid)) != UUID_RC_OK)

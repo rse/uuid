@@ -420,7 +420,7 @@ md5_rc_t md5_format(md5_t *md5, char **data_ptr, size_t *data_len)
     if (md5 == NULL || data_ptr == NULL)
         return MD5_RC_ARG;
     if (*data_ptr == NULL) {
-        if ((*data_ptr = malloc(MD5_LEN_STR+1)) == NULL)
+        if ((*data_ptr = (char *)malloc(MD5_LEN_STR+1)) == NULL)
             return MD5_RC_MEM;
         if (data_len != NULL)
             *data_len = MD5_LEN_STR+1;
@@ -435,10 +435,10 @@ md5_rc_t md5_format(md5_t *md5, char **data_ptr, size_t *data_len)
 
     bufptr = buf;
     buflen = sizeof(buf);
-    if ((rc = md5_store(md5, (void *)(&bufptr), &buflen)) != MD5_RC_OK)
+    if ((rc = md5_store(md5, (void **)((void *)&bufptr), &buflen)) != MD5_RC_OK)
         return rc;
 
-    for (i = 0; i < buflen; i++) {
+    for (i = 0; i < (int)buflen; i++) {
 	    (*data_ptr)[(i*2)+0] = hex[(int)(bufptr[i] >> 4)];
 	    (*data_ptr)[(i*2)+1] = hex[(int)(bufptr[i] & 0x0f)];
     }

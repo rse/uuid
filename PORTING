@@ -7,7 +7,7 @@
   OSSP uuid - Universally Unique Identifier
 
   PORTING
- 
+
   OSSP uuid was already written with maximum portability in mind, so
   there should be no great effort required to get it running on any Unix
   platform with a reasonable POSIX API. Additionally, the portability

@@ -86,8 +86,9 @@ are I<version> "C<1>", "C<3>" and "C<4>". The default is "C<1>".
 For version 3 UUIDs the additional command line arguments I<namespace>
 and I<name> have to be given. The I<namespace> is either a UUID in
 string representation or an identifier for internally pre-defined
-namespace UUIDs (currently known are "C<DNS>", "C<URL>", "C<OID>", and
-"C<X500>"). The I<name> is a string of arbitrary length.
+namespace UUIDs (currently known are "C<ns:DNS>", "C<ns:URL>",
+"C<ns:OID>", and "C<ns:X500>"). The I<name> is a string of arbitrary
+length.
 
 =item B<-m>
 
@@ -141,7 +142,7 @@ line) and dump textual information about the UUID.
           node:  00:90:27:2f:f7:25 (global unicast)
 
  # generate DCE 1.1 v3 UUID (name based)
- $ uuid -v3 URL http://www.ossp.org/
+ $ uuid -v3 ns:URL http://www.ossp.org/
  02d9e6d5-9467-382e-8f9b-9300a64ac3cd
 
  # decode and dump DCE 1.1 v3 UUID (name based)
@@ -149,10 +150,11 @@ line) and dump textual information about the UUID.
  UUID:    02d9e6d5-9467-382e-8f9b-9300a64ac3cd
  variant: DCE 1.1, ISO/IEC 11578:1996
  version: 3 (name based)
- content: [not decipherable]
+ content: 02:D9:E6:D5:94:67:08:2E:0F:9B:93:00:A6:4A:C3:CD
+          (not decipherable, because message digest only)
 
  # generate DCE 1.1 v4 UUID 4 (random data based)
- $ uuid -v4                         
+ $ uuid -v4
  eb424026-6f54-4ef8-a4d0-bb658a1fc6cf
 
  # decode and dump DCE 1.1 v4 UUID 4 (random data based)
@@ -160,7 +162,8 @@ line) and dump textual information about the UUID.
  UUID:    eb424026-6f54-4ef8-a4d0-bb658a1fc6cf
  variant: DCE 1.1, ISO/IEC 11578:1996
  version: 4 (random data based)
- content: [no semantics]
+ content: EB:42:40:26:6F:54:0E:F8:24:D0:BB:65:8A:1F:C6:CF
+          (no semantics, because random data only)
 
 =head1 SEE ALSO
 

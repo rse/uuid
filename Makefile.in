@@ -113,19 +113,23 @@ uuid.1: uuid_cli.pod
 	$(RM) /tmp/uuid.pod
 
 check: $(PRG_NAME)
-	@echo "==== UUID version 1 (time and node based): 8 single iterations"; \
-	$(LIBTOOL) --mode=execute ./$(PRG_NAME) -v1 -n 8 -1
-	@echo "==== UUID version 1 (time and node based): 16 subsequent iterations"; \
-	$(LIBTOOL) --mode=execute ./$(PRG_NAME) -v1 -n 8
+	@echo "==== UUID version 1 (time and node based): 4 single iterations"; \
+	$(LIBTOOL) --mode=execute ./$(PRG_NAME) -v1 -n 4 -1
+	@echo "==== UUID version 1 (time and node based): 4 subsequent iterations"; \
+	$(LIBTOOL) --mode=execute ./$(PRG_NAME) -v1 -n 4
 	@echo "==== UUID version 3 (name based): 2 times repeated"; \
-	$(LIBTOOL) --mode=execute ./$(PRG_NAME) -v3 -n 2 URL http://www.ossp.org/
-	@echo "==== UUID version 4 (random data based): 16 single iterations"; \
-	$(LIBTOOL) --mode=execute ./$(PRG_NAME) -v4 -n 8 -1
-	@echo "==== UUID version 4 (random data based): 16 subsequent iterations"; \
-	$(LIBTOOL) --mode=execute ./$(PRG_NAME) -v4 -n 8
+	$(LIBTOOL) --mode=execute ./$(PRG_NAME) -v3 -n 2 ns:URL http://www.ossp.org/
+	@echo "==== UUID version 4 (random data based): 4 single iterations"; \
+	$(LIBTOOL) --mode=execute ./$(PRG_NAME) -v4 -n 4 -1
+	@echo "==== UUID version 4 (random data based): 4 subsequent iterations"; \
+	$(LIBTOOL) --mode=execute ./$(PRG_NAME) -v4 -n 4
 	@echo "==== UUID version 1 generation and decoding"; \
 	$(LIBTOOL) --mode=execute ./$(PRG_NAME) -d `$(LIBTOOL) --mode=execute ./$(PRG_NAME) -v1`; \
 	$(LIBTOOL) --mode=execute ./$(PRG_NAME) -d `$(LIBTOOL) --mode=execute ./$(PRG_NAME) -v1 -m`
+	@echo "==== UUID version 3 generation and decoding"; \
+	$(LIBTOOL) --mode=execute ./$(PRG_NAME) -d `$(LIBTOOL) --mode=execute ./$(PRG_NAME) -v3 ns:URL http://www.ossp.org/`
+	@echo "==== UUID version 3 generation and decoding"; \
+	$(LIBTOOL) --mode=execute ./$(PRG_NAME) -d `$(LIBTOOL) --mode=execute ./$(PRG_NAME) -v4`
 
 install:
 	$(SHTOOL) mkdir -f -p -m 755 $(DESTDIR)$(prefix)

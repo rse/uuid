@@ -94,7 +94,7 @@ prng_rc_t prng_data(prng_t *prng, void *data_ptr, size_t data_len)
 
     /* try to gather data from the system PRNG device */
     if (prng->devfd != -1) {
-        p = data_ptr;
+        p = (unsigned char *)data_ptr;
         n = data_len;
         cnt = 0;
         while (n > 0) {
@@ -112,7 +112,7 @@ prng_rc_t prng_data(prng_t *prng, void *data_ptr, size_t data_len)
 
     /* always also apply the weaker PRNG. In case the stronger PRNG device
        based source failed, this is the only remaining randomness, of course */
-    for (p = data_ptr, n = 0; n < data_len; n++)
+    for (p = (unsigned char *)data_ptr, n = 0; n < data_len; n++)
         *p++ ^= (unsigned char)(((unsigned int)rand() >> 7) & 0xFF);
 
     return PRNG_RC_OK;

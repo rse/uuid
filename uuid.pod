@@ -112,8 +112,31 @@ B<uuid_format>() deal with.
 A UUID has a variant and version. The variant defines the layout of the
 UUID. The version defines the content of the UUID. The UUID variant
 supported in B<OSSP uuid> is the DCE 1.1 variant only. The DCE 1.1 UUID
-variant versions supported in B<OSSP uuid> are version 1 (time and node
-based), version 3 (name based) and version 4 (random data based).
+variant versions supported in B<OSSP uuid> are:
+
+=over 4
+
+=item B<Version 1> (time and node based)
+
+These are the classical UUIDs, created out of a 60-bit system time,
+a 14-bit local clock sequence and 48-bit system MAC address. The MAC
+address can be either the real one of a physical network interface card
+(NIC) or a random multi-cast MAC address. Version 1 UUIDs are usually
+used as one-time global unique identifiers.
+
+=item B<Version 3> (name based)
+
+These are UUIDs which are based on the 128-bit MD5 message digest of the
+concatenation of a 128-bit namespace UUID and a name string of arbitrary
+length. Version 3 UUIDs are usually used for non-unique but repeatable
+message digest identifiers.
+
+=item B<Version 4> (random data based)
+
+These are UUIDs which are based on just 128-bit of random data. Version
+4 UUIDs are usually used as one-time local unique identifiers.
+
+=back
 
 =head2 UUID Uniqueness
 
@@ -163,7 +186,7 @@ the necessary C<NUL> termination character.
 
 =item B<UUID_VERSION1>, B<UUID_VERSION3>, B<UUID_VERSION4>, B<UUID_MCASTRND>
 
-The I<mode> bits for use with B<uuid_generate>(). The
+The I<mode> bits for use with B<uuid_make>(). The
 B<UUID_VERSION>I<N> specify which UUID version to generate. The
 B<UUID_MCASTRND> forces the use of a random multi-cast MAC address
 instead of the real physical MAC address in version 1 UUIDs.
@@ -172,6 +195,14 @@ instead of the real physical MAC address in version 1 UUIDs.
 
 The possible numerical return-codes of API functions.
 Use B<uuid_error>() to translate them into string versions.
+
+=item B<UUID_FMT_BIN>, B<UUID_FMT_STR>, B<UUID_FMT_TXT>
+
+The I<fmt> formats for use with B<uuid_import>() and B<uuid_export>().
+The B<UUID_FMT_BIN> indicates the UUID binary representation (of
+length B<UUID_LEN_BIN>), the B<UUID_FMT_STR> indicates the UUID string
+representation (of length B<UUID_LEN_STR>) and the B<UUID_FMT_TXT>
+indicates the textual description (of arbitrary length) of a UUID.
 
 =back
 
@@ -192,10 +223,6 @@ timestamp information. The initial UUID is the I<Nil> UUID.
 
 Destroy UUID object I<uuid>.
 
-=item uuid_rc_t B<uuid_nil>(uuid_t *I<uuid>);
-
-Sets or resets the UUID in I<uuid> to the I<Nil> UUID.
-
 =item uuid_rc_t B<uuid_isnil>(uuid_t *I<uuid>, int *I<result>);
 
 Checks whether the UUID in I<uuid> is the I<Nil> UUID.
@@ -209,32 +236,54 @@ and returns the result in C<*>I<result>: C<-1> if I<uuid1> is
 smaller than I<uuid2>, C<0> if I<uuid1> is equal to I<uuid2>
 and C<+1> if I<uuid1> is greater than I<uuid2>.
 
-=item uuid_rc_t B<uuid_unpack>(uuid_t *I<uuid>, const void *I<buf>);
+=item uuid_rc_t B<uuid_import>(uuid_t *I<uuid>, uuid_fmt_t I<fmt>, const void *I<data_ptr>, size_t I<data_len>);
 
-Imports the value of the UUID in I<uuid> by unpacking the binary
-representation of length C<UUID_LEN_BIN> starting at I<buf>.
+Imports a UUID I<uuid> from an external representation of format I<fmt>.
+The data is read from the buffer at I<data_ptr> which contains at least
+I<data_len> bytes.
 
-=item uuid_rc_t B<uuid_pack>(uuid_t *I<uuid>, void **I<buf>);
+The format of the external representation is specified by I<fmt> and the
+minimum expected length in I<data_len> depends on it. Valid values for
+I<fmt> are B<UUID_FMT_BIN> and B<UUID_FMT_STR>.
 
-Exports the value of the UUID in I<uuid> by packing it into the
-binary representation and storing it (with length C<UUID_LEN_BIN>)
-at I<buf>. If I<buf> points to a C<NULL> pointer, a buffer of length
-C<UUID_LEN_BIN> is allocated and stored into C<*>I<buf> first.
+=item uuid_rc_t B<uuid_export>(uuid_t *I<uuid>, uuid_fmt_t I<fmt>, void **I<data_ptr>, size_t *I<data_len>);
 
-=item uuid_rc_t B<uuid_parse>(uuid_t  *I<uuid>, const char  *I<str>);
+Exports a UUID I<uuid> into an external representation of format I<fmt>.
+The data is written to the buffer at C<*>I<data_ptr> which has room
+for at least C<*>I<data_len> bytes. If C<*>I<data_ptr> is C<NULL>,
+a new buffer is allocated (and I<data_len> ignored as input). If
+I<data_len> is not C<NULL>, the number of written bytes are stored into
+C<*>I<data_len>.
 
-Imports the value of the UUID in I<uuid> by parsing the string
-representation of length C<UUID_LEN_STR> starting at I<str>.
+The format of the external representation is specified by I<fmt> and the
+minimum required length in C<*>I<data_len> depends on it. Valid values
+for I<fmt> are B<UUID_FMT_BIN>, B<UUID_FMT_STR> and B<UUID_FMT_TXT>.
 
-=item uuid_rc_t B<uuid_format>(uuid_t *I<uuid>, char **I<str>);
+=item uuid_rc_t B<uuid_load>(uuid_t *I<uuid>, const char *I<name>);
 
-Exports the value of the UUID in I<uuid> by formatting it into the
-C<NUL>-terminated string representation and storing it (with length
-C<UUID_LEN_STR>+1) at I<str>. If I<str> points to a C<NULL> pointer,
-a buffer of length C<UUID_LEN_STR>+1 is allocated and stored into
-C<*>I<str> first.
+Loads a pre-defined UUID value into the UUID object I<uuid>. The
+following I<name> arguments are currently known:
 
-=item uuid_rc_t B<uuid_generate>(uuid_t *I<uuid>, unsigned int I<mode>, ...);
+=over 4
+
+=item I<name>      I<UUID>
+
+=item nil       00000000-0000-0000-0000-000000000000
+
+=item ns:DNS    6ba7b810-9dad-11d1-80b4-00c04fd430c8
+
+=item ns:URL    6ba7b811-9dad-11d1-80b4-00c04fd430c8
+
+=item ns:OID    6ba7b812-9dad-11d1-80b4-00c04fd430c8
+
+=item ns:X500   6ba7b814-9dad-11d1-80b4-00c04fd430c8
+
+=back
+
+The "C<ns:>I<XXX>" are names of pre-defined name-space UUIDs for use in
+the generation of DCE 1.1 version 3 UUIDs.
+
+=item uuid_rc_t B<uuid_make>(uuid_t *I<uuid>, unsigned int I<mode>, ...);
 
 Generates a new UUID in I<uuid> according to I<mode> and optional
 arguments (dependent on I<mode>).
@@ -258,19 +307,6 @@ If I<mode> contains the C<UUID_VERSION4> bit, a DCE 1.1 variant UUID
 of version 4 is generated. The UUID is generated out of 128-bit random
 data.
 
-=item uuid_rc_t B<uuid_dump>(uuid_t *I<uuid>, char **I<str>);
-
-This decodes the loaded UUID in I<uuid> and dumps a textual description
-into a string buffer which is allocated under C<*>I<str>. The output has
-the format (for DCE 1.1 v1 UUIDs):
-
- UUID:    01c47915-4777-11d8-bc70-0090272ff725
- variant: DCE 1.1, ISO/IEC 11578:1996
- version: 1 (time and node based)
- content: time:  2004-01-15 16:22:26.376322.1 UTC
-          clock: 15472 (usually random)
-          node:  00:90:27:2f:f7:25 (global unicast)
-
 =item char *B<uuid_error>(uuid_rc_t I<rc>);
 
 Returns a constant string representation corresponding to the
@@ -278,13 +314,49 @@ return-code I<rc> for use in displaying B<OSSP uuid> errors.
 
 =back
 
+=head1 EXAMPLE
+
+The following shows an example usage of the API. Error handling is
+omitted for code simplification and has to be re-added for production
+code.
+
+ /* generate a DCE 1.1 v1 UUID from system environment */
+ char *uuid_v1(void)
+ {
+     uuid_t *uuid;
+     char *str = NULL;
+
+     uuid_create(&uuid);
+     uuid_make(uuid, UUID_VERSION1);
+     uuid_export(uuid, UUID_FMT_STR, (void **)&str, NULL);
+     uuid_destroy(uuid);
+     return str;
+ }
+
+ /* generate a DCE 1.1 v3 UUID from an URL */
+ char *uuid_v3(const char *url)
+ {
+     uuid_t *uuid;
+     uuid_t *uuid_ns;
+     char *str = NULL;
+
+     uuid_create(&uuid);
+     uuid_create(&uuid_ns);
+     uuid_load(uuid_ns, "ns:URL");
+     uuid_make(uuid, UUID_VERSION3, uuid_ns, url);
+     uuid_export(uuid, UUID_FMT_STR, (void **)&str, NULL);
+     uuid_destroy(uuid_ns);
+     uuid_destroy(uuid);
+     return str;
+ }
+
 =head1 SEE ALSO
 
 See the following are references to more B<UUID> documentation and specifications:
 
 =over 4
 
-=item 
+=item
 
 B<UUIDs and GUIDs>,
 IETF Internet Draft (expired),
@@ -292,7 +364,7 @@ Paul J. Leach, Rich Salz,
 February 1998, 27 pages,
 http://www.opengroup.org/dce/info/draft-leach-uuids-guids-01.txt
 
-=item 
+=item
 
 B<DCE 1.1: Remote Procedure Call>,
 appendix B<Universally Unique Identifier>,
@@ -300,16 +372,16 @@ Open Group Technical Standard
 Document Number C706, August 1997, 737 pages,
 (supersedes C309 DCE: Remote Procedure Call 8/1994,
 which was basis for ISO/IEC 11578:1996 specification),
-http://www.opengroup.org/publications/catalog/c706.htm 
+http://www.opengroup.org/publications/catalog/c706.htm
 
-=item 
+=item
 
 B<Information technology -- Open Systems Interconnection (OSI) -- Remote Procedure Call (RPC)>,
 ISO/IEC 11578:1996,
 August 2001, 570 pages, (CHF 340,00),
 http://www.iso.ch/cate/d2229.html
 
-=item 
+=item
 
 B<HTTP Extensions for Distributed Authoring (WebDAV)>,
 section B<6.4.1 Node Field Generation Without the IEEE 802 Address>,
