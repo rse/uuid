@@ -129,12 +129,12 @@
 .\" ========================================================================
 .\"
 .IX Title "UUID 1"
-.TH UUID 1 "OSSP uuid 1.1.2" "13-Jan-2005" "Universally Unique Identifier"
+.TH UUID 1 "OSSP uuid 1.2.0" "23-Jan-2005" "Universally Unique Identifier"
 .SH "NAME"
 \&\fBOSSP uuid\fR \- \fBUniversally Unique Identifier Command\-Line Tool\fR
 .SH "VERSION"
 .IX Header "VERSION"
-\&\s-1OSSP\s0 uuid \s-11.1.2 (13-Jan-2005)\s0
+\&\s-1OSSP\s0 uuid \s-11.2.0 (23-Jan-2005)\s0
 .SH "SYNOPSIS"
 .IX Header "SYNOPSIS"
 \&\fBuuid\fR
@@ -157,7 +157,8 @@
 and corresponding command line interface (\s-1CLI\s0) for the generation of \s-1DCE\s0
 1.1 and \s-1ISO/IEC\s0 11578:1996 compliant \fIUniversally Unique Identifier\fR
 (\s-1UUID\s0). It supports \s-1DCE\s0 1.1 variant UUIDs of version 1 (time and node
-based), version 3 (name based) and version 4 (random number based).
+based), version 3 (name based, \s-1MD5\s0), version 4 (random number based) and
+version 5 (name based, \s-1SHA\-1\s0).
 .PP
 UUIDs are 128 bit numbers which are intended to have a high likelihood
 of uniqueness over space and time and are computationally difficult
@@ -175,14 +176,14 @@ programming interface (\s-1API\s0) in \fIuuid\fR\|(3).
 .IP "\fB\-v\fR \fIversion\fR" 3
 .IX Item "-v version"
 Sets the version of the generated \s-1DCE\s0 1.1 variant \s-1UUID\s0. Supported
-are \fIversion\fR "\f(CW1\fR\*(L", \*(R"\f(CW3\fR\*(L" and \*(R"\f(CW4\fR\*(L". The default is \*(R"\f(CW1\fR".
+are \fIversion\fR "\f(CW1\fR\*(L", \*(R"\f(CW3\fR\*(L", \*(R"\f(CW4\fR\*(L" and \*(R"\f(CW5\fR\*(L". The default is \*(R"\f(CW1\fR".
 .Sp
-For version 3 UUIDs the additional command line arguments \fInamespace\fR
-and \fIname\fR have to be given. The \fInamespace\fR is either a \s-1UUID\s0 in
-string representation or an identifier for internally pre-defined
-namespace UUIDs (currently known are "\f(CW\*(C`ns:DNS\*(C'\fR\*(L", \*(R"\f(CW\*(C`ns:URL\*(C'\fR\*(L",
-\&\*(R"\f(CW\*(C`ns:OID\*(C'\fR\*(L", and \*(R"\f(CW\*(C`ns:X500\*(C'\fR"). The \fIname\fR is a string of arbitrary
-length.
+For version 3 and version 5 UUIDs the additional command line arguments
+\&\fInamespace\fR and \fIname\fR have to be given. The \fInamespace\fR is either
+a \s-1UUID\s0 in string representation or an identifier for internally
+pre-defined namespace UUIDs (currently known are "\f(CW\*(C`ns:DNS\*(C'\fR\*(L",
+\&\*(R"\f(CW\*(C`ns:URL\*(C'\fR\*(L", \*(R"\f(CW\*(C`ns:OID\*(C'\fR\*(L", and \*(R"\f(CW\*(C`ns:X500\*(C'\fR"). The \fIname\fR is a string of
+arbitrary length.
 .IP "\fB\-m\fR" 3
 .IX Item "-m"
 Forces the use of a random multi-cast \s-1MAC\s0 address when generating
@@ -195,7 +196,7 @@ Generate \fIcount\fR UUIDs instead of just a single one (the default).
 .IX Item "-1"
 If option \fB\-n\fR is used with a \fIcount\fR greater than \f(CW1\fR, then this
 option can enforce the reset the \s-1UUID\s0 context for each generated \s-1UUID\s0.
-This makes no difference for \fIversion\fR \f(CW3\fR and \f(CW4\fR UUIDs. But
+This makes no difference for \fIversion\fR \f(CW3\fR, \f(CW4\fR and \f(CW5\fR UUIDs. But
 version \f(CW1\fR UUIDs are based on the previously generated \s-1UUID\s0 which is
 remembered in the \s-1UUID\s0 context of the \s-1API\s0. Option \fB\-1\fR deletes the
 remembered \s-1UUID\s0 on each iteration.

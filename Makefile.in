@@ -56,7 +56,7 @@ POD2MAN     = pod2man
 PERL        = @PERL@
 
 LIB_NAME    = libuuid.la
-LIB_OBJS    = uuid.lo uuid_md5.lo uuid_prng.lo uuid_mac.lo uuid_ui64.lo uuid_str.lo
+LIB_OBJS    = uuid.lo uuid_md5.lo uuid_sha1.lo uuid_prng.lo uuid_mac.lo uuid_ui64.lo uuid_str.lo
 
 DCE_NAME    = libuuid_dce.la
 DCE_OBJS    = $(LIB_OBJS) uuid_dce.lo
@@ -100,9 +100,10 @@ $(PERL_NAME): $(PERL_OBJS) $(LIB_NAME)
 	@cd perl && $(PERL) Makefile.PL PREFIX=$(prefix) && $(MAKE) $(MFLAGS) all
 	@touch $(PERL_NAME)
 
-uuid.lo: uuid.c config.h uuid.h uuid_md5.h uuid_prng.h uuid_mac.h uuid_ui64.h uuid_str.h uuid_bm.h uuid_ac.h
+uuid.lo: uuid.c config.h uuid.h uuid_md5.h uuid_sha1.h uuid_prng.h uuid_mac.h uuid_ui64.h uuid_str.h uuid_bm.h uuid_ac.h
 uuid_mac.lo: uuid_mac.c config.h uuid_mac.h
 uuid_md5.lo: uuid_md5.c uuid_md5.h
+uuid_sha1.lo: uuid_sha1.c uuid_sha1.h
 uuid_prng.lo: uuid_prng.c uuid_prng.h
 uuid_str.lo: uuid_str.c config.h uuid_str.h
 uuid_ui64.lo: uuid_ui64.c uuid_ui64.h
@@ -142,8 +143,10 @@ check: all
 	$(LIBTOOL) --mode=execute ./$(PRG_NAME) -v1 -n 4 -1
 	@echo "==== UUID version 1 (time and node based): 4 subsequent iterations"; \
 	$(LIBTOOL) --mode=execute ./$(PRG_NAME) -v1 -n 4
-	@echo "==== UUID version 3 (name based): 2 times repeated"; \
+	@echo "==== UUID version 3 (name based, MD5): 2 times repeated"; \
 	$(LIBTOOL) --mode=execute ./$(PRG_NAME) -v3 -n 2 ns:URL http://www.ossp.org/
+	@echo "==== UUID version 5 (name based, SHA-1): 2 times repeated"; \
+	$(LIBTOOL) --mode=execute ./$(PRG_NAME) -v5 -n 2 ns:URL http://www.ossp.org/
 	@echo "==== UUID version 4 (random data based): 4 single iterations"; \
 	$(LIBTOOL) --mode=execute ./$(PRG_NAME) -v4 -n 4 -1
 	@echo "==== UUID version 4 (random data based): 4 subsequent iterations"; \
@@ -153,6 +156,8 @@ check: all
 	$(LIBTOOL) --mode=execute ./$(PRG_NAME) -d `$(LIBTOOL) --mode=execute ./$(PRG_NAME) -v1 -m`
 	@echo "==== UUID version 3 generation and decoding"; \
 	$(LIBTOOL) --mode=execute ./$(PRG_NAME) -d `$(LIBTOOL) --mode=execute ./$(PRG_NAME) -v3 ns:URL http://www.ossp.org/`
+	@echo "==== UUID version 5 generation and decoding"; \
+	$(LIBTOOL) --mode=execute ./$(PRG_NAME) -d `$(LIBTOOL) --mode=execute ./$(PRG_NAME) -v5 ns:URL http://www.ossp.org/`
 	@echo "==== UUID version 3 generation and decoding"; \
 	$(LIBTOOL) --mode=execute ./$(PRG_NAME) -d `$(LIBTOOL) --mode=execute ./$(PRG_NAME) -v4`
 	-@if [ ".$(WITH_PERL)" = .yes ]; then \

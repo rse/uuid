@@ -45,6 +45,7 @@
 #include "uuid.h"
 #include "uuid_vers.h"
 #include "uuid_md5.h"
+#include "uuid_sha1.h"
 #include "uuid_prng.h"
 #include "uuid_mac.h"
 #include "uuid_ui64.h"
@@ -83,6 +84,7 @@ struct uuid_st {
     uuid_obj_t     obj;                       /* inlined UUID object */
     prng_t        *prng;                      /* RPNG sub-object */
     md5_t         *md5;                       /* MD5 sub-object */
+    sha1_t        *sha1;                      /* SHA-1 sub-object */
     uuid_uint8_t   mac[IEEE_MAC_OCTETS];      /* pre-determined MAC address */
     struct timeval time_last;                 /* last retrieved timestamp */
     unsigned long  time_seq;                  /* last timestamp sequence counter */
@@ -107,6 +109,8 @@ uuid_rc_t uuid_create(uuid_t **uuid)
         return UUID_RC_INT;
     if (md5_create(&(*uuid)->md5) != MD5_RC_OK)
         return UUID_RC_INT;
+    if (sha1_create(&(*uuid)->sha1) != SHA1_RC_OK)
+        return UUID_RC_INT;
 
     /* resolve MAC address for insertion into node field of UUIDs */
     if (!mac_address((unsigned char *)((*uuid)->mac), sizeof((*uuid)->mac))) {
@@ -129,9 +133,10 @@ uuid_rc_t uuid_destroy(uuid_t *uuid)
     if (uuid == NULL)
         return UUID_RC_ARG;
 
-    /* destroy PRNG and MD5 sub-objects */
+    /* destroy PRNG, MD5 and SHA-1 sub-objects */
     prng_destroy(uuid->prng);
     md5_destroy(uuid->md5);
+    sha1_destroy(uuid->sha1);
 
     /* free UUID object */
     free(uuid);
@@ -443,8 +448,9 @@ static struct {
     const char *desc;
 } uuid_dectab_version[] = {
     { 1, "time and node based" },
-    { 3, "name based" },
-    { 4, "random data based" }
+    { 3, "name based, MD5" },
+    { 4, "random data based" },
+    { 5, "name based, SHA-1" }
 };
 
 /* INTERNAL: dump UUID object as descriptive text */
@@ -569,13 +575,15 @@ static uuid_rc_t uuid_export_txt(uuid_t *uuid, void **data_ptr, size_t *data_len
         /* decode anything else as hexadecimal byte-string only */
 
         /* determine annotational hint */
-        content = "not decipherable, because unknown UUID version";
+        content = "not decipherable: unknown UUID version";
         if (isnil)
-            content = "special case of DCE 1.1 Nil UUID";
+            content = "special case: DCE 1.1 Nil UUID";
         else if (tmp16 == 3)
-            content = "not decipherable, because message digest only";
+            content = "not decipherable: MD5 message digest only";
         else if (tmp16 == 4)
-            content = "no semantics, because random data only";
+            content = "no semantics: random data only";
+        else if (tmp16 == 5)
+            content = "not decipherable: truncated SHA-1 message digest only";
 
         /* pack UUID into binary representation */
         tmp_ptr = (void *)&tmp_bin;
@@ -852,7 +860,7 @@ uuid_rc_t uuid_load(uuid_t *uuid, const char *name)
     return UUID_RC_OK;
 }
 
-/* INTERNAL: generate UUID version 3: name based */
+/* INTERNAL: generate UUID version 3: name based with MD5 */
 static uuid_rc_t uuid_make_v3(uuid_t *uuid, unsigned int mode, va_list ap)
 {
     char *str;
@@ -909,6 +917,56 @@ static uuid_rc_t uuid_make_v4(uuid_t *uuid, unsigned int mode, va_list ap)
     return UUID_RC_OK;
 }
 
+/* INTERNAL: generate UUID version 5: name based with SHA-1 */
+static uuid_rc_t uuid_make_v5(uuid_t *uuid, unsigned int mode, va_list ap)
+{
+    char *str;
+    uuid_t *uuid_ns;
+    uuid_uint8_t uuid_buf[UUID_LEN_BIN];
+    void *uuid_ptr;
+    size_t uuid_len;
+    uuid_uint8_t sha1_buf[SHA1_LEN_BIN];
+    void *sha1_ptr;
+
+    /* determine namespace UUID and name string arguments */
+    if ((uuid_ns = (uuid_t *)va_arg(ap, void *)) == NULL)
+        return UUID_RC_ARG;
+    if ((str = (char *)va_arg(ap, char *)) == NULL)
+        return UUID_RC_ARG;
+
+    /* initialize SHA-1 context */
+    if (sha1_init(uuid->sha1) != MD5_RC_OK)
+        return UUID_RC_MEM;
+
+    /* load the namespace UUID into SHA-1 context */
+    uuid_ptr = (void *)&uuid_buf;
+    uuid_len = sizeof(uuid_buf);
+    uuid_export(uuid_ns, UUID_FMT_BIN, &uuid_ptr, &uuid_len);
+    sha1_update(uuid->sha1, uuid_buf, uuid_len);
+
+    /* load the argument name string into SHA-1 context */
+    sha1_update(uuid->sha1, str, strlen(str));
+
+    /* store SHA-1 result into UUID
+       (requires SHA1_LEN_BIN space, but UUID_LEN_BIN space is available
+       only, so use a temporary buffer to store SHA-1 results and then
+       use lower part only according to standard */
+    sha1_ptr = (void *)sha1_buf;
+    sha1_store(uuid->sha1, &sha1_ptr, NULL);
+    uuid_ptr = (void *)&(uuid->obj);
+    memcpy(uuid_ptr, sha1_ptr, UUID_LEN_BIN);
+
+    /* fulfill requirement of standard and convert UUID data into
+       local/host byte order (this uses fact that uuid_import_bin() is
+       able to operate in-place!) */
+    uuid_import(uuid, UUID_FMT_BIN, (void *)&(uuid->obj), UUID_LEN_BIN);
+
+    /* brand UUID with version and variant */
+    uuid_brand(uuid, 5);
+
+    return UUID_RC_OK;
+}
+
 /* generate UUID */
 uuid_rc_t uuid_make(uuid_t *uuid, unsigned int mode, ...)
 {
@@ -927,6 +985,8 @@ uuid_rc_t uuid_make(uuid_t *uuid, unsigned int mode, ...)
         rc = uuid_make_v3(uuid, mode, ap);
     else if (mode & UUID_MAKE_V4)
         rc = uuid_make_v4(uuid, mode, ap);
+    else if (mode & UUID_MAKE_V5)
+        rc = uuid_make_v5(uuid, mode, ap);
     else
         rc = UUID_RC_ARG;
     va_end(ap);

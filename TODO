@@ -14,8 +14,10 @@
   CANDO
   =====
 
+  - allow to re-create version 1 UUIDs by specifying time, etc.
+  - use MD5/SHA1 for further post-processing data in PRNG?
   - getopt_long support for CLI?
-  - a more sophisticated test suite?!
+  - a more sophisticated test suite with UUID references?!
   - more platform support in uuid_mac.c?!
   - global memory locking according to standard??
   - persistent/non-volatile state writing according to standard??

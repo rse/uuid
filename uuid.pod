@@ -43,7 +43,8 @@ B<OSSP uuid> is a ISO-C and Perl application programming interface (API)
 and corresponding command line interface (CLI) for the generation of DCE
 1.1 and ISO/IEC 11578:1996 compliant I<Universally Unique Identifier>
 (UUID). It supports DCE 1.1 variant UUIDs of version 1 (time and node
-based), version 3 (name based) and version 4 (random number based).
+based), version 3 (name based, MD5), version 4 (random number based) and
+version 5 (name based, SHA-1).
 
 UUIDs are 128 bit numbers which are intended to have a high likelihood
 of uniqueness over space and time and are computationally difficult
@@ -125,7 +126,7 @@ address can be either the real one of a physical network interface card
 (NIC) or a random multi-cast MAC address. Version 1 UUIDs are usually
 used as one-time global unique identifiers.
 
-=item B<Version 3> (name based)
+=item B<Version 3> (name based, MD5)
 
 These are UUIDs which are based on the 128-bit MD5 message digest of the
 concatenation of a 128-bit namespace UUID and a name string of arbitrary
@@ -136,6 +137,13 @@ message digest identifiers.
 
 These are UUIDs which are based on just 128-bit of random data. Version
 4 UUIDs are usually used as one-time local unique identifiers.
+
+=item B<Version 5> (name based, SHA-1)
+
+These are UUIDs which are based on the 160-bit SHA-1 message digest of the
+concatenation of a 128-bit namespace UUID and a name string of arbitrary
+length. Version 5 UUIDs are usually used for non-unique but repeatable
+message digest identifiers.
 
 =back
 
@@ -154,8 +162,9 @@ be unique in time. Just in case some part of the above goes wrong
 backward), there is a random clock sequence component placed into the
 UUID as a "catch-all" for uniqueness.
 
-Version 3 UUIDs are guaranteed to be inherently globally unique if the
-combination of namespace and name used to generate them is unique.
+Version 3 and version 5 UUIDs are guaranteed to be inherently globally
+unique if the combination of namespace and name used to generate them is
+unique.
 
 Version 4 UUIDs are not guaranteed to be globally unique, because they
 are generated out of locally gathered pseudo-random numbers only.
@@ -197,7 +206,7 @@ The number of octets of the UUID binary and string representations.
 Notice that the lengths of the string representation does I<not> include
 the necessary C<NUL> termination character.
 
-=item B<UUID_MAKE_V1>, B<UUID_MAKE_V3>, B<UUID_MAKE_V4>, B<UUID_MAKE_MC>
+=item B<UUID_MAKE_V1>, B<UUID_MAKE_V3>, B<UUID_MAKE_V4>, B<UUID_MAKE_V5>, B<UUID_MAKE_MC>
 
 The I<mode> bits for use with B<uuid_make>(). The B<UUID_MAKE_V>I<N>
 specify which UUID version to generate. The B<UUID_MAKE_MC> forces the
@@ -297,7 +306,7 @@ following I<name> arguments are currently known:
 =back
 
 The "C<ns:>I<XXX>" are names of pre-defined name-space UUIDs for use in
-the generation of DCE 1.1 version 3 UUIDs.
+the generation of DCE 1.1 version 3 and version 5 UUIDs.
 
 =item uuid_rc_t B<uuid_make>(uuid_t *I<uuid>, unsigned int I<mode>, ...);
 
@@ -310,14 +319,14 @@ the use of random multi-cast MAC address instead of the real physical
 MAC address (the default). The UUID is generated out of the 60-bit current
 system time, a 12-bit clock sequence and the 48-bit MAC address.
 
-If I<mode> contains the C<UUID_MAKE_V3> bit, a DCE 1.1 variant UUID
-of version 3 is generated and two additional C<NUL>-terminated string
-arguments of type "C<const char *>" are expected: first a namespace,
-given as an internally pre-defined id (currently known are ids "C<DNS>",
-"C<URL>", "C<OID>", and "C<X500>") or a UUID in string representation.
-Second, a name string of arbitrary length. The UUID is generated out of
-the 128-bit MD5 from the concatenated octet stream of namespace UUID and name
-string.
+If I<mode> contains the C<UUID_MAKE_V3> or C<UUID_MAKE_V5> bit, a DCE
+1.1 variant UUID of version 3 or 5 is generated and two additional
+C<NUL>-terminated string arguments of type "C<const char *>" are
+expected: first a namespace, given as an internally pre-defined id
+(currently known are ids "C<DNS>", "C<URL>", "C<OID>", and "C<X500>")
+or a UUID in string representation. Second, a name string of arbitrary
+length. The UUID is generated out of the 128-bit MD5 or 160-bit SHA-1
+from the concatenated octet stream of namespace UUID and name string.
 
 If I<mode> contains the C<UUID_MAKE_V4> bit, a DCE 1.1 variant UUID
 of version 4 is generated. The UUID is generated out of 128-bit random
@@ -400,10 +409,20 @@ http://www.opengroup.org/publications/catalog/c706.htm
 
 =item
 
-B<Information technology -- Open Systems Interconnection (OSI) -- Remote Procedure Call (RPC)>,
+Information technology -- Open Systems Interconnection (OSI),
+B<Remote Procedure Call (RPC)>,
 ISO/IEC 11578:1996,
 August 2001, 570 pages, (CHF 340,00),
 http://www.iso.ch/cate/d2229.html
+
+=item 
+
+Information technology -- Open Systems Interconnection (OSI),
+B<Procedures for the operation of OSI Registration Authorities:
+Generation and Registration of Universally Unique Identifiers (UUIDs)
+and their Use as ASN.1 Object Identifier Components>,
+ISO/IEC 9834-8:2004 / ITU-T Rec. X.667, 2004,
+December 2004, 25 pages.
 
 =item
 
@@ -417,9 +436,9 @@ http://www.ietf.org/rfc/rfc2518.txt
 
 B<A UUID URN Namespace>,
 P. Leach, M. Mealling, R. Salz,
-IETF Internet Draft draft-mealling-uuid-urn-02,
-January 2004, 31 pages,
-http://www.ietf.org/internet-drafts/draft-mealling-uuid-urn-03.txt
+IETF Internet Draft draft-mealling-uuid-urn-05,
+December 2004, 31 pages,
+http://www.ietf.org/internet-drafts/draft-mealling-uuid-urn-05.txt
 
 =item
 

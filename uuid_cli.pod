@@ -60,7 +60,8 @@ B<OSSP uuid> is a ISO-C and Perl application programming interface (API)
 and corresponding command line interface (CLI) for the generation of DCE
 1.1 and ISO/IEC 11578:1996 compliant I<Universally Unique Identifier>
 (UUID). It supports DCE 1.1 variant UUIDs of version 1 (time and node
-based), version 3 (name based) and version 4 (random number based).
+based), version 3 (name based, MD5), version 4 (random number based) and
+version 5 (name based, SHA-1).
 
 UUIDs are 128 bit numbers which are intended to have a high likelihood
 of uniqueness over space and time and are computationally difficult
@@ -81,14 +82,14 @@ programming interface (API) in uuid(3).
 =item B<-v> I<version>
 
 Sets the version of the generated DCE 1.1 variant UUID. Supported
-are I<version> "C<1>", "C<3>" and "C<4>". The default is "C<1>".
+are I<version> "C<1>", "C<3>", "C<4>" and "C<5>". The default is "C<1>".
 
-For version 3 UUIDs the additional command line arguments I<namespace>
-and I<name> have to be given. The I<namespace> is either a UUID in
-string representation or an identifier for internally pre-defined
-namespace UUIDs (currently known are "C<ns:DNS>", "C<ns:URL>",
-"C<ns:OID>", and "C<ns:X500>"). The I<name> is a string of arbitrary
-length.
+For version 3 and version 5 UUIDs the additional command line arguments
+I<namespace> and I<name> have to be given. The I<namespace> is either
+a UUID in string representation or an identifier for internally
+pre-defined namespace UUIDs (currently known are "C<ns:DNS>",
+"C<ns:URL>", "C<ns:OID>", and "C<ns:X500>"). The I<name> is a string of
+arbitrary length.
 
 =item B<-m>
 
@@ -104,7 +105,7 @@ Generate I<count> UUIDs instead of just a single one (the default).
 
 If option B<-n> is used with a I<count> greater than C<1>, then this
 option can enforce the reset the UUID context for each generated UUID.
-This makes no difference for I<version> C<3> and C<4> UUIDs. But
+This makes no difference for I<version> C<3>, C<4> and C<5> UUIDs. But
 version C<1> UUIDs are based on the previously generated UUID which is
 remembered in the UUID context of the API. Option B<-1> deletes the
 remembered UUID on each iteration.

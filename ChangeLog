@@ -11,6 +11,16 @@
   This is a list of all changes to OSSP uuid.
   For a more brief summary please have a look at the NEWS file.
 
+  Changes between 1.1.2 and 1.2.0 (13-Jan-2005 to 23-Jan-2005)
+
+   o Added support for new version 5 UUIDs (name-based, SHA-1)
+     according to latest draft-mealling-uuid-urn-05.txt.
+     [Ralf S. Engelschall]
+
+   o Reference new ISO/IEC 9834-8:2004 / ITU-T Rec. X.667 2004 standard
+     and latest IETF draft-mealling-uuid-urn-05.txt.
+     [Ralf S. Engelschall]
+
   Changes between 1.1.1 and 1.1.2 (18-Nov-2004 to 13-Jan-2005)
 
    o Fix generation of v3 UUIDs by adding support for 64-bit platforms

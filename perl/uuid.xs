@@ -57,6 +57,7 @@ constant(sv)
             { "UUID_MAKE_V1", UUID_MAKE_V1 },
             { "UUID_MAKE_V3", UUID_MAKE_V3 },
             { "UUID_MAKE_V4", UUID_MAKE_V4 },
+            { "UUID_MAKE_V5", UUID_MAKE_V5 },
             { "UUID_MAKE_MC", UUID_MAKE_MC },
             { "UUID_FMT_BIN", UUID_FMT_BIN },
             { "UUID_FMT_STR", UUID_FMT_STR },
@@ -126,11 +127,11 @@ uuid_make(uuid,mode,...)
         uuid_t *ns;
         const char *name;
     CODE:
-        if (mode & UUID_MAKE_V3) {
+        if ((mode & UUID_MAKE_V3) || (mode & UUID_MAKE_V5)) {
             if (items != 4)
-                croak("mode UUID_MAKE_V3 requires two additional arguments to uuid_make()");
+                croak("mode UUID_MAKE_V3/UUID_MAKE_V5 requires two additional arguments to uuid_make()");
 	        if (!SvROK(ST(2)))
-                croak("mode UUID_MAKE_V3 requires a UUID object as namespace");
+                croak("mode UUID_MAKE_V3/UUID_MAKE_V5 requires a UUID object as namespace");
             ns   = INT2PTR(uuid_t *, SvIV((SV*)SvRV(ST(2))));
             name = (const char *)SvPV_nolen(ST(3));
             RETVAL = uuid_make(uuid, mode, ns, name);

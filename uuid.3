@@ -129,19 +129,20 @@
 .\" ========================================================================
 .\"
 .IX Title ".::uuid 3"
-.TH .::uuid 3 "OSSP uuid 1.1.2" "13-Jan-2005" "Universally Unique Identifier"
+.TH .::uuid 3 "OSSP uuid 1.2.0" "23-Jan-2005" "Universally Unique Identifier"
 .SH "NAME"
 \&\fBOSSP uuid\fR \- \fBUniversally Unique Identifier\fR
 .SH "VERSION"
 .IX Header "VERSION"
-\&\s-1OSSP\s0 uuid \s-11.1.2 (13-Jan-2005)\s0
+\&\s-1OSSP\s0 uuid \s-11.2.0 (23-Jan-2005)\s0
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
 \&\fB\s-1OSSP\s0 uuid\fR is a ISO-C and Perl application programming interface (\s-1API\s0)
 and corresponding command line interface (\s-1CLI\s0) for the generation of \s-1DCE\s0
 1.1 and \s-1ISO/IEC\s0 11578:1996 compliant \fIUniversally Unique Identifier\fR
 (\s-1UUID\s0). It supports \s-1DCE\s0 1.1 variant UUIDs of version 1 (time and node
-based), version 3 (name based) and version 4 (random number based).
+based), version 3 (name based, \s-1MD5\s0), version 4 (random number based) and
+version 5 (name based, \s-1SHA\-1\s0).
 .PP
 UUIDs are 128 bit numbers which are intended to have a high likelihood
 of uniqueness over space and time and are computationally difficult
@@ -220,8 +221,8 @@ a 14\-bit local clock sequence and 48\-bit system \s-1MAC\s0 address. The \s-1MA
 address can be either the real one of a physical network interface card
 (\s-1NIC\s0) or a random multi-cast \s-1MAC\s0 address. Version 1 UUIDs are usually
 used as one-time global unique identifiers.
-.IP "\fBVersion 3\fR (name based)" 4
-.IX Item "Version 3 (name based)"
+.IP "\fBVersion 3\fR (name based, \s-1MD5\s0)" 4
+.IX Item "Version 3 (name based, MD5)"
 These are UUIDs which are based on the 128\-bit \s-1MD5\s0 message digest of the
 concatenation of a 128\-bit namespace \s-1UUID\s0 and a name string of arbitrary
 length. Version 3 UUIDs are usually used for non-unique but repeatable
@@ -230,6 +231,12 @@ message digest identifiers.
 .IX Item "Version 4 (random data based)"
 These are UUIDs which are based on just 128\-bit of random data. Version
 4 UUIDs are usually used as one-time local unique identifiers.
+.IP "\fBVersion 5\fR (name based, \s-1SHA\-1\s0)" 4
+.IX Item "Version 5 (name based, SHA-1)"
+These are UUIDs which are based on the 160\-bit \s-1SHA\-1\s0 message digest of the
+concatenation of a 128\-bit namespace \s-1UUID\s0 and a name string of arbitrary
+length. Version 5 UUIDs are usually used for non-unique but repeatable
+message digest identifiers.
 .Sh "\s-1UUID\s0 Uniqueness"
 .IX Subsection "UUID Uniqueness"
 Version 1 UUIDs are guaranteed to be unique through combinations of
@@ -245,8 +252,9 @@ be unique in time. Just in case some part of the above goes wrong
 backward), there is a random clock sequence component placed into the
 \&\s-1UUID\s0 as a \*(L"catch\-all\*(R" for uniqueness.
 .PP
-Version 3 UUIDs are guaranteed to be inherently globally unique if the
-combination of namespace and name used to generate them is unique.
+Version 3 and version 5 UUIDs are guaranteed to be inherently globally
+unique if the combination of namespace and name used to generate them is
+unique.
 .PP
 Version 4 UUIDs are not guaranteed to be globally unique, because they
 are generated out of locally gathered pseudo-random numbers only.
@@ -280,8 +288,8 @@ i.e., the version 0.9.6 is encoded as \*(R"0x009206".
 The number of octets of the \s-1UUID\s0 binary and string representations.
 Notice that the lengths of the string representation does \fInot\fR include
 the necessary \f(CW\*(C`NUL\*(C'\fR termination character.
-.IP "\fB\s-1UUID_MAKE_V1\s0\fR, \fB\s-1UUID_MAKE_V3\s0\fR, \fB\s-1UUID_MAKE_V4\s0\fR, \fB\s-1UUID_MAKE_MC\s0\fR" 4
-.IX Item "UUID_MAKE_V1, UUID_MAKE_V3, UUID_MAKE_V4, UUID_MAKE_MC"
+.IP "\fB\s-1UUID_MAKE_V1\s0\fR, \fB\s-1UUID_MAKE_V3\s0\fR, \fB\s-1UUID_MAKE_V4\s0\fR, \fB\s-1UUID_MAKE_V5\s0\fR, \fB\s-1UUID_MAKE_MC\s0\fR" 4
+.IX Item "UUID_MAKE_V1, UUID_MAKE_V3, UUID_MAKE_V4, UUID_MAKE_V5, UUID_MAKE_MC"
 The \fImode\fR bits for use with \fBuuid_make\fR(). The \fB\s-1UUID_MAKE_V\s0\fR\fIN\fR
 specify which \s-1UUID\s0 version to generate. The \fB\s-1UUID_MAKE_MC\s0\fR forces the
 use of a random multi-cast \s-1MAC\s0 address instead of the real physical \s-1MAC\s0
@@ -367,7 +375,7 @@ following \fIname\fR arguments are currently known:
 .PD
 .Sp
 The "\f(CW\*(C`ns:\*(C'\fR\fI\s-1XXX\s0\fR" are names of pre-defined name-space UUIDs for use in
-the generation of \s-1DCE\s0 1.1 version 3 UUIDs.
+the generation of \s-1DCE\s0 1.1 version 3 and version 5 UUIDs.
 .RE
 .IP "uuid_rc_t \fBuuid_make\fR(uuid_t *\fIuuid\fR, unsigned int \fImode\fR, ...);" 4
 .IX Item "uuid_rc_t uuid_make(uuid_t *uuid, unsigned int mode, ...);"
@@ -380,14 +388,14 @@ the use of random multi-cast \s-1MAC\s0 address instead of the real physical
 \&\s-1MAC\s0 address (the default). The \s-1UUID\s0 is generated out of the 60\-bit current
 system time, a 12\-bit clock sequence and the 48\-bit \s-1MAC\s0 address.
 .Sp
-If \fImode\fR contains the \f(CW\*(C`UUID_MAKE_V3\*(C'\fR bit, a \s-1DCE\s0 1.1 variant \s-1UUID\s0
-of version 3 is generated and two additional \f(CW\*(C`NUL\*(C'\fR\-terminated string
-arguments of type "\f(CW\*(C`const char *\*(C'\fR\*(L" are expected: first a namespace,
-given as an internally pre-defined id (currently known are ids \*(R"\f(CW\*(C`DNS\*(C'\fR\*(L",
-\&\*(R"\f(CW\*(C`URL\*(C'\fR\*(L", \*(R"\f(CW\*(C`OID\*(C'\fR\*(L", and \*(R"\f(CW\*(C`X500\*(C'\fR") or a \s-1UUID\s0 in string representation.
-Second, a name string of arbitrary length. The \s-1UUID\s0 is generated out of
-the 128\-bit \s-1MD5\s0 from the concatenated octet stream of namespace \s-1UUID\s0 and name
-string.
+If \fImode\fR contains the \f(CW\*(C`UUID_MAKE_V3\*(C'\fR or \f(CW\*(C`UUID_MAKE_V5\*(C'\fR bit, a \s-1DCE\s0
+1.1 variant \s-1UUID\s0 of version 3 or 5 is generated and two additional
+\&\f(CW\*(C`NUL\*(C'\fR\-terminated string arguments of type "\f(CW\*(C`const char *\*(C'\fR\*(L" are
+expected: first a namespace, given as an internally pre-defined id
+(currently known are ids \*(R"\f(CW\*(C`DNS\*(C'\fR\*(L", \*(R"\f(CW\*(C`URL\*(C'\fR\*(L", \*(R"\f(CW\*(C`OID\*(C'\fR\*(L", and \*(R"\f(CW\*(C`X500\*(C'\fR")
+or a \s-1UUID\s0 in string representation. Second, a name string of arbitrary
+length. The \s-1UUID\s0 is generated out of the 128\-bit \s-1MD5\s0 or 160\-bit \s-1SHA\-1\s0
+from the concatenated octet stream of namespace \s-1UUID\s0 and name string.
 .Sp
 If \fImode\fR contains the \f(CW\*(C`UUID_MAKE_V4\*(C'\fR bit, a \s-1DCE\s0 1.1 variant \s-1UUID\s0
 of version 4 is generated. The \s-1UUID\s0 is generated out of 128\-bit random
@@ -464,10 +472,18 @@ Document Number C706, August 1997, 737 pages,
 which was basis for \s-1ISO/IEC\s0 11578:1996 specification),
 http://www.opengroup.org/publications/catalog/c706.htm
 .IP "\(bu" 4
-\&\fBInformation technology \*(-- Open Systems Interconnection (\s-1OSI\s0) \*(-- Remote Procedure Call (\s-1RPC\s0)\fR,
+Information technology \*(-- Open Systems Interconnection (\s-1OSI\s0),
+\&\fBRemote Procedure Call (\s-1RPC\s0)\fR,
 \&\s-1ISO/IEC\s0 11578:1996,
 August 2001, 570 pages, (\s-1CHF\s0 340,00),
 http://www.iso.ch/cate/d2229.html
+.IP "\(bu" 4
+Information technology \*(-- Open Systems Interconnection (\s-1OSI\s0),
+\&\fBProcedures for the operation of \s-1OSI\s0 Registration Authorities:
+Generation and Registration of Universally Unique Identifiers (UUIDs)
+and their Use as \s-1ASN\s0.1 Object Identifier Components\fR,
+\&\s-1ISO/IEC\s0 9834\-8:2004 / ITU-T Rec. X.667, 2004,
+December 2004, 25 pages.
 .IP "\(bu" 4
 \&\fB\s-1HTTP\s0 Extensions for Distributed Authoring (WebDAV)\fR,
 section \fB6.4.1 Node Field Generation Without the \s-1IEEE\s0 802 Address\fR,
@@ -477,9 +493,9 @@ http://www.ietf.org/rfc/rfc2518.txt
 .IP "\(bu" 4
 \&\fBA \s-1UUID\s0 \s-1URN\s0 Namespace\fR,
 P. Leach, M. Mealling, R. Salz,
-\&\s-1IETF\s0 Internet Draft draft\-mealling\-uuid\-urn\-02,
-January 2004, 31 pages,
-http://www.ietf.org/internet\-drafts/draft\-mealling\-uuid\-urn\-03.txt
+\&\s-1IETF\s0 Internet Draft draft\-mealling\-uuid\-urn\-05,
+December 2004, 31 pages,
+http://www.ietf.org/internet\-drafts/draft\-mealling\-uuid\-urn\-05.txt
 .IP "\(bu" 4
 \&\fB\s-1DCE\s0 1.1 compliant \s-1UUID\s0 functions\fR,
 FreeBSD manual pages \fIuuid\fR\|(3) and \fIuuidgen\fR\|(2),

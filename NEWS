@@ -11,5 +11,10 @@
   This is a list of major changes to OSSP uuid. For more detailed
   change descriptions, please have a look at the ChangeLog file.
 
-  -NONE-
+  Changes between 1.1 and 1.2
+    o Added support for version 5 UUIDs (name-based, SHA-1)
+  Changes between 1.0 and 1.1
+    o Added Perl API
+  Changes between 0.9 and 1.0
+    o Initial functionality
 

@@ -5,7 +5,7 @@
   |_|_|_|  \___/|____/____/|_|      \__,_|\__,_|_|\__,_|
 
   OSSP uuid - Universally Unique Identifier
-  Version 1.1.2 (13-Jan-2005)
+  Version 1.2.0 (23-Jan-2005)
 
   ABSTRACT
 
@@ -13,7 +13,8 @@
   and corresponding command line interface (CLI) for the generation of
   DCE 1.1 and ISO/IEC 11578:1996 compliant Universally Unique Identifier
   (UUID). It supports DCE 1.1 variant UUIDs of version 1 (time and node
-  based), version 3 (name based) and version 4 (random number based).
+  based), version 3 (name based, MD5), version 4 (random number based)
+  and version 5 (name based, SHA-1).
 
   UUIDs are 128 bit numbers which are intended to have a high likelihood
   of uniqueness over space and time and are computationally difficult

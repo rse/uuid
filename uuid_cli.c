@@ -62,7 +62,7 @@ usage(const char *str, ...)
         vfprintf(stderr, str, ap);
         fprintf(stderr, "\n");
     }
-    fprintf(stderr, "usage: uuid [-v version] [-m] [-n count] [-1] [-r] [-o filename] [namespace-name]\n");
+    fprintf(stderr, "usage: uuid [-v version] [-m] [-n count] [-1] [-r] [-o filename] [namespace name]\n");
     fprintf(stderr, "usage: uuid -d [-r] [-o filename] [uuid]\n");
     va_end(ap);
     exit(1);
@@ -130,6 +130,7 @@ int main(int argc, char *argv[])
                     case 1: version = UUID_MAKE_V1; break;;
                     case 3: version = UUID_MAKE_V3; break;;
                     case 4: version = UUID_MAKE_V4; break;;
+                    case 5: version = UUID_MAKE_V5; break;;
                     default:
                         usage("invalid version on option 'v'");
                         break;
@@ -188,7 +189,8 @@ int main(int argc, char *argv[])
         /* encoding */
         if (   (version == UUID_MAKE_V1 && argc != 0)
             || (version == UUID_MAKE_V3 && argc != 2)
-            || (version == UUID_MAKE_V4 && argc != 0))
+            || (version == UUID_MAKE_V4 && argc != 0)
+            || (version == UUID_MAKE_V5 && argc != 2))
             usage("invalid number of arguments");
         if ((rc = uuid_create(&uuid)) != UUID_RC_OK)
             error(1, "uuid_create: %s", uuid_error(rc));
@@ -204,7 +206,7 @@ int main(int argc, char *argv[])
                 if ((rc = uuid_load(uuid, "nil")) != UUID_RC_OK)
                     error(1, "uuid_load: %s", uuid_error(rc));
             }
-            if (version == UUID_MAKE_V3) {
+            if (version == UUID_MAKE_V3 || version == UUID_MAKE_V5) {
                 if ((rc = uuid_create(&uuid_ns)) != UUID_RC_OK)
                     error(1, "uuid_create: %s", uuid_error(rc));
                 if ((rc = uuid_load(uuid_ns, argv[0])) != UUID_RC_OK) {
