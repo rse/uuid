@@ -1,7 +1,7 @@
 ##
 ##  OSSP uuid - Universally Unique Identifier
-##  Copyright (c) 2004 Ralf S. Engelschall <rse@engelschall.com>
-##  Copyright (c) 2004 The OSSP Project <http://www.ossp.org/>
+##  Copyright (c) 2004-2005 Ralf S. Engelschall <rse@engelschall.com>
+##  Copyright (c) 2004-2005 The OSSP Project <http://www.ossp.org/>
 ##
 ##  This file is part of OSSP uuid, a library for the generation
 ##  of UUIDs which can found at http://www.ossp.org/pkg/lib/uuid/
@@ -98,6 +98,7 @@ $(PRG_NAME): $(PRG_OBJS) $(LIB_NAME)
 
 $(PERL_NAME): $(PERL_OBJS) $(LIB_NAME)
 	@cd perl && $(PERL) Makefile.PL PREFIX=$(prefix) && $(MAKE) $(MFLAGS) all
+	@touch $(PERL_NAME)
 
 uuid.lo: uuid.c config.h uuid.h uuid_md5.h uuid_prng.h uuid_mac.h uuid_ui64.h uuid_str.h uuid_bm.h uuid_ac.h
 uuid_mac.lo: uuid_mac.c config.h uuid_mac.h

@@ -1,7 +1,7 @@
 /*
 **  OSSP uuid - Universally Unique Identifier
-**  Copyright (c) 2004 Ralf S. Engelschall <rse@engelschall.com>
-**  Copyright (c) 2004 The OSSP Project <http://www.ossp.org/>
+**  Copyright (c) 2004-2005 Ralf S. Engelschall <rse@engelschall.com>
+**  Copyright (c) 2004-2005 The OSSP Project <http://www.ossp.org/>
 **
 **  This file is part of OSSP uuid, a library for the generation
 **  of UUIDs which can found at http://www.ossp.org/pkg/lib/uuid/
@@ -105,7 +105,7 @@ int mac_address(unsigned char *data_ptr, size_t data_len)
             return FALSE;
         for (ifap = ifap_head; ifap != NULL; ifap = ifap->ifa_next) {
             if (ifap->ifa_addr != NULL && ifap->ifa_addr->sa_family == AF_LINK) {
-                sdl = (const struct sockaddr_dl *)ifap->ifa_addr;
+                sdl = (const struct sockaddr_dl *)(void *)ifap->ifa_addr;
                 ucp = (unsigned char *)(sdl->sdl_data + sdl->sdl_nlen);
                 if (ucp != NULL && sdl->sdl_alen > 0) {
                     for (i = 0; i < MAC_LEN && i < sdl->sdl_alen; i++, ucp++)

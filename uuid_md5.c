@@ -1,7 +1,7 @@
 /*
 **  OSSP uuid - Universally Unique Identifier
-**  Copyright (c) 2004 Ralf S. Engelschall <rse@engelschall.com>
-**  Copyright (c) 2004 The OSSP Project <http://www.ossp.org/>
+**  Copyright (c) 2004-2005 Ralf S. Engelschall <rse@engelschall.com>
+**  Copyright (c) 2004-2005 The OSSP Project <http://www.ossp.org/>
 **
 **  This file is part of OSSP uuid, a library for the generation
 **  of UUIDs which can found at http://www.ossp.org/pkg/lib/uuid/
@@ -30,6 +30,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "config.h"
 #include "uuid_md5.h"
 
 /*
@@ -77,10 +78,28 @@
 typedef unsigned char *POINTER;
 
 /* UINT2 defines a two byte word */
+#if SIZEOF_UNSIGNED_SHORT   == 2
 typedef unsigned short int UINT2;
+#elif SIZEOF_UNSIGNED_INT   == 2
+typedef unsigned int       UINT2;
+#elif SIZEOF_UNSIGNED_LONG  == 2
+typedef unsigned long int  UINT2;
+#else
+#error ERROR: unable to determine UINT2 type (two byte word)
+#endif
 
 /* UINT4 defines a four byte word */
-typedef unsigned long int UINT4;
+#if SIZEOF_UNSIGNED_SHORT       == 4
+typedef unsigned short int     UINT4;
+#elif SIZEOF_UNSIGNED_INT       == 4
+typedef unsigned int           UINT4;
+#elif SIZEOF_UNSIGNED_LONG      == 4
+typedef unsigned long int      UINT4;
+#elif SIZEOF_UNSIGNED_LONG_LONG == 4
+typedef unsigned long long int UINT4;
+#else
+#error ERROR: unable to determine UINT4 type (four byte word)
+#endif
 
 /* MD5 context. */
 typedef struct {
@@ -89,14 +108,15 @@ typedef struct {
   unsigned char buffer[64];                         /* input buffer */
 } MD5_CTX;
 
+/* prototypes for internal functions */
 static void MD5Init      (MD5_CTX *_ctx);
 static void MD5Update    (MD5_CTX *_ctx, unsigned char *, unsigned int);
 static void MD5Final     (unsigned char [16], MD5_CTX *);
-
 static void MD5Transform (UINT4 [4], unsigned char [64]);
 static void Encode       (unsigned char *, UINT4 *, unsigned int);
 static void Decode       (UINT4 *, unsigned char *, unsigned int);
 
+/* finalization padding */
 static unsigned char PADDING[64] = {
   0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -207,7 +227,7 @@ static void MD5Final(
     Encode(digest, context->state, 16);
 
     /* Zeroize sensitive information. */
-    memset((POINTER)context, 0, sizeof (*context));
+    memset((POINTER)context, '\0', sizeof (*context));
 }
 
 /* MD5 basic transformation. Transforms state based on block. */
@@ -313,7 +333,7 @@ static void MD5Transform(
     state[3] += d;
 
     /* Zeroize sensitive information. */
-    memset((POINTER)x, 0, sizeof (x));
+    memset((POINTER)x, '\0', sizeof (x));
 }
 
 /* Encodes input (UINT4) into output (unsigned char).
@@ -403,8 +423,7 @@ md5_rc_t md5_store(md5_t *md5, void **data_ptr, size_t *data_len)
         }
     }
     memcpy((void *)(&ctx), (void *)(&(md5->ctx)), sizeof(MD5_CTX));
-    MD5Final((unsigned char *)(*data_ptr), &(md5->ctx));
-    memcpy((void *)(&(md5->ctx)), (void *)(&ctx), sizeof(MD5_CTX));
+    MD5Final((unsigned char *)(*data_ptr), &(ctx));
     return MD5_RC_OK;
 }
 

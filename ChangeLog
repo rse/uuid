@@ -11,6 +11,24 @@
   This is a list of all changes to OSSP uuid.
   For a more brief summary please have a look at the NEWS file.
 
+  Changes between 1.1.1 and 1.1.2 (18-Nov-2004 to 13-Jan-2005)
+
+   o Fix generation of v3 UUIDs by adding support for 64-bit platforms
+     to the underlying uuid_md5.c code (which internally is based on
+     the RFC reference code which in turn assumes a 32-bit environment).
+     [Ralf S. Engelschall, Piotr Roszatycki <Piotr_Roszatycki@netia.net.pl>]
+
+   o Optimize internal md5_store() function by directly finalizing MD5
+     calculation on buffer copy instead of finalizing original buffer
+     and having to restore it from the buffer copy.
+     [Ralf S. Engelschall]
+
+   o Adjust copyright messages for new year 2005.
+     [Ralf S. Engelschall]
+
+   o Do not rebuild the Perl API if there were no actual changes.
+     [Ralf S. Engelschall]
+
   Changes between 1.1.0 and 1.1.1 (03-Nov-2004 to 18-Nov-2004)
 
    o Apply the FreeBSD libc uuid_create() related workaround
