@@ -129,13 +129,14 @@
 .\" ========================================================================
 .\"
 .IX Title "UUID 1"
-.TH UUID 1 "OSSP uuid 0.9.0" "10-Jan-2004" "Universally Unique Identifiers"
+.TH UUID 1 "OSSP uuid 0.9.1" "13-Jan-2004" "Universally Unique Identifier"
 .SH "NAME"
 \&\fBOSSP uuid\fR \- \fBUniversally Unique Identifier Command\-Line Tool\fR
 .SH "SYNOPSIS"
 .IX Header "SYNOPSIS"
 \&\fBuuid\fR
 [\fB\-v\fR \fIversion\fR]
+[\fB\-m\fR]
 [\fB\-n\fR \fIcount\fR]
 [\fB\-1\fR]
 [\fB\-r\fR]
@@ -151,20 +152,38 @@
 .IX Header "DESCRIPTION"
 \&\fB\s-1OSSP\s0 uuid\fR is a ISO-C application programming interface (\s-1API\s0) and
 corresponding command line interface (\s-1CLI\s0) for the generation of \s-1DCE\s0
-1.1 and \s-1ISO/IEC\s0 11578:1996 compliant \fIUniversally Unique Identifiers\fR
+1.1 and \s-1ISO/IEC\s0 11578:1996 compliant \fIUniversally Unique Identifier\fR
 (\s-1UUID\s0). It supports \s-1DCE\s0 1.1 variant UUIDs of version 1 (time and node
 based), version 3 (name based) and version 4 (random number based).
 .PP
-This is the command line interface (\s-1CLI\s0). For a brief overview of UUIDs
-see the documentation of the application programming interface (\s-1API\s0) in
-\&\fIuuid\fR\|(3).
+UUIDs are 128 bit numbers which are intended to have a high likelihood
+of uniqueness over space and time and are computationally difficult
+to guess. They are globally unique identifiers which can be locally
+generated without contacting a global registration authority. UUIDs
+are intended as unique identifiers for both mass tagging objects
+with an extremely short lifetime and to reliably identifying very
+persistent objects across a network.
+.PP
+This is the command line interface (\s-1CLI\s0) of \fB\s-1OSSP\s0 uuid\fR. For a
+detailed description of UUIDs see the documentation of the application
+programming interface (\s-1API\s0) in \fIuuid\fR\|(3).
 .SH "OPTIONS"
 .IX Header "OPTIONS"
 .IP "\fB\-v\fR \fIversion\fR" 3
 .IX Item "-v version"
-Sets the version of the generated \s-1DCE\s0 1.1 variant \s-1UUID\s0.
-Supported are \fIversion\fR "\f(CW1\fR\*(L", \*(R"\f(CW3\fR\*(L" and \*(R"\f(CW4\fR\*(L".
-The default is \*(R"\f(CW1\fR".
+Sets the version of the generated \s-1DCE\s0 1.1 variant \s-1UUID\s0. Supported
+are \fIversion\fR "\f(CW1\fR\*(L", \*(R"\f(CW3\fR\*(L" and \*(R"\f(CW4\fR\*(L". The default is \*(R"\f(CW1\fR".
+.Sp
+For version 3 UUIDs the additional command line arguments \fInamespace\fR
+and \fIname\fR have to be given. The \fInamespace\fR is either a \s-1UUID\s0 in
+string representation or an identifier for internally pre-defined
+namespace UUIDs (currently known are "\f(CW\*(C`DNS\*(C'\fR\*(L", \*(R"\f(CW\*(C`URL\*(C'\fR\*(L", \*(R"\f(CW\*(C`OID\*(C'\fR\*(L", and
+\&\*(R"\f(CW\*(C`X500\*(C'\fR"). The \fIname\fR is a string of arbitrary length.
+.IP "\fB\-m\fR" 3
+.IX Item "-m"
+Forces the use of a random multi-cast \s-1MAC\s0 address when generating
+version 1 UUIDs. By default the real physical \s-1MAC\s0 address of the system
+is used.
 .IP "\fB\-n\fR \fIcount\fR" 3
 .IX Item "-n count"
 Generate \fIcount\fR UUIDs instead of just a single one (the default).

@@ -24,31 +24,40 @@
 **  OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 **  SUCH DAMAGE.
 **
-**  uuid_mac.h: Media Access Control (MAC) resolver API definition
+**  uuid_str.h: string formatting functions
 */
 
-#ifndef __UUID_MAC_H__
-#define __UUID_MAC_H__
+#ifndef __UUID_STR_H__
+#define __UUID_STR_H__
 
-#include <string.h> /* size_t */
+#include <stdarg.h>
+#include <string.h>
 
-#define MAC_PREFIX uuid_
+#define STR_PREFIX uuid_
 
 /* embedding support */
-#ifdef MAC_PREFIX
+#ifdef STR_PREFIX
 #if defined(__STDC__) || defined(__cplusplus)
-#define __MAC_CONCAT(x,y) x ## y
-#define MAC_CONCAT(x,y) __MAC_CONCAT(x,y)
+#define __STR_CONCAT(x,y) x ## y
+#define STR_CONCAT(x,y) __STR_CONCAT(x,y)
 #else
-#define __MAC_CONCAT(x) x
-#define MAC_CONCAT(x,y) __MAC_CONCAT(x)y
+#define __STR_CONCAT(x) x
+#define STR_CONCAT(x,y) __STR_CONCAT(x)y
 #endif
-#define mac_address MAC_CONCAT(MAC_PREFIX,mac_create)
+#define str_vsnprintf  STR_CONCAT(STR_PREFIX,str_vsnprintf)
+#define str_snprintf   STR_CONCAT(STR_PREFIX,str_snprintf)
+#define str_vrsprintf  STR_CONCAT(STR_PREFIX,str_vrsprintf)
+#define str_rsprintf   STR_CONCAT(STR_PREFIX,str_rsprintf)
+#define str_vasprintf  STR_CONCAT(STR_PREFIX,str_vasprintf)
+#define str_asprintf   STR_CONCAT(STR_PREFIX,str_asprintf)
 #endif
 
-#define MAC_LEN 6
+extern int   str_vsnprintf (char  *, size_t, const char *, va_list);
+extern int   str_snprintf  (char  *, size_t, const char *, ...);
+extern int   str_vrsprintf (char **,         const char *, va_list);
+extern int   str_rsprintf  (char **,         const char *, ...);
+extern char *str_vasprintf (                 const char *, va_list);
+extern char *str_asprintf  (                 const char *, ...);
 
-extern int mac_address(unsigned char *data_ptr, size_t data_len);
-
-#endif /* __UUID_MAC_H__ */
+#endif /* __UUID_STR_H__ */
 

@@ -129,97 +129,213 @@
 .\" ========================================================================
 .\"
 .IX Title "uuid 3"
-.TH uuid 3 "OSSP uuid 0.9.0" "10-Jan-2004" "Universally Unique Identifiers"
+.TH uuid 3 "OSSP uuid 0.9.0" "11-Jan-2004" "Universally Unique Identifier"
 .SH "NAME"
 \&\fBOSSP uuid\fR \- \fBUniversally Unique Identifier\fR
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
 \&\fB\s-1OSSP\s0 uuid\fR is a ISO-C application programming interface (\s-1API\s0) and
 corresponding command line interface (\s-1CLI\s0) for the generation of \s-1DCE\s0
-1.1 and \s-1ISO/IEC\s0 11578:1996 compliant \fIUniversally Unique Identifiers\fR
+1.1 and \s-1ISO/IEC\s0 11578:1996 compliant \fIUniversally Unique Identifier\fR
 (\s-1UUID\s0). It supports \s-1DCE\s0 1.1 variant UUIDs of version 1 (time and node
 based), version 3 (name based) and version 4 (random number based).
-.PP
-This is the ISO-C application programming interface (\s-1API\s0).
-.Sh "Overview"
-.IX Subsection "Overview"
-\&\fB\s-1UUID\s0\fR stands for \fBU\fRniversal \fBU\fRnique \fB\s-1ID\s0\fRentifier (aka \fB\s-1GUID\s0\fR
-which stands for \fBG\fRlobally \fBU\fRnique \fB\s-1ID\s0\fRentifier). \fB\s-1UUID\s0\fRs are 128
-bit numbers assigned to any object and which are intended to have a high
-likelihood of uniqueness over space and time and are computationally
-difficult to guess.
 .PP
 UUIDs are 128 bit numbers which are intended to have a high likelihood
 of uniqueness over space and time and are computationally difficult
 to guess. They are globally unique identifiers which can be locally
-generated without contacting a global registration authority. UUIDs are
-intended as unique identifiers for both mass tagging objects with an
-extremely short lifetime and to reliably identifying very persistent
-objects across a network.
+generated without contacting a global registration authority. UUIDs
+are intended as unique identifiers for both mass tagging objects
+with an extremely short lifetime and to reliably identifying very
+persistent objects across a network.
 .PP
-A \fB\s-1UUID\s0\fR is usually encoded using the \s-1ASCII\s0 character string
-representation described in \s-1ISO/IEC\s0 11578:1996: a string
-consisting of 8 hexadecimal digits followed by a hyphen,
-then three groups of 4 hexadecimal digits each followed by a
-hyphen, then 12 hexadecimal digits. An example of a \fB\s-1UUID\s0\fR is
-"\f(CW\*(C`54531d28\-402b\-11d8\-af12\-0002a5094c23\*(C'\fR".
-.Sh "Uniqueness"
-.IX Subsection "Uniqueness"
-The mechanism used to guarantee that \fB\s-1UUID\s0\fRs are unique is
-through combinations of hardware addresses, time stamps and random
-seeds.
+This is the ISO-C application programming interface (\s-1API\s0) of \fB\s-1OSSP\s0 uuid\fR.
+.Sh "\s-1UUID\s0 Binary Representation"
+.IX Subsection "UUID Binary Representation"
+According to the \s-1DCE\s0 1.1 and \s-1ISO/IEC\s0 11578:1996 standards, a \s-1DCE\s0 1.1
+variant \s-1UUID\s0 is a 128 bit number defined out of 7 fields, each field a
+multiple of an octet in size and stored in network byte order:
 .PP
-There is a reference in the \fB\s-1UUID\s0\fR to the hardware (\s-1MAC\s0) address of
-the first network interface card (\s-1NIC\s0) on the host which generated the
-\&\fB\s-1UUID\s0\fR \*(-- this reference is intended to ensure the \fB\s-1UUID\s0\fR will be
-unique in space as the \s-1MAC\s0 address of every network card is assigned by
-a single global authority (\s-1IEEE\s0) and is guaranteed to be unique.
+.Vb 11
+\&  0                   1                   2                   3
+\&   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+\&  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+\& 0|                          time_low                             |
+\&  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+\& 1|       time_mid                |         time_hi_and_version   |
+\&  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+\& 2|clk_seq_hi_res |  clk_seq_low  |         node (0-1)            |
+\&  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+\& 3|                         node (2-5)                            |
+\&  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.Ve
 .PP
-The next component in a \fB\s-1UUID\s0\fR is a timestamp which, as clock always
-(should) move forward, will be unique in time.
+An example of a \s-1UUID\s0 binary representation is the octet stream "\f(CW\*(C`0xEC
+0xB9 0xF3 0x5F 0x44 0x2A 0x11 0xD8 0x8A 0x24 0x00 0x90 0x27 0x2F 0xF7
+0x25\*(C'\fR". The binary representation format is exactly what the \fB\s-1OSSP\s0 uuid\fR
+\&\s-1API\s0 functions \fBuuid_pack\fR() and \fBuuid_unpack\fR() deal with.
+.Sh "\s-1UUID\s0 \s-1ASCII\s0 String Representation"
+.IX Subsection "UUID ASCII String Representation"
+According to the \s-1DCE\s0 1.1 and \s-1ISO/IEC\s0 11578:1996 standards, a \s-1DCE\s0
+1.1 variant \s-1UUID\s0 is represented as an \s-1ASCII\s0 string consisting
+of 8 hexadecimal digits followed by a hyphen, then three groups
+of 4 hexadecimal digits each followed by a hyphen, then 12
+hexadecimal digits. Formally, the string representation is defined by
+the following grammar:
 .PP
-Just in case some part of the above goes wrong (the hardware address
-cannot be determined or the clock moved a step backward), there is
-a random component placed into the \fB\s-1UUID\s0\fR as a \*(L"catch\-all\*(R" for
-uniqueness.
+.Vb 14
+\& uuid                   = <time_low> "-" <time_mid> "-"
+\&                          <time_high_and_version> "-"
+\&                          <clock_seq_and_reserved>
+\&                          <clock_seq_low> "-" <node>
+\& time_low               = 4*<hexOctet>
+\& time_mid               = 2*<hexOctet>
+\& time_high_and_version  = 2*<hexOctet>
+\& clock_seq_and_reserved = <hexOctet>
+\& clock_seq_low          = <hexOctet>
+\& node                   = 6*<hexOctet>
+\& hexOctet               = <hexDigit> <hexDigit>
+\& hexDigit =               "0"|"1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"
+\&                         |"a"|"b"|"c"|"d"|"e"|"f"
+\&                         |"A"|"B"|"C"|"D"|"E"|"F"
+.Ve
+.PP
+An example of a \s-1UUID\s0 string representation is the \s-1ASCII\s0 string
+"\f(CW\*(C`54531d28\-402b\-11d8\-af12\-0002a5094c23\*(C'\fR". The string representation
+format is exactly what the \fB\s-1OSSP\s0 uuid\fR \s-1API\s0 functions \fBuuid_parse\fR() and
+\&\fBuuid_format\fR() deal with.
+.Sh "\s-1UUID\s0 Variants and Versions"
+.IX Subsection "UUID Variants and Versions"
+A \s-1UUID\s0 has a variant and version. The variant defines the layout of the
+\&\s-1UUID\s0. The version defines the content of the \s-1UUID\s0. The \s-1UUID\s0 variant
+supported in \fB\s-1OSSP\s0 uuid\fR is the \s-1DCE\s0 1.1 variant only. The \s-1DCE\s0 1.1 \s-1UUID\s0
+variant versions supported in \fB\s-1OSSP\s0 uuid\fR are version 1 (time and node
+based), version 3 (name based) and version 4 (random data based).
+.Sh "\s-1UUID\s0 Uniqueness"
+.IX Subsection "UUID Uniqueness"
+Version 1 UUIDs are guaranteed to be unique through combinations of
+hardware addresses, time stamps and random seeds. There is a reference
+in the \s-1UUID\s0 to the hardware (\s-1MAC\s0) address of the first network interface
+card (\s-1NIC\s0) on the host which generated the \s-1UUID\s0 \*(-- this reference
+is intended to ensure the \s-1UUID\s0 will be unique in space as the \s-1MAC\s0
+address of every network card is assigned by a single global authority
+(\s-1IEEE\s0) and is guaranteed to be unique. The next component in a \s-1UUID\s0
+is a timestamp which, as clock always (should) move forward, will
+be unique in time. Just in case some part of the above goes wrong
+(the hardware address cannot be determined or the clock moved steps
+backward), there is a random clock sequence component placed into the
+\&\s-1UUID\s0 as a \*(L"catch\-all\*(R" for uniqueness.
+.PP
+Version 3 UUIDs are guaranteed to be inherently globally unique if the
+combination of namespace and name used to generate them is unique.
+.PP
+Version 4 UUIDs are not guaranteed to be globally unique, because they
+are generated out of locally gathered pseudo-random numbers only.
+Nevertheless there is still a high likelihood of uniqueness over space
+and time and that they are computationally difficult to guess.
+.Sh "Nil \s-1UUID\s0"
+.IX Subsection "Nil UUID"
+There is a special \fINil\fR \s-1UUID\s0 consisting of all octets set to zero in
+the binary representation. It can be used as a special \s-1UUID\s0 value which does
+not conflict with real UUIDs.
 .SH "APPLICATION PROGRAMMING INTERFACE"
 .IX Header "APPLICATION PROGRAMMING INTERFACE"
+The ISO-C Application Programming Interface (\s-1API\s0) of \fB\s-1OSSP\s0 uuid\fR
+consists of the following components.
+.Sh "\s-1CONSTANTS\s0"
+.IX Subsection "CONSTANTS"
+The following constants are provided:
+.IP "\fB\s-1UUID_LEN_BIN\s0\fR, \fB\s-1UUID_LEN_STR\s0\fR" 4
+.IX Item "UUID_LEN_BIN, UUID_LEN_STR"
+The number of octets of the \s-1UUID\s0 binary and string representations.
+Notice that the lengths of the string representation does \fInot\fR include
+the necessary \f(CW\*(C`NUL\*(C'\fR termination character.
+.IP "\fB\s-1UUID_VERSION1\s0\fR, \fB\s-1UUID_VERSION3\s0\fR, \fB\s-1UUID_VERSION4\s0\fR, \fB\s-1UUID_MCASTRND\s0\fR" 4
+.IX Item "UUID_VERSION1, UUID_VERSION3, UUID_VERSION4, UUID_MCASTRND"
+The \fImode\fR bits for use with \fBuuid_generate\fR(). The
+\&\fB\s-1UUID_VERSION\s0\fR\fIN\fR specify which \s-1UUID\s0 version to generate. The
+\&\fB\s-1UUID_MCASTRND\s0\fR forces the use of a random multi-cast \s-1MAC\s0 address
+instead of the real physical \s-1MAC\s0 address in version 1 UUIDs.
+.IP "\fB\s-1UUID_RC_OK\s0\fR, \fB\s-1UUID_RC_ARG\s0\fR, \fB\s-1UUID_RC_MEM\s0\fR, \fB\s-1UUID_RC_SYS\s0\fR, \fB\s-1UUID_RC_INT\s0\fR" 4
+.IX Item "UUID_RC_OK, UUID_RC_ARG, UUID_RC_MEM, UUID_RC_SYS, UUID_RC_INT"
+The possible numerical return-codes of \s-1API\s0 functions.
+Use \fBuuid_error\fR() to translate them into string versions.
+.Sh "\s-1FUNCTIONS\s0"
+.IX Subsection "FUNCTIONS"
+The following functions are provided:
 .IP "uuid_rc_t \fBuuid_create\fR(uuid_t **\fIuuid\fR);" 4
 .IX Item "uuid_rc_t uuid_create(uuid_t **uuid);"
-\&\s-1FIXME\s0
+Create a new \s-1UUID\s0 object and store a pointer to it in \f(CW\*(C`*\*(C'\fR\fIuuid\fR.
+A \s-1UUID\s0 object consists of an internal representation of a \s-1UUID\s0, the
+internal \s-1PRNG\s0 and \s-1MD5\s0 generator contexts, and cached \s-1MAC\s0 address and
+timestamp information. The initial \s-1UUID\s0 is the \fINil\fR \s-1UUID\s0.
 .IP "uuid_rc_t \fBuuid_destroy\fR(uuid_t *\fIuuid\fR);" 4
 .IX Item "uuid_rc_t uuid_destroy(uuid_t *uuid);"
-\&\s-1FIXME\s0
+Destroy \s-1UUID\s0 object \fIuuid\fR.
 .IP "uuid_rc_t \fBuuid_nil\fR(uuid_t *\fIuuid\fR);" 4
 .IX Item "uuid_rc_t uuid_nil(uuid_t *uuid);"
-\&\s-1FIXME\s0
-.IP "uuid_rc_t \fBuuid_compare\fR(uuid_t *\fIuuid\fR, uuid_t *\fIuuid2\fR, int *\fIresult\fR);" 4
-.IX Item "uuid_rc_t uuid_compare(uuid_t *uuid, uuid_t *uuid2, int *result);"
-\&\s-1FIXME\s0
+Sets or resets the \s-1UUID\s0 in \fIuuid\fR to the \fINil\fR \s-1UUID\s0.
 .IP "uuid_rc_t \fBuuid_isnil\fR(uuid_t *\fIuuid\fR, int *\fIresult\fR);" 4
 .IX Item "uuid_rc_t uuid_isnil(uuid_t *uuid, int *result);"
-\&\s-1FIXME\s0
+Checks whether the \s-1UUID\s0 in \fIuuid\fR is the \fINil\fR \s-1UUID\s0.
+If this is the case, it returns \fItrue\fR in \f(CW\*(C`*\*(C'\fR\fIresult\fR.
+Else it returns \fIfalse\fR in \f(CW\*(C`*\*(C'\fR\fIresult\fR.
+.IP "uuid_rc_t \fBuuid_compare\fR(uuid_t *\fIuuid\fR, uuid_t *\fIuuid2\fR, int *\fIresult\fR);" 4
+.IX Item "uuid_rc_t uuid_compare(uuid_t *uuid, uuid_t *uuid2, int *result);"
+Compares the order of the two UUIDs in \fIuuid1\fR and \fIuuid2\fR
+and returns the result in \f(CW\*(C`*\*(C'\fR\fIresult\fR: \f(CW\*(C`\-1\*(C'\fR if \fIuuid1\fR is
+smaller than \fIuuid2\fR, \f(CW0\fR if \fIuuid1\fR is equal to \fIuuid2\fR
+and \f(CW+1\fR if \fIuuid1\fR is greater than \fIuuid2\fR.
 .IP "uuid_rc_t \fBuuid_unpack\fR(uuid_t *\fIuuid\fR, const void *\fIbuf\fR);" 4
 .IX Item "uuid_rc_t uuid_unpack(uuid_t *uuid, const void *buf);"
-\&\s-1FIXME\s0
+Imports the value of the \s-1UUID\s0 in \fIuuid\fR by unpacking the binary
+representation of length \f(CW\*(C`UUID_LEN_BIN\*(C'\fR starting at \fIbuf\fR.
 .IP "uuid_rc_t \fBuuid_pack\fR(uuid_t *\fIuuid\fR, void **\fIbuf\fR);" 4
 .IX Item "uuid_rc_t uuid_pack(uuid_t *uuid, void **buf);"
-\&\s-1FIXME\s0
+Exports the value of the \s-1UUID\s0 in \fIuuid\fR by packing it into the
+binary representation and storing it (with length \f(CW\*(C`UUID_LEN_BIN\*(C'\fR)
+at \fIbuf\fR. If \fIbuf\fR points to a \f(CW\*(C`NULL\*(C'\fR pointer, a buffer of length
+\&\f(CW\*(C`UUID_LEN_BIN\*(C'\fR is allocated and stored into \f(CW\*(C`*\*(C'\fR\fIbuf\fR first.
 .IP "uuid_rc_t \fBuuid_parse\fR(uuid_t  *\fIuuid\fR, const char  *\fIstr\fR);" 4
 .IX Item "uuid_rc_t uuid_parse(uuid_t  *uuid, const char  *str);"
-\&\s-1FIXME\s0
+Imports the value of the \s-1UUID\s0 in \fIuuid\fR by parsing the string
+representation of length \f(CW\*(C`UUID_LEN_STR\*(C'\fR starting at \fIstr\fR.
 .IP "uuid_rc_t \fBuuid_format\fR(uuid_t *\fIuuid\fR, char **\fIstr\fR);" 4
 .IX Item "uuid_rc_t uuid_format(uuid_t *uuid, char **str);"
-\&\s-1FIXME\s0
+Exports the value of the \s-1UUID\s0 in \fIuuid\fR by formatting it into the
+\&\f(CW\*(C`NUL\*(C'\fR\-terminated string representation and storing it (with length
+\&\f(CW\*(C`UUID_LEN_STR\*(C'\fR+1) at \fIstr\fR. If \fIstr\fR points to a \f(CW\*(C`NULL\*(C'\fR pointer,
+a buffer of length \f(CW\*(C`UUID_LEN_STR\*(C'\fR+1 is allocated and stored into
+\&\f(CW\*(C`*\*(C'\fR\fIstr\fR first.
 .IP "uuid_rc_t \fBuuid_generate\fR(uuid_t *\fIuuid\fR, unsigned int \fImode\fR, ...);" 4
 .IX Item "uuid_rc_t uuid_generate(uuid_t *uuid, unsigned int mode, ...);"
-\&\s-1FIXME\s0
+Generates a new \s-1UUID\s0 in \fIuuid\fR according to \fImode\fR and optional
+arguments (dependent on \fImode\fR).
+.Sp
+If \fImode\fR contains the \f(CW\*(C`UUID_VERSION1\*(C'\fR bit, a \s-1DCE\s0 1.1 variant \s-1UUID\s0 of
+version 1 is generated. Then optionally the bit \f(CW\*(C`UUID_MCASTRND\*(C'\fR forces
+the use of random multi-cast \s-1MAC\s0 address instead of the real physical
+\&\s-1MAC\s0 address (the default). The \s-1UUID\s0 is generated out of the 60\-bit current
+system time, a 12\-bit clock sequence and the 48\-bit \s-1MAC\s0 address.
+.Sp
+If \fImode\fR contains the \f(CW\*(C`UUID_VERSION3\*(C'\fR bit, a \s-1DCE\s0 1.1 variant \s-1UUID\s0
+of version 3 is generated and two additional \f(CW\*(C`NUL\*(C'\fR\-terminated string
+arguments of type "\f(CW\*(C`const char *\*(C'\fR\*(L" are expected: first a namespace,
+given as an internally pre-defined id (currently known are ids \*(R"\f(CW\*(C`DNS\*(C'\fR\*(L",
+\&\*(R"\f(CW\*(C`URL\*(C'\fR\*(L", \*(R"\f(CW\*(C`OID\*(C'\fR\*(L", and \*(R"\f(CW\*(C`X500\*(C'\fR") or a \s-1UUID\s0 in string representation.
+Second, a name string of arbitrary length. The \s-1UUID\s0 is generated out of
+the 128\-bit \s-1MD5\s0 from the concatenated octet stream of namespace \s-1UUID\s0 and name
+string.
+.Sp
+If \fImode\fR contains the \f(CW\*(C`UUID_VERSION4\*(C'\fR bit, a \s-1DCE\s0 1.1 variant \s-1UUID\s0
+of version 4 is generated. The \s-1UUID\s0 is generated out of 128\-bit random
+data.
 .IP "uuid_rc_t \fBuuid_dump\fR(uuid_t *\fIuuid\fR, char **\fIstr\fR);" 4
 .IX Item "uuid_rc_t uuid_dump(uuid_t *uuid, char **str);"
 \&\s-1FIXME\s0
 .IP "char *\fBuuid_error\fR(uuid_rc_t \fIrc\fR);" 4
 .IX Item "char *uuid_error(uuid_rc_t rc);"
-\&\s-1FIXME\s0
+Returns a constangt string representation corresponding to the
+return-code \fIrc\fR for use in displaying \fB\s-1OSSP\s0 uuid\fR errors.
 .SH "SEE ALSO"
 .IX Header "SEE ALSO"
 See the following are references to more \fB\s-1UUID\s0\fR documentation and specifications:
@@ -258,3 +374,13 @@ http://www.ietf.org/internet\-drafts/draft\-mealling\-uuid\-urn\-01.txt
 \&\fB\s-1DCE\s0 1.1 compliant \s-1UUID\s0 functions\fR,
 FreeBSD manual pages \fIuuid\fR\|(3) and \fIuuidgen\fR\|(2),
 http://www.freebsd.org/cgi/man.cgi?query=uuid&manpath=FreeBSD+5.2\-RELEASE
+.SH "HISTORY"
+.IX Header "HISTORY"
+\&\fB\s-1OSSP\s0 uuid\fR was implemented in January 2004 by Ralf S. Engelschall
+<rse@engelschall.com>. It was prompted by the use of UUIDs
+in the \fB\s-1OSSP\s0 as\fR and \fBOpenPKG\fR projects. It is a clean room
+implementation intended to be strictly standards compliant and maximum
+portable.
+.SH "SEE ALSO"
+.IX Header "SEE ALSO"
+\&\fIuuid\fR\|(1), \fIuuid\-config\fR\|(1).

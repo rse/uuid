@@ -37,6 +37,7 @@ B<OSSP uuid> - B<Universally Unique Identifier Command-Line Tool>
 
 B<uuid>
 [B<-v> I<version>]
+[B<-m>]
 [B<-n> I<count>]
 [B<-1>]
 [B<-r>]
@@ -53,13 +54,21 @@ B<-d>
 
 B<OSSP uuid> is a ISO-C application programming interface (API) and
 corresponding command line interface (CLI) for the generation of DCE
-1.1 and ISO/IEC 11578:1996 compliant I<Universally Unique Identifiers>
+1.1 and ISO/IEC 11578:1996 compliant I<Universally Unique Identifier>
 (UUID). It supports DCE 1.1 variant UUIDs of version 1 (time and node
 based), version 3 (name based) and version 4 (random number based).
 
-This is the command line interface (CLI). For a brief overview of UUIDs
-see the documentation of the application programming interface (API) in
-uuid(3).
+UUIDs are 128 bit numbers which are intended to have a high likelihood
+of uniqueness over space and time and are computationally difficult
+to guess. They are globally unique identifiers which can be locally
+generated without contacting a global registration authority. UUIDs
+are intended as unique identifiers for both mass tagging objects
+with an extremely short lifetime and to reliably identifying very
+persistent objects across a network.
+
+This is the command line interface (CLI) of B<OSSP uuid>. For a
+detailed description of UUIDs see the documentation of the application
+programming interface (API) in uuid(3).
 
 =head1 OPTIONS
 
@@ -67,9 +76,20 @@ uuid(3).
 
 =item B<-v> I<version>
 
-Sets the version of the generated DCE 1.1 variant UUID.
-Supported are I<version> "C<1>", "C<3>" and "C<4>".
-The default is "C<1>".
+Sets the version of the generated DCE 1.1 variant UUID. Supported
+are I<version> "C<1>", "C<3>" and "C<4>". The default is "C<1>".
+
+For version 3 UUIDs the additional command line arguments I<namespace>
+and I<name> have to be given. The I<namespace> is either a UUID in
+string representation or an identifier for internally pre-defined
+namespace UUIDs (currently known are "C<DNS>", "C<URL>", "C<OID>", and
+"C<X500>"). The I<name> is a string of arbitrary length.
+
+=item B<-m>
+
+Forces the use of a random multi-cast MAC address when generating
+version 1 UUIDs. By default the real physical MAC address of the system
+is used.
 
 =item B<-n> I<count>
 

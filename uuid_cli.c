@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
     raw = 0;        /* default is ASCII output */
     decode = 0;     /* default is to encode */
     version = UUID_VERSION1;
-    while ((ch = getopt(argc, argv, "1n:rdo:v:")) != -1) {
+    while ((ch = getopt(argc, argv, "1n:rdmo:v:")) != -1) {
         switch (ch) {
             case '1':
                 iterate = 1;
@@ -115,6 +115,9 @@ int main(int argc, char *argv[])
                 if ((fp = fopen(optarg, "w")) == NULL)
                     error(1, "fopen: %s", strerror(errno));
                 break;
+            case 'm':
+                version |= UUID_MCASTRND;
+                break;
             case 'v':
                 i = strtol(optarg, &p, 10);
                 if (*p != '\0')
@@ -129,7 +132,7 @@ int main(int argc, char *argv[])
                 }
                 break;
             default:
-                usage("invalid option '%c'", ch);
+                usage("invalid option '%c'", optopt);
         }
     }
     argv += optind;
@@ -141,7 +144,16 @@ int main(int argc, char *argv[])
         /* decoding */
         if (argc != 1)
             usage("invalid number of arguments");
-        /* FIXME */
+        if ((rc = uuid_create(&uuid)) != UUID_RC_OK)
+            error(1, "uuid_create: %s", uuid_error(rc));
+        if ((rc = uuid_parse(uuid, argv[0])) != UUID_RC_OK)
+            error(1, "uuid_parse: %s", uuid_error(rc));
+        if ((rc = uuid_dump(uuid, &cp)) != UUID_RC_OK)
+            error(1, "uuid_dump: %s", uuid_error(rc));
+        fprintf(stdout, "%s", cp);
+        free(cp);
+        if ((rc = uuid_destroy(uuid)) != UUID_RC_OK)
+            error(1, "uuid_destroy: %s", uuid_error(rc));
     }
     else {
         /* encoding */

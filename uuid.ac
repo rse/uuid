@@ -86,6 +86,7 @@ AC_DEFUN(UUID_CHECK_ALL,[
     AC_CHECK_FUNCS(getifaddrs nanosleep)
 
     dnl #   check size of built-in types
+    AC_CHECK_TYPES([long long, long double])
     AC_CHECK_SIZEOF(char, 1)
     AC_CHECK_SIZEOF(unsigned char, 1)
     AC_CHECK_SIZEOF(short, 2)

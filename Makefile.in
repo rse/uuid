@@ -51,7 +51,7 @@ TRUE        = true
 POD2MAN     = pod2man
 
 LIB_NAME    = libuuid.la
-LIB_OBJS    = uuid.lo uuid_md5.lo uuid_prng.lo uuid_mac.lo uuid_ui64.lo
+LIB_OBJS    = uuid.lo uuid_md5.lo uuid_prng.lo uuid_mac.lo uuid_ui64.lo uuid_str.lo
 
 PRG_NAME    = uuid
 PRG_OBJS    = uuid_cli.o
@@ -82,7 +82,7 @@ uuid.3: uuid.pod
 	V2=`$(SHTOOL) version -l txt -d long VERSION`; \
 	D=`$(SHTOOL) version -l txt -d long VERSION | sed -e 's;.*(;;' -e 's;).*;;'`; \
 	$(POD2MAN) --quotes=none \
-	           --section=3 --center="Universally Unique Identifiers" \
+	           --section=3 --center="Universally Unique Identifier" \
 	           --release="$$D" --date="OSSP uuid $$V1" uuid.pod | \
 	sed -e "s;UUID_VERSION_STR;$$V2;" >uuid.3
 uuid.1: uuid_cli.pod
@@ -91,7 +91,7 @@ uuid.1: uuid_cli.pod
 	D=`$(SHTOOL) version -l txt -d long VERSION | sed -e 's;.*(;;' -e 's;).*;;'`; \
 	$(CP) uuid_cli.pod /tmp/uuid.pod; \
 	$(POD2MAN) --quotes=none \
-	           --section=1 --center="Universally Unique Identifiers" \
+	           --section=1 --center="Universally Unique Identifier" \
 	           --release="$$D" --date="OSSP uuid $$V1" /tmp/uuid.pod | \
 	sed -e "s;UUID_VERSION_STR;$$V2;" >uuid.1; \
 	$(RM) /tmp/uuid.pod
@@ -119,13 +119,13 @@ install:
 	$(SHTOOL) install -c -m 644 uuid.h $(DESTDIR)$(includedir)/
 	$(SHTOOL) install -c -m 644 uuid.3 $(DESTDIR)$(mandir)/man3/
 	@$(LIBTOOL) --mode=install $(SHTOOL) install -c -m 644 libuuid.la $(DESTDIR)$(libdir)/
-	$(SHTOOL) install -c -s -m 755 uuid $(DESTDIR)$(bindir)/
+	@$(LIBTOOL) --mode=install $(SHTOOL) install -c -s -m 755 uuid $(DESTDIR)$(bindir)/
 	$(SHTOOL) install -c -m 644 uuid.1 $(DESTDIR)$(mandir)/man1/
 
 uninstall:
 	-$(RM) $(DESTDIR)$(mandir)/man1/uuid.1
-	-$(RM) $(DESTDIR)$(bindir)/uuid
-	@$(LIBTOOL) --mode=uninstall $(RM) $(DESTDIR)$(libdir)/libuuid.la
+	-@$(LIBTOOL) --mode=uninstall $(RM) $(DESTDIR)$(bindir)/uuid
+	-@$(LIBTOOL) --mode=uninstall $(RM) $(DESTDIR)$(libdir)/libuuid.la
 	-$(RM) $(DESTDIR)$(mandir)/man3/uuid.3
 	-$(RM) $(DESTDIR)$(includedir)/uuid.h
 	-$(RM) $(DESTDIR)$(bindir)/uuid-config

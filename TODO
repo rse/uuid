@@ -1,7 +1,9 @@
-- write documentation uuid(3) [uuid.pod]
+TODO
+- none
+CANDO
 - more platform support in uuid_mac.c?!
-- implement uuid -d (uuid_dump): dumping/decoding
 - global locking according to standard?
 - persistent/non-volatile state writing?
-- additional C API for DCE 1.1 compatibility
+- use uuid_bm.h stuff throughout code
 - additional Perl API for covering Perl language
+- additional C API for DCE 1.1 compatibility

@@ -46,6 +46,7 @@
 #define md5_st      MD5_CONCAT(MD5_PREFIX,md5_st)
 #define md5_t       MD5_CONCAT(MD5_PREFIX,md5_t)
 #define md5_create  MD5_CONCAT(MD5_PREFIX,md5_create)
+#define md5_init    MD5_CONCAT(MD5_PREFIX,md5_init)
 #define md5_update  MD5_CONCAT(MD5_PREFIX,md5_update)
 #define md5_store   MD5_CONCAT(MD5_PREFIX,md5_store)
 #define md5_format  MD5_CONCAT(MD5_PREFIX,md5_format)

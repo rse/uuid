@@ -1,0 +1,48 @@
+   _        ___  ____ ____  ____                _     _
+  |_|_ _   / _ \/ ___/ ___||  _ \   _   _ _   _(_) __| |
+  _|_||_| | | | \___ \___ \| |_) | | | | | | | | |/ _` |
+ |_||_|_| | |_| |___) |__) |  __/  | |_| | |_| | | (_| |
+  |_|_|_|  \___/|____/____/|_|      \__,_|\__,_|_|\__,_|
+
+  OSSP uuid - Universally Unique Identifier
+
+  CHANGELOG
+
+  This is a list of all changes to OSSP uuid.
+  For a more brief summary please have a look at the NEWS file.
+
+  Changes between 0.9.0 and 0.9.1 (11-Jan-2004 to xx-Jan-2004)
+
+   o Make "md5_init" and "mac_address" symbols namespace clean
+     by adding correct embedding support via "uuid_" prefix.
+     [Ralf S. Engelschall]
+
+   o Implement uuid_dump() and corresponding uuid CLI "-d"
+     option for dumping a given UUID into clear text. For convinience
+     reasons add uuid_bm.h (bit mask API) and uuid_str (string
+     formatting API) sub-modules.
+     [Ralf S. Engelschall]
+
+   o Add "-m" option to CLI for allowing to generate v1 UUIDs
+     with random multi-cast addresses (API UUID_MCASTRND option).
+     [Ralf S. Engelschall]
+
+   o Disable the C++ and F77 checks in GNU libtool.
+     [Ralf S. Engelschall]
+
+   o Print involved option character (instead of '?') on invalid
+     option for uuid(1) CLI.
+     [Matthias Andree <matthias.andree@gmx.de>] 
+
+   o Fixed "make install" and "make uninstall": the uuid(1) CLI
+     has to be [un]installed through GNU libtool, too.
+     [Matthias Andree <matthias.andree@gmx.de>] 
+
+   o Document in uuid(1) [uuid_cli.pod] that for version 3
+     UUIDs additional arguments are required and what pre-defined
+     namespace ids are known.
+     [Ralf S. Engelschall, M.Daniel <mdaniel@scdi.com>]
+
+   o cleaned up source tree documentation files.
+     [Ralf S. Engelschall]
+

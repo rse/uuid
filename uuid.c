@@ -45,6 +45,8 @@
 #include "uuid_prng.h"
 #include "uuid_mac.h"
 #include "uuid_ui64.h"
+#include "uuid_str.h"
+#include "uuid_bm.h"
 
 /* determine types of 8-bit size */
 #if SIZEOF_CHAR == 1
@@ -193,6 +195,28 @@ uuid_rc_t uuid_nil(uuid_t *uuid)
     return UUID_RC_OK;
 }
 
+/* check whether UUID object represents 'nil UUID' */
+uuid_rc_t uuid_isnil(uuid_t *uuid, int *result)
+{
+    const unsigned char *ucp;
+    int i;
+
+    /* sanity check argument(s) */
+    if (uuid == NULL || result == NULL)
+        return UUID_RC_ARG;
+
+    /* a "nil UUID" is defined as all octets zero, so check for this case */
+    *result = TRUE;
+    for (i = 0, ucp = (unsigned char *)&(uuid->obj); i < UUID_LEN_BIN; i++) {
+        if (*ucp++ != '\0') {
+            *result = FALSE;
+            break;
+        }
+    }
+
+    return UUID_RC_OK;
+}
+
 /* compare UUID objects */
 uuid_rc_t uuid_compare(uuid_t *uuid1, uuid_t *uuid2, int *result)
 {
@@ -241,28 +265,6 @@ uuid_rc_t uuid_compare(uuid_t *uuid1, uuid_t *uuid2, int *result)
     *result = 0;
 
     result_exit:
-    return UUID_RC_OK;
-}
-
-/* check whether UUID object represents 'nil UUID' */
-uuid_rc_t uuid_isnil(uuid_t *uuid, int *result)
-{
-    const unsigned char *ucp;
-    int i;
-
-    /* sanity check argument(s) */
-    if (uuid == NULL || result == NULL)
-        return UUID_RC_ARG;
-
-    /* a "nil UUID" is defined as all octets zero, so check for this case */
-    *result = TRUE;
-    for (i = 0, ucp = (unsigned char *)&(uuid->obj); i < UUID_LEN_BIN; i++) {
-        if (*ucp++ != '\0') {
-            *result = FALSE;
-            break;
-        }
-    }
-
     return UUID_RC_OK;
 }
 
@@ -478,6 +480,11 @@ static void uuid_brand(uuid_t *uuid, int version)
    (which in our case is 1us (= 1000ns) because we use gettimeofday(2) */
 #define UUIDS_PER_TICK 10
 
+/* time offset between UUID and Unix Epoch time according to standards.
+   (UUID UTC base time is October 15, 1582
+    Unix UTC base time is January  1, 1970) */
+#define UUID_TIMEOFFSET "01B21DD213814000"
+
 /* INTERNAL: generate UUID version 1: time, clock and node based */
 static uuid_rc_t uuid_generate_v1(uuid_t *uuid, unsigned int mode, va_list ap)
 {
@@ -536,11 +543,8 @@ static uuid_rc_t uuid_generate_v1(uuid_t *uuid, unsigned int mode, va_list ap)
     t = ui64_addn(t, time_now.tv_usec, NULL);
     t = ui64_muln(t, 10, NULL);
 
-    /* adjust for offset between UUID and Unix Epoch time through adding
-       the magic offset 01B21DD213814000 from draft-leach-uuids-guids-01.
-       (UUID UTC base time is October 15, 1582
-        Unix UTC base time is January  1, 1970) */
-    offset = ui64_s2i("01B21DD213814000", NULL, 16);
+    /* adjust for offset between UUID and Unix Epoch time */
+    offset = ui64_s2i(UUID_TIMEOFFSET, NULL, 16);
     t = ui64_add(t, offset, NULL);
 
     /* compensate for low resolution system clock by adding
@@ -732,13 +736,130 @@ uuid_rc_t uuid_generate(uuid_t *uuid, unsigned int mode, ...)
     return rc;
 }
 
+/* decoding tables */
+static struct {
+    uuid_uint8_t num;
+    const char *desc;
+} uuid_dectab_variant[] = {
+    { BM_OCTET(0,0,0,0,0,0,0,0), "reserved (NCS backward compatible)" },
+    { BM_OCTET(1,0,0,0,0,0,0,0), "DCE 1.1, ISO/IEC 11578:1996" },
+    { BM_OCTET(1,1,0,0,0,0,0,0), "reserved (Microsoft GUID)" },
+    { BM_OCTET(1,1,1,0,0,0,0,0), "reserved (future use)" }
+};
+static struct {
+    int num;
+    const char *desc;
+} uuid_dectab_version[] = {
+    { 1, "time and node based" },
+    { 3, "name based" },
+    { 4, "random data based" }
+};
+
 /* dump UUID object as descriptive text */
 uuid_rc_t uuid_dump(uuid_t *uuid, char **str)
 {
+    const char *version;
+    const char *variant;
+    uint8_t tmp8;
+    uint16_t tmp16;
+    uint32_t tmp32;
+    char string[UUID_LEN_STR+1];
+    char *s;
+    int i;
+    ui64_t t;
+    ui64_t offset;
+    int t_nsec;
+    int t_usec;
+    time_t t_sec;
+    char buf[19+1]; /* YYYY-MM-DD HH:MM:SS */
+    struct tm *tm;
+
     /* sanity check argument(s) */
     if (uuid == NULL || str == NULL)
         return UUID_RC_ARG;
-    /* FIXME */
+
+    /* initialize output buffer */
+    *str = NULL;
+
+    /* decode into string representation */
+    s = string;
+    uuid_format(uuid, &s);
+    str_rsprintf(str, "UUID:    %s\n", s);
+
+    /* decode UUID variant */
+    variant = "unknown";
+    tmp8 = uuid->obj.clock_seq_hi_and_reserved;
+    for (i = 7; i >= 0; i--) {
+        if ((tmp8 & BM_BIT(i,1)) == 0) {
+            tmp8 &= ~BM_MASK(i,0);
+            break;
+        }
+    }
+    for (i = 0; i < sizeof(uuid_dectab_variant)/sizeof(uuid_dectab_variant[0]); i++) {
+        if (uuid_dectab_variant[i].num == tmp8) {
+            variant = uuid_dectab_variant[i].desc;
+            break;
+        }
+    }
+    str_rsprintf(str, "variant: %s\n", variant);
+
+    /* decode UUID version */
+    version = "unknown";
+    tmp16 = (BM_SHR(uuid->obj.time_hi_and_version, 12) & 0x000f);
+    for (i = 0; i < sizeof(uuid_dectab_version)/sizeof(uuid_dectab_version[0]); i++) {
+        if (uuid_dectab_version[i].num == (int)tmp16) {
+            version = uuid_dectab_version[i].desc;
+            break;
+        }
+    }
+    str_rsprintf(str, "version: %d (%s)\n", (int)tmp16, version);
+
+    /* we currently support DCE 1.1 variants of version 1/3/4 only */
+    if (!(   tmp8 == BM_OCTET(1,0,0,0,0,0,0,0)
+          && (tmp16 == 1 || tmp16 == 3 || tmp16 == 4)))
+        return UUID_RC_OK;
+
+    /* decode more */
+    if (tmp16 == 1) {
+        /* decode version 1 */
+
+        /* decode system time */
+        t = ui64_rol(ui64_n2i((unsigned long)(uuid->obj.time_hi_and_version & 0x0fff)), 48, NULL),
+        t = ui64_or(t, ui64_rol(ui64_n2i((unsigned long)(uuid->obj.time_mid)), 32, NULL));
+        t = ui64_or(t, ui64_n2i((unsigned long)(uuid->obj.time_low)));
+        offset = ui64_s2i(UUID_TIMEOFFSET, NULL, 16);
+        t = ui64_sub(t, offset, NULL);
+        t = ui64_divn(t, 10, &t_nsec);
+        t = ui64_divn(t, 1000000, &t_usec);
+        t_sec = (time_t)ui64_i2n(t);
+        tm = gmtime(&t_sec);
+        strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", tm);
+        str_rsprintf(str, "content: time:  %s.%06d.%d UTC\n", buf, t_usec, t_nsec);
+
+        /* decode clock sequence */
+        tmp32 = ((uuid->obj.clock_seq_hi_and_reserved & ~((0x03) << 6)) << 8)
+                + uuid->obj.clock_seq_low;
+        str_rsprintf(str, "         clock: %ld (usually random)\n", (unsigned long)tmp32);
+
+        /* decode node MAC address */
+        str_rsprintf(str, "         node:  %02x:%02x:%02x:%02x:%02x:%02x (%s)\n",
+            (unsigned int)uuid->obj.node[0],
+            (unsigned int)uuid->obj.node[1],
+            (unsigned int)uuid->obj.node[2],
+            (unsigned int)uuid->obj.node[3],
+            (unsigned int)uuid->obj.node[4],
+            (unsigned int)uuid->obj.node[5],
+            (uuid->obj.node[0] & 0x80 ? "random multicast" : "real unicast"));
+    }
+    else if (tmp16 == 3) {
+        /* decode version 3 */
+        str_rsprintf(str, "content: [not decipherable]\n");
+    }
+    else if (tmp16 == 4) {
+        /* decode version 4 */
+        str_rsprintf(str, "content: [no semantics]\n");
+    }
+
     return UUID_RC_OK;
 }
 

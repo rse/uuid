@@ -30,13 +30,17 @@ dnl ##
 AC_PREREQ(2.53)
 AC_INIT
 UUID_VERSION_STR=`./shtool version -l txt -d long VERSION`
-./shtool echo -e "Configuring %BOSSP uuid%b (Universally Unique Identifiers), version %B${UUID_VERSION_STR}%b"
+./shtool echo -e "Configuring %BOSSP uuid%b (Universally Unique Identifier), version %B${UUID_VERSION_STR}%b"
 AC_SUBST(UUID_VERSION_STR)
 
 AC_PROG_MAKE_SET
 AC_PROG_CC
 AC_CHECK_DEBUGGING
 
+m4_defun([AC_PROG_CXX])
+m4_defun([AC_PROG_CXXCPP])
+m4_defun([AC_PROG_F77])
+with_tags=""
 sinclude(libtool.m4)
 AC_PROG_LIBTOOL
 

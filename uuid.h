@@ -30,43 +30,6 @@
 #ifndef __UUID_H__
 #define __UUID_H__
 
-/*
- *  UUID Binary Representation:
- *
- *  0                   1                   2                   3
- *   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
- *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * 0|                          time_low                             |
- *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * 1|       time_mid                |         time_hi_and_version   |
- *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * 2|clk_seq_hi_res |  clk_seq_low  |         node (0-1)            |
- *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * 3|                         node (2-5)                            |
- *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *
- *  UUID ASCII String Representation:
- *
- *  uuid                   = <time_low> "-" <time_mid> "-"
- *                           <time_high_and_version> "-"
- *                           <clock_seq_and_reserved>
- *                           <clock_seq_low> "-" <node>
- *  time_low               = 4*<hexOctet>
- *  time_mid               = 2*<hexOctet>
- *  time_high_and_version  = 2*<hexOctet>
- *  clock_seq_and_reserved = <hexOctet>
- *  clock_seq_low          = <hexOctet>
- *  node                   = 6*<hexOctet>
- *  hexOctet               = <hexDigit> <hexDigit>
- *  hexDigit =               "0"|"1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"
- *                          |"a"|"b"|"c"|"d"|"e"|"f"
- *                          |"A"|"B"|"C"|"D"|"E"|"F"
- *
- *  Example string representation of a UUID:
- *
- *  "f81d4fae-7dec-11d0-a765-00a0c91e6bf6"
- */
-
 /* encoding octet stream lengths */
 #define UUID_LEN_BIN (128 / 8 /*bytes*/)
 #define UUID_LEN_STR (128 / 4 /*nibbles*/ + 4 /*hyphens*/)
@@ -98,14 +61,14 @@ extern uuid_rc_t  uuid_destroy  (uuid_t  *uuid);
 extern uuid_rc_t  uuid_nil      (uuid_t  *uuid);
 
 /* UUID comparison */
-extern uuid_rc_t  uuid_compare  (uuid_t  *uuid, uuid_t *uuid2, int *result);
 extern uuid_rc_t  uuid_isnil    (uuid_t  *uuid,                int *result);
+extern uuid_rc_t  uuid_compare  (uuid_t  *uuid, uuid_t *uuid2, int *result);
 
-/* binary representation handling */
+/* UUID binary representation handling */
 extern uuid_rc_t  uuid_unpack   (uuid_t  *uuid, const void  *buf);
 extern uuid_rc_t  uuid_pack     (uuid_t  *uuid,       void **buf);
 
-/* string representation handling */
+/* UUID string representation handling */
 extern uuid_rc_t  uuid_parse    (uuid_t  *uuid, const char  *str);
 extern uuid_rc_t  uuid_format   (uuid_t  *uuid,       char **str);
 
