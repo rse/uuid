@@ -482,7 +482,7 @@ fmtint(
 }
 
 static LDOUBLE
-abs_val(LDOUBLE value)
+math_abs(LDOUBLE value)
 {
     LDOUBLE result = value;
     if (value < 0)
@@ -491,7 +491,7 @@ abs_val(LDOUBLE value)
 }
 
 static LDOUBLE
-pow10(int exponent)
+math_pow10(int exponent)
 {
     LDOUBLE result = 1;
     while (exponent > 0) {
@@ -502,7 +502,7 @@ pow10(int exponent)
 }
 
 static long
-round(LDOUBLE value)
+math_round(LDOUBLE value)
 {
     long intpart;
     intpart = (long) value;
@@ -536,7 +536,7 @@ fmtfp(
 
     if (max < 0)
         max = 6;
-    ufvalue = abs_val(fvalue);
+    ufvalue = math_abs(fvalue);
     if (fvalue < 0)
         signvalue = '-';
     else if (flags & DP_F_PLUS)
@@ -553,11 +553,11 @@ fmtfp(
 
     /* we "cheat" by converting the fractional part to integer by
        multiplying by a factor of 10 */
-    fracpart = round((pow10(max)) * (ufvalue - intpart));
+    fracpart = math_round((math_pow10(max)) * (ufvalue - intpart));
 
-    if (fracpart >= pow10(max)) {
+    if (fracpart >= math_pow10(max)) {
         intpart++;
-        fracpart -= (long)pow10(max);
+        fracpart -= (long)math_pow10(max);
     }
 
     /* convert integer part */

@@ -11,6 +11,20 @@
   This is a list of all changes to OSSP uuid.
   For a more brief summary please have a look at the NEWS file.
 
+  Changes between 0.9.7 and 1.0.0 (13-Feb-2004 to 16-Feb-2004)
+
+   o Replace remaining (old) UUID_VERSIONX names with UUID_MAKE_VX
+     in the documentation (uuid.pod).
+     [Ralf S. Engelschall]
+
+   o Resolve namespace conflicts with GCC 3.4 internal pow10() and round()
+     functions within uuid_str.c.
+     [Ralf S. Engelschall]
+
+   o Fix buffer handling in "uuid_export(..., UUID_FMT_TXT, vp, ...)" in
+     case "vp" is not NULL.
+     [Fuyuki <fuyuki@nigredo.org>]
+
   Changes between 0.9.6 and 0.9.7 (11-Feb-2004 to 13-Feb-2004)
 
    o remove --with-rfc2518 option and functionality because
@@ -27,18 +41,18 @@
 
    o Add missing documentation entries for UUID_XXXX API constants and
      uuid_version() function.
-     [<fuyuki@nigredo.org>]
+     [Fuyuki <fuyuki@nigredo.org>]
 
    o Adjust references for new draft-mealling-uuid-urn-02.txt.
-     [<fuyuki@nigredo.org>]
+     [Fuyuki <fuyuki@nigredo.org>]
 
    o Replaced overlooked references to old
      uuid_{unpack,pack,parse,format,dump}() functions with their
      current uuid_{import,export}() replacements.
-     [<fuyuki@nigredo.org>]
+     [Fuyuki <fuyuki@nigredo.org>]
 
    o Fixed "uuid -h" command.
-     [<fuyuki@nigredo.org>]
+     [Fuyuki <fuyuki@nigredo.org>]
 
   Changes between 0.9.5 and 0.9.6 (06-Feb-2004 to 11-Feb-2004)
 

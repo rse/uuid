@@ -129,12 +129,12 @@
 .\" ========================================================================
 .\"
 .IX Title "uuid 3"
-.TH uuid 3 "OSSP uuid 0.1.0" "13-Feb-2004" "Universally Unique Identifier"
+.TH uuid 3 "OSSP uuid 0.1.0" "16-Feb-2004" "Universally Unique Identifier"
 .SH "NAME"
 \&\fBOSSP uuid\fR \- \fBUniversally Unique Identifier\fR
 .SH "VERSION"
 .IX Header "VERSION"
-\&\s-1OSSP\s0 uuid \s-10.1.0 (13-Feb-2004)\s0
+\&\s-1OSSP\s0 uuid \s-10.1.0 (16-Feb-2004)\s0
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
 \&\fB\s-1OSSP\s0 uuid\fR is a ISO-C application programming interface (\s-1API\s0) and
@@ -372,13 +372,13 @@ the generation of \s-1DCE\s0 1.1 version 3 UUIDs.
 Generates a new \s-1UUID\s0 in \fIuuid\fR according to \fImode\fR and optional
 arguments (dependent on \fImode\fR).
 .Sp
-If \fImode\fR contains the \f(CW\*(C`UUID_VERSION1\*(C'\fR bit, a \s-1DCE\s0 1.1 variant \s-1UUID\s0 of
-version 1 is generated. Then optionally the bit \f(CW\*(C`UUID_MCASTRND\*(C'\fR forces
+If \fImode\fR contains the \f(CW\*(C`UUID_MAKE_V1\*(C'\fR bit, a \s-1DCE\s0 1.1 variant \s-1UUID\s0 of
+version 1 is generated. Then optionally the bit \f(CW\*(C`UUID_MAKE_MC\*(C'\fR forces
 the use of random multi-cast \s-1MAC\s0 address instead of the real physical
 \&\s-1MAC\s0 address (the default). The \s-1UUID\s0 is generated out of the 60\-bit current
 system time, a 12\-bit clock sequence and the 48\-bit \s-1MAC\s0 address.
 .Sp
-If \fImode\fR contains the \f(CW\*(C`UUID_VERSION3\*(C'\fR bit, a \s-1DCE\s0 1.1 variant \s-1UUID\s0
+If \fImode\fR contains the \f(CW\*(C`UUID_MAKE_V3\*(C'\fR bit, a \s-1DCE\s0 1.1 variant \s-1UUID\s0
 of version 3 is generated and two additional \f(CW\*(C`NUL\*(C'\fR\-terminated string
 arguments of type "\f(CW\*(C`const char *\*(C'\fR\*(L" are expected: first a namespace,
 given as an internally pre-defined id (currently known are ids \*(R"\f(CW\*(C`DNS\*(C'\fR\*(L",
@@ -387,7 +387,7 @@ Second, a name string of arbitrary length. The \s-1UUID\s0 is generated out of
 the 128\-bit \s-1MD5\s0 from the concatenated octet stream of namespace \s-1UUID\s0 and name
 string.
 .Sp
-If \fImode\fR contains the \f(CW\*(C`UUID_VERSION4\*(C'\fR bit, a \s-1DCE\s0 1.1 variant \s-1UUID\s0
+If \fImode\fR contains the \f(CW\*(C`UUID_MAKE_V4\*(C'\fR bit, a \s-1DCE\s0 1.1 variant \s-1UUID\s0
 of version 4 is generated. The \s-1UUID\s0 is generated out of 128\-bit random
 data.
 .IP "char *\fBuuid_error\fR(uuid_rc_t \fIrc\fR);" 4
@@ -415,7 +415,7 @@ code.
 .PP
 .Vb 6
 \&     uuid_create(&uuid);
-\&     uuid_make(uuid, UUID_VERSION1);
+\&     uuid_make(uuid, UUID_MAKE_V1);
 \&     uuid_export(uuid, UUID_FMT_STR, (void **)&str, NULL);
 \&     uuid_destroy(uuid);
 \&     return str;
@@ -435,7 +435,7 @@ code.
 \&     uuid_create(&uuid);
 \&     uuid_create(&uuid_ns);
 \&     uuid_load(uuid_ns, "ns:URL");
-\&     uuid_make(uuid, UUID_VERSION3, uuid_ns, url);
+\&     uuid_make(uuid, UUID_MAKE_V3, uuid_ns, url);
 \&     uuid_export(uuid, UUID_FMT_STR, (void **)&str, NULL);
 \&     uuid_destroy(uuid_ns);
 \&     uuid_destroy(uuid);

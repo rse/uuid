@@ -302,13 +302,13 @@ the generation of DCE 1.1 version 3 UUIDs.
 Generates a new UUID in I<uuid> according to I<mode> and optional
 arguments (dependent on I<mode>).
 
-If I<mode> contains the C<UUID_VERSION1> bit, a DCE 1.1 variant UUID of
-version 1 is generated. Then optionally the bit C<UUID_MCASTRND> forces
+If I<mode> contains the C<UUID_MAKE_V1> bit, a DCE 1.1 variant UUID of
+version 1 is generated. Then optionally the bit C<UUID_MAKE_MC> forces
 the use of random multi-cast MAC address instead of the real physical
 MAC address (the default). The UUID is generated out of the 60-bit current
 system time, a 12-bit clock sequence and the 48-bit MAC address.
 
-If I<mode> contains the C<UUID_VERSION3> bit, a DCE 1.1 variant UUID
+If I<mode> contains the C<UUID_MAKE_V3> bit, a DCE 1.1 variant UUID
 of version 3 is generated and two additional C<NUL>-terminated string
 arguments of type "C<const char *>" are expected: first a namespace,
 given as an internally pre-defined id (currently known are ids "C<DNS>",
@@ -317,7 +317,7 @@ Second, a name string of arbitrary length. The UUID is generated out of
 the 128-bit MD5 from the concatenated octet stream of namespace UUID and name
 string.
 
-If I<mode> contains the C<UUID_VERSION4> bit, a DCE 1.1 variant UUID
+If I<mode> contains the C<UUID_MAKE_V4> bit, a DCE 1.1 variant UUID
 of version 4 is generated. The UUID is generated out of 128-bit random
 data.
 
@@ -347,7 +347,7 @@ code.
      char *str = NULL;
 
      uuid_create(&uuid);
-     uuid_make(uuid, UUID_VERSION1);
+     uuid_make(uuid, UUID_MAKE_V1);
      uuid_export(uuid, UUID_FMT_STR, (void **)&str, NULL);
      uuid_destroy(uuid);
      return str;
@@ -363,7 +363,7 @@ code.
      uuid_create(&uuid);
      uuid_create(&uuid_ns);
      uuid_load(uuid_ns, "ns:URL");
-     uuid_make(uuid, UUID_VERSION3, uuid_ns, url);
+     uuid_make(uuid, UUID_MAKE_V3, uuid_ns, url);
      uuid_export(uuid, UUID_FMT_STR, (void **)&str, NULL);
      uuid_destroy(uuid_ns);
      uuid_destroy(uuid);

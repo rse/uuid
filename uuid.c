@@ -611,7 +611,7 @@ static uuid_rc_t uuid_export_txt(uuid_t *uuid, void **data_ptr, size_t *data_len
             return UUID_RC_ARG;
         if (*data_len < out_len)
             return UUID_RC_MEM;
-        memcpy(*data_ptr, &out_ptr, out_len);
+        memcpy(*data_ptr, out_ptr, out_len);
     }
 
     return UUID_RC_OK;
