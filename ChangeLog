@@ -11,7 +11,54 @@
   This is a list of all changes to OSSP uuid.
   For a more brief summary please have a look at the NEWS file.
 
-  Changes between 0.9.0 and 0.9.1 (11-Jan-2004 to xx-Jan-2004)
+  Changes between 0.9.1 and 0.9.2 (13-Jan-2004 to 15-Jan-2004)
+
+   o Provide both incorrect RFC2518-based and correct IEEE 802
+     multicast address generation. The default now is the correct
+     IEEE 802 multicast address generation but compile-time option
+     --with-rfc2518 selects the broken variant.
+     [Ralf S. Engelschall]
+
+   o Decode also the IEEE 802 MAC address local/global bit.
+     [Ralf S. Engelschall]
+
+   o Added missing documentation for uuid_dump().
+     [Ralf S. Engelschall]
+
+   o Fixed BM_POW2() macro implementation.
+     [Ralf S. Engelschall]
+
+   o Use BM_XXX() and str_xxx() APIs throughout internal implementation.
+     [Ralf S. Engelschall]
+
+   o Added missing manual page uuid-config(1).
+     [Ralf S. Engelschall]
+
+   o Fixed output of "uuid-config --version"
+     [Ralf S. Engelschall]
+
+   o Fixed typos in uuid.pod
+     [Ralf S. Engelschall]
+
+   o Cleanup uuid.ac for unused elements.
+     [Ralf S. Engelschall]
+
+   o Moved uuid_[u]int{8,16,32}_t auto-configuration into
+     own internal header uuid_ac.h.
+     [Ralf S. Engelschall]
+
+   o Fixed portability by replacing accidentally introduced
+     uint{8,16,32}_t with the portable uuid_uint{8,16,32}_t.
+     [Guerry Semones <guerry@tsunamiresearch.com>]
+
+   o Prefix all variable symbols in uuid.h with underscores
+     to avoid namespace conflicts.
+     [Ralf S. Engelschall]
+
+   o Add decoding examples to uuid(1) manual page.
+     [Ralf S. Engelschall]
+
+  Changes between 0.9.0 and 0.9.1 (11-Jan-2004 to 13-Jan-2004)
 
    o Make "md5_init" and "mac_address" symbols namespace clean
      by adding correct embedding support via "uuid_" prefix.

@@ -15,9 +15,6 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
-/* Define to 1 if you have the `inet6' library (-linet6). */
-#undef HAVE_LIBINET6
-
 /* Define to 1 if you have the `nsl' library (-lnsl). */
 #undef HAVE_LIBNSL
 
@@ -50,12 +47,6 @@
 
 /* Define to 1 if you have the <net/if.h> header file. */
 #undef HAVE_NET_IF_H
-
-/* Define to 1 if socklen_t exists */
-#undef HAVE_SOCKLEN_T
-
-/* Define to 1 if ssize_t exists */
-#undef HAVE_SSIZE_T
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
@@ -140,3 +131,7 @@
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
+
+/* whether to use incorrect generation of IEEE 802 multicast addresses
+   according to RFC2518 */
+#undef WITH_RFC2518

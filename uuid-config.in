@@ -45,7 +45,7 @@ uuid_acdir="@datadir@/aclocal"
 uuid_cflags="@CFLAGS@"
 uuid_ldflags="@LDFLAGS@"
 uuid_libs="@LIBS@"
-uuid_version="@SA_VERSION_STR@"
+uuid_version="@UUID_VERSION_STR@"
 
 help=no
 version=no

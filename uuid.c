@@ -27,6 +27,7 @@
 **  uuid.c: library API implementation
 */
 
+/* system headers */
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -39,6 +40,7 @@
 #include <sys/time.h>
 #include <sys/types.h>
 
+/* own headers */
 #include "config.h"
 #include "uuid.h"
 #include "uuid_md5.h"
@@ -47,88 +49,29 @@
 #include "uuid_ui64.h"
 #include "uuid_str.h"
 #include "uuid_bm.h"
+#include "uuid_ac.h"
 
-/* determine types of 8-bit size */
-#if SIZEOF_CHAR == 1
-typedef char uuid_int8_t;
-#else
-#error uexpected: sizeof(char) != 1 !?
-#endif
-#if SIZEOF_UNSIGNED_CHAR == 1
-typedef unsigned char uuid_uint8_t;
-#else
-#error uexpected: sizeof(unsigned char) != 1 !?
-#endif
-
-/* determine types of 16-bit size */
-#if SIZEOF_SHORT == 2
-typedef short uuid_int16_t;
-#elif SIZEOF_INT == 2
-typedef int uuid_int16_t;
-#elif SIZEOF_LONG == 2
-typedef long uuid_int16_t;
-#else
-#error unexpected: no type found for uuid_int16_t
-#endif
-#if SIZEOF_UNSIGNED_SHORT == 2
-typedef unsigned short uuid_uint16_t;
-#elif SIZEOF_UNSIGNED_INT == 2
-typedef unsigned int uuid_uint16_t;
-#elif SIZEOF_UNSIGNED_LONG == 2
-typedef unsigned long uuid_uint16_t;
-#else
-#error unexpected: no type found for uuid_uint16_t
-#endif
-
-/* determine types of 32-bit size */
-#if SIZEOF_SHORT == 4
-typedef short uuid_int32_t;
-#elif SIZEOF_INT == 4
-typedef int uuid_int32_t;
-#elif SIZEOF_LONG == 4
-typedef long uuid_int32_t;
-#elif SIZEOF_LONG_LONG == 4
-typedef long long uuid_int32_t;
-#else
-#error unexpected: no type found for uuid_int32_t
-#endif
-#if SIZEOF_UNSIGNED_SHORT == 4
-typedef unsigned short uuid_uint32_t;
-#elif SIZEOF_UNSIGNED_INT == 4
-typedef unsigned int uuid_uint32_t;
-#elif SIZEOF_UNSIGNED_LONG == 4
-typedef unsigned long uuid_uint32_t;
-#elif SIZEOF_UNSIGNED_LONG_LONG == 4
-typedef unsigned long long uuid_uint32_t;
-#else
-#error unexpected: no type found for uuid_uint32_t
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-#ifndef TRUE
-#define TRUE !FALSE
-#endif
+/* IEEE 802 MAC address octet length */
+#define MAC_OCTETS 6
 
 /* UUID binary representation according to UUID standards */
 typedef struct {
-    uuid_uint32_t   time_low;
-    uuid_uint16_t   time_mid;
-    uuid_uint16_t   time_hi_and_version;
-    uuid_uint8_t    clock_seq_hi_and_reserved;
-    uuid_uint8_t    clock_seq_low;
-    uuid_uint8_t    node[6];
+    uuid_uint32_t  time_low;                  /* bits  0-31 of time field */
+    uuid_uint16_t  time_mid;                  /* bits 32-47 of time field */
+    uuid_uint16_t  time_hi_and_version;       /* bits 48-59 of time field plus 4 bit version */
+    uuid_uint8_t   clock_seq_hi_and_reserved; /* bits  8-13 of clock sequence field plus 2 bit variant */
+    uuid_uint8_t   clock_seq_low;             /* bits  0-7  of clock sequence field */
+    uuid_uint8_t   node[MAC_OCTETS];          /* bits  0-47 of node MAC address */
 } uuid_obj_t;
 
 /* abstract data type (ADT) of API */
 struct uuid_st {
-    uuid_obj_t     obj;       /* inlined UUID object */
-    prng_t        *prng;      /* RPNG sub-object */
-    md5_t         *md5;       /* MD5 sub-object */
-    uuid_uint8_t   mac[6];    /* pre-determined MAC address */
-    struct timeval time_last; /* last retrieved timestamp */
-    unsigned long  time_seq;  /* last timestamp sequence counter */
+    uuid_obj_t     obj;                       /* inlined UUID object */
+    prng_t        *prng;                      /* RPNG sub-object */
+    md5_t         *md5;                       /* MD5 sub-object */
+    uuid_uint8_t   mac[MAC_OCTETS];           /* pre-determined MAC address */
+    struct timeval time_last;                 /* last retrieved timestamp */
+    unsigned long  time_seq;                  /* last timestamp sequence counter */
 };
 
 /* create UUID object */
@@ -154,7 +97,7 @@ uuid_rc_t uuid_create(uuid_t **uuid)
     /* resolve MAC address for insertion into node field of UUIDs */
     if (!mac_address((unsigned char *)((*uuid)->mac), sizeof((*uuid)->mac))) {
         memset((*uuid)->mac, '\0', sizeof((*uuid)->mac));
-        (*uuid)->mac[0] = 0x80;
+        (*uuid)->mac[0] = BM_OCTET(1,0,0,0,0,0,0,0);
     }
 
     /* initialize time attributes */
@@ -206,10 +149,10 @@ uuid_rc_t uuid_isnil(uuid_t *uuid, int *result)
         return UUID_RC_ARG;
 
     /* a "nil UUID" is defined as all octets zero, so check for this case */
-    *result = TRUE;
+    *result = UUID_TRUE;
     for (i = 0, ucp = (unsigned char *)&(uuid->obj); i < UUID_LEN_BIN; i++) {
         if (*ucp++ != '\0') {
-            *result = FALSE;
+            *result = UUID_FALSE;
             break;
         }
     }
@@ -366,7 +309,7 @@ uuid_rc_t uuid_pack(uuid_t *uuid, void **buf)
 }
 
 /* INTERNAL: check for valid UUID string representation syntax */
-static int uuid_isstr(const char *str)
+static int uuid_isstr(const char *str, size_t str_len)
 {
     int i;
     const char *cp;
@@ -376,23 +319,22 @@ static int uuid_isstr(const char *str)
        012345678901234567890123456789012345
        0         1         2         3       */
     if (str == NULL)
-        return FALSE;
-    if (strlen(str) != UUID_LEN_STR)
-        return FALSE;
-    for (i = 0, cp = str; i <= UUID_LEN_STR; i++, cp++) {
+        return UUID_FALSE;
+    if (str_len == 0)
+        str_len = strlen(str);
+    if (str_len < UUID_LEN_STR)
+        return UUID_FALSE;
+    for (i = 0, cp = str; i < UUID_LEN_STR; i++, cp++) {
         if ((i == 8) || (i == 13) || (i == 18) || (i == 23)) {
             if (*cp == '-')
                 continue;
             else
-                return FALSE;
+                return UUID_FALSE;
         }
-        if (i == UUID_LEN_STR)
-            if (*cp == '\0')
-                continue;
         if (!isxdigit((int)(*cp)))
-            return FALSE;
+            return UUID_FALSE;
     }
-    return TRUE;
+    return UUID_TRUE;
 }
 
 /* parse string representation into UUID object */
@@ -408,7 +350,7 @@ uuid_rc_t uuid_parse(uuid_t *uuid, const char *str)
         return UUID_RC_ARG;
 
     /* check for correct UUID string representation syntax */
-    if (!uuid_isstr(str))
+    if (!uuid_isstr(str, 0))
         return UUID_RC_ARG;
 
     /* parse hex values of "time" parts */
@@ -446,7 +388,7 @@ uuid_rc_t uuid_format(uuid_t *uuid, char **str)
             return UUID_RC_MEM;
 
     /* format UUID into string representation */
-    sprintf(*str,
+    str_snprintf(*str, UUID_LEN_STR+1,
         "%08lx-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
         (unsigned long)uuid->obj.time_low,
         (unsigned int)uuid->obj.time_mid,
@@ -467,12 +409,12 @@ uuid_rc_t uuid_format(uuid_t *uuid, char **str)
 static void uuid_brand(uuid_t *uuid, int version)
 {
     /* set version (as given) */
-    uuid->obj.time_hi_and_version &= 0x0fff;
-    uuid->obj.time_hi_and_version |= (((uuid_uint16_t)version & 0x0fff) << 12);
+    uuid->obj.time_hi_and_version &= BM_MASK(11,0);
+    uuid->obj.time_hi_and_version |= BM_SHL((uuid_uint16_t)version, 12);
 
     /* set variant (always DCE 1.1 only) */
-    uuid->obj.clock_seq_hi_and_reserved &= ~((0x03) << 6);
-    uuid->obj.clock_seq_hi_and_reserved |= (0x02 << 6);
+    uuid->obj.clock_seq_hi_and_reserved &= BM_MASK(5,0);
+    uuid->obj.clock_seq_hi_and_reserved |= BM_SHL(0x02, 6);
     return;
 }
 
@@ -484,6 +426,71 @@ static void uuid_brand(uuid_t *uuid, int version)
    (UUID UTC base time is October 15, 1582
     Unix UTC base time is January  1, 1970) */
 #define UUID_TIMEOFFSET "01B21DD213814000"
+
+/* IEEE 802 MAC address encoding/decoding bit fields
+
+   ATTENTION:
+
+   In case no real/physical IEEE 802 address is available, both
+   "draft-leach-uuids-guids-01" (section "4. Node IDs when no IEEE 802
+   network card is available") and RFC 2518 (section "6.4.1 Node Field
+   Generation Without the IEEE 802 Address") recommend (quoted from RFC
+   2518):
+
+     "The ideal solution is to obtain a 47 bit cryptographic quality
+     random number, and use it as the low 47 bits of the node ID, with
+     the most significant bit of the first octet of the node ID set to
+     1. This bit is the unicast/multicast bit, which will never be set
+     in IEEE 802 addresses obtained from network cards; hence, there can
+     never be a conflict between UUIDs generated by machines with and
+     without network cards."
+
+   This clearly explains that the intention is to use IEEE 802 multicast
+   addresses. Unfortunately, it incorrectly explains how to implement
+   this! It actually is the "*LEAST* significant bit of the first octet
+   of the node ID" in a memory and hexadecimal string representation of
+   a 48-bit IEEE 802 MAC address.
+
+   Unfortunately, even the reference implementation included in the
+   expired IETF "draft-leach-uuids-guids-01" incorrectly set the
+   multicast bit with an OR bit operation and an incorrect mask of
+   0x80. Hence, multiple other UUID implementations can be found on the
+   Internet which inherited this bug.
+
+   Luckily, neither DCE 1.1 nor ISO/IEC 11578:1996 are affected by this
+   problem. They disregard the topic of missing IEEE 802 addresses
+   entirely, and thus avoid adopting this bug from the original draft
+   and code ;-)
+
+   The reason for the bug in the standards seems to be that the
+   multicast bit actually is the *MOST* significant bit in IEEE 802.3
+   (Ethernet) _transmission order_ of an IEEE 802 MAC address. The
+   authors seem to be confused by this and especially were not aware
+   that the bitwise order of an octet from a MAC address memory and
+   hexadecimal string representation is still always from left (MSB, bit
+   7) to right (LSB, bit 0).
+
+   For more information on this, see especially "Understanding
+   Physical Addresses" in "Ethernet -- The Definitive Guide",
+   p.43, and section "ETHERNET MULTICAST ADDRESSES" in
+   http://www.iana.org/assignments/ethernet-numbers.
+
+   Hence, we do it the intended/correct way and generate a real IEEE 802
+   multicast address, but with a brain-dead compile-time option one can
+   nevertheless enforce the broken generation of IEEE 802 MAC addresses.
+   For the decoding we always use the correct way, of course. */
+
+/* encoding */
+#ifdef WITH_RFC2518
+#define IEEE_MAC_MCBIT_ENC BM_OCTET(1,0,0,0,0,0,0,0)
+#else
+#define IEEE_MAC_MCBIT_ENC BM_OCTET(0,0,0,0,0,0,0,1)
+#endif
+#define IEEE_MAC_LOBIT_ENC BM_OCTET(0,0,0,0,0,0,1,0)
+
+/* decoding */
+#define IEEE_MAC_MCBIT_DEC BM_OCTET(0,0,0,0,0,0,0,1)
+#define IEEE_MAC_LOBIT_DEC BM_OCTET(0,0,0,0,0,0,1,0)
 
 /* INTERNAL: generate UUID version 1: time, clock and node based */
 static uuid_rc_t uuid_generate_v1(uuid_t *uuid, unsigned int mode, va_list ap)
@@ -568,7 +575,7 @@ static uuid_rc_t uuid_generate_v1(uuid_t *uuid, unsigned int mode, va_list ap)
      */
 
     /* retrieve current clock sequence */
-    clck = ((uuid->obj.clock_seq_hi_and_reserved & ~((0x03) << 6)) << 8)
+    clck = ((uuid->obj.clock_seq_hi_and_reserved & BM_MASK(5,0)) << 8)
            + uuid->obj.clock_seq_low;
 
     /* generate new random clock sequence (initially or if the
@@ -580,11 +587,11 @@ static uuid_rc_t uuid_generate_v1(uuid_t *uuid, unsigned int mode, va_list ap)
         prng_data(uuid->prng, (void *)&clck, sizeof(clck));
     else
         clck++;
-    clck &= ~((0x03) << 6);
+    clck %= BM_POW2(14);
 
     /* store back new clock sequence */
     uuid->obj.clock_seq_hi_and_reserved =
-        (uuid->obj.clock_seq_hi_and_reserved & ((0x03) << 6))
+        (uuid->obj.clock_seq_hi_and_reserved & BM_MASK(7,6))
         | (uuid_uint8_t)((clck >> 8) & 0xff);
     uuid->obj.clock_seq_low =
         (uuid_uint8_t)(clck & 0xff);
@@ -593,10 +600,11 @@ static uuid_rc_t uuid_generate_v1(uuid_t *uuid, unsigned int mode, va_list ap)
      *  GENERATE NODE
      */
 
-    if ((mode & UUID_MCASTRND) || (uuid->mac[0] & 0x80)) {
-        /* use random multi-cast MAC address */
+    if ((mode & UUID_MCASTRND) || (uuid->mac[0] & BM_OCTET(1,0,0,0,0,0,0,0))) {
+        /* generate random IEEE 802 local multicast MAC address */
         prng_data(uuid->prng, (void *)&(uuid->obj.node), sizeof(uuid->obj.node));
-        uuid->obj.node[0] |= 0x80;
+        uuid->obj.node[0] |= IEEE_MAC_MCBIT_ENC;
+        uuid->obj.node[0] |= IEEE_MAC_LOBIT_ENC;
     }
     else {
         /* use real regular MAC address */
@@ -654,7 +662,7 @@ static uuid_rc_t uuid_generate_v3(uuid_t *uuid, unsigned int mode, va_list ap)
         return UUID_RC_MEM;
 
     /* load the namespace UUID into MD5 context */
-    if (uuid_isstr(ns)) {
+    if (uuid_isstr(ns, 0)) {
         /* custom namespace via UUID string representation */
         if ((rc = uuid_create(&uuid_object)) != UUID_RC_OK)
             return rc;
@@ -760,9 +768,9 @@ uuid_rc_t uuid_dump(uuid_t *uuid, char **str)
 {
     const char *version;
     const char *variant;
-    uint8_t tmp8;
-    uint16_t tmp16;
-    uint32_t tmp32;
+    uuid_uint8_t tmp8;
+    uuid_uint16_t tmp16;
+    uuid_uint32_t tmp32;
     char string[UUID_LEN_STR+1];
     char *s;
     int i;
@@ -805,7 +813,7 @@ uuid_rc_t uuid_dump(uuid_t *uuid, char **str)
 
     /* decode UUID version */
     version = "unknown";
-    tmp16 = (BM_SHR(uuid->obj.time_hi_and_version, 12) & 0x000f);
+    tmp16 = (BM_SHR(uuid->obj.time_hi_and_version, 12) & BM_MASK(3,0));
     for (i = 0; i < sizeof(uuid_dectab_version)/sizeof(uuid_dectab_version[0]); i++) {
         if (uuid_dectab_version[i].num == (int)tmp16) {
             version = uuid_dectab_version[i].desc;
@@ -824,7 +832,7 @@ uuid_rc_t uuid_dump(uuid_t *uuid, char **str)
         /* decode version 1 */
 
         /* decode system time */
-        t = ui64_rol(ui64_n2i((unsigned long)(uuid->obj.time_hi_and_version & 0x0fff)), 48, NULL),
+        t = ui64_rol(ui64_n2i((unsigned long)(uuid->obj.time_hi_and_version & BM_MASK(11,0))), 48, NULL),
         t = ui64_or(t, ui64_rol(ui64_n2i((unsigned long)(uuid->obj.time_mid)), 32, NULL));
         t = ui64_or(t, ui64_n2i((unsigned long)(uuid->obj.time_low)));
         offset = ui64_s2i(UUID_TIMEOFFSET, NULL, 16);
@@ -837,19 +845,20 @@ uuid_rc_t uuid_dump(uuid_t *uuid, char **str)
         str_rsprintf(str, "content: time:  %s.%06d.%d UTC\n", buf, t_usec, t_nsec);
 
         /* decode clock sequence */
-        tmp32 = ((uuid->obj.clock_seq_hi_and_reserved & ~((0x03) << 6)) << 8)
+        tmp32 = ((uuid->obj.clock_seq_hi_and_reserved & BM_MASK(5,0)) << 8)
                 + uuid->obj.clock_seq_low;
         str_rsprintf(str, "         clock: %ld (usually random)\n", (unsigned long)tmp32);
 
         /* decode node MAC address */
-        str_rsprintf(str, "         node:  %02x:%02x:%02x:%02x:%02x:%02x (%s)\n",
+        str_rsprintf(str, "         node:  %02x:%02x:%02x:%02x:%02x:%02x (%s %s)\n",
             (unsigned int)uuid->obj.node[0],
             (unsigned int)uuid->obj.node[1],
             (unsigned int)uuid->obj.node[2],
             (unsigned int)uuid->obj.node[3],
             (unsigned int)uuid->obj.node[4],
             (unsigned int)uuid->obj.node[5],
-            (uuid->obj.node[0] & 0x80 ? "random multicast" : "real unicast"));
+            (uuid->obj.node[0] & IEEE_MAC_LOBIT_DEC ? "local" : "global"),
+            (uuid->obj.node[0] & IEEE_MAC_MCBIT_DEC ? "multicast" : "unicast"));
     }
     else if (tmp16 == 3) {
         /* decode version 3 */

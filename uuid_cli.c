@@ -146,6 +146,8 @@ int main(int argc, char *argv[])
             usage("invalid number of arguments");
         if ((rc = uuid_create(&uuid)) != UUID_RC_OK)
             error(1, "uuid_create: %s", uuid_error(rc));
+        if (strlen(argv[0]) != UUID_LEN_STR)
+            error(1, "invalid length of UUID string representation");
         if ((rc = uuid_parse(uuid, argv[0])) != UUID_RC_OK)
             error(1, "uuid_parse: %s", uuid_error(rc));
         if ((rc = uuid_dump(uuid, &cp)) != UUID_RC_OK)
@@ -165,6 +167,8 @@ int main(int argc, char *argv[])
             error(1, "uuid_create: %s", uuid_error(rc));
         if (argc == 1) {
             /* load initial UUID for setting old generator state */
+            if (strlen(argv[0]) != UUID_LEN_STR)
+                error(1, "invalid length of UUID string representation");
             if ((rc = uuid_parse(uuid, argv[0])) != UUID_RC_OK)
                 error(1, "uuid_parse: %s", uuid_error(rc));
         }

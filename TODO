@@ -1,9 +1,13 @@
 TODO
-- none
+- in-depth code review
+- at least minimum test suite
 CANDO
 - more platform support in uuid_mac.c?!
 - global locking according to standard?
 - persistent/non-volatile state writing?
-- use uuid_bm.h stuff throughout code
 - additional Perl API for covering Perl language
 - additional C API for DCE 1.1 compatibility
+- unify pack/unpack/parse/format/dump into:
+  typedef enum { UUID_FMT_BIN, UUID_FMT_STR, UUID_FMT_TXT, UUID_FMT_XML } uuid_fmt_t;
+  uuid_rc_t uuid_import(uuid_t *_uuid, uuid_fmt_t _fmt, const void  *_buf, size_t _size);
+  uuid_rc_t uuid_export(uuid_t *_uuid, uuid_fmt_t _fmt,       void **_buf, size_t _size);

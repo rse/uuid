@@ -56,28 +56,28 @@ struct uuid_st;
 typedef struct uuid_st uuid_t;
 
 /* object handling */
-extern uuid_rc_t  uuid_create   (uuid_t **uuid);
-extern uuid_rc_t  uuid_destroy  (uuid_t  *uuid);
-extern uuid_rc_t  uuid_nil      (uuid_t  *uuid);
+extern uuid_rc_t  uuid_create   (uuid_t **_uuid);
+extern uuid_rc_t  uuid_destroy  (uuid_t  *_uuid);
+extern uuid_rc_t  uuid_nil      (uuid_t  *_uuid);
 
 /* UUID comparison */
-extern uuid_rc_t  uuid_isnil    (uuid_t  *uuid,                int *result);
-extern uuid_rc_t  uuid_compare  (uuid_t  *uuid, uuid_t *uuid2, int *result);
+extern uuid_rc_t  uuid_isnil    (uuid_t  *_uuid,                 int *_result);
+extern uuid_rc_t  uuid_compare  (uuid_t  *_uuid, uuid_t *_uuid2, int *_result);
 
 /* UUID binary representation handling */
-extern uuid_rc_t  uuid_unpack   (uuid_t  *uuid, const void  *buf);
-extern uuid_rc_t  uuid_pack     (uuid_t  *uuid,       void **buf);
+extern uuid_rc_t  uuid_unpack   (uuid_t  *_uuid, const void  *_buf);
+extern uuid_rc_t  uuid_pack     (uuid_t  *_uuid,       void **_buf);
 
 /* UUID string representation handling */
-extern uuid_rc_t  uuid_parse    (uuid_t  *uuid, const char  *str);
-extern uuid_rc_t  uuid_format   (uuid_t  *uuid,       char **str);
+extern uuid_rc_t  uuid_parse    (uuid_t  *_uuid, const char  *_str);
+extern uuid_rc_t  uuid_format   (uuid_t  *_uuid,       char **_str);
 
 /* UUID generation and dumping */
-extern uuid_rc_t  uuid_generate (uuid_t  *uuid, unsigned int mode, ...);
-extern uuid_rc_t  uuid_dump     (uuid_t  *uuid, char **str);
+extern uuid_rc_t  uuid_generate (uuid_t  *_uuid, unsigned int _mode, ...);
+extern uuid_rc_t  uuid_dump     (uuid_t  *_uuid, char **_str);
 
 /* error handling */
-extern char      *uuid_error    (uuid_rc_t rc);
+extern char      *uuid_error    (uuid_rc_t _rc);
 
 #endif /* __UUID_H__ */
 

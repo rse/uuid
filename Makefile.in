@@ -76,7 +76,15 @@ $(LIB_NAME): $(LIB_OBJS)
 $(PRG_NAME): $(PRG_OBJS) $(LIB_NAME)
 	@$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) -o $(PRG_NAME) $(PRG_OBJS) $(LIB_NAME) $(LIBS)
 
-man: uuid.3 uuid.1
+uuid.lo: uuid.c config.h uuid.h uuid_md5.h uuid_prng.h uuid_mac.h uuid_ui64.h uuid_str.h uuid_bm.h uuid_ac.h
+uuid_mac.lo: uuid_mac.c config.h uuid_mac.h
+uuid_md5.lo: uuid_md5.c uuid_md5.h
+uuid_prng.lo: uuid_prng.c uuid_prng.h
+uuid_str.lo: uuid_str.c config.h uuid_str.h
+uuid_ui64.lo: uuid_ui64.c uuid_ui64.h
+uuid_cli.o: uuid_cli.c uuid.h
+
+man: uuid.3 uuid-config.1 uuid.1
 uuid.3: uuid.pod
 	V1=`$(SHTOOL) version -l txt -d short VERSION`; \
 	V2=`$(SHTOOL) version -l txt -d long VERSION`; \
@@ -85,6 +93,14 @@ uuid.3: uuid.pod
 	           --section=3 --center="Universally Unique Identifier" \
 	           --release="$$D" --date="OSSP uuid $$V1" uuid.pod | \
 	sed -e "s;UUID_VERSION_STR;$$V2;" >uuid.3
+uuid-config.1: uuid-config.pod
+	V1=`$(SHTOOL) version -l txt -d short VERSION`; \
+	V2=`$(SHTOOL) version -l txt -d long VERSION`; \
+	D=`$(SHTOOL) version -l txt -d long VERSION | sed -e 's;.*(;;' -e 's;).*;;'`; \
+	$(POD2MAN) --quotes=none \
+	           --section=3 --center="Universally Unique Identifier" \
+	           --release="$$D" --date="OSSP uuid $$V1" uuid-config.pod | \
+	sed -e "s;UUID_VERSION_STR;$$V2;" >uuid-config.1
 uuid.1: uuid_cli.pod
 	V1=`$(SHTOOL) version -l txt -d short VERSION`; \
 	V2=`$(SHTOOL) version -l txt -d long VERSION`; \
@@ -116,6 +132,7 @@ install:
 	$(SHTOOL) mkdir -f -p -m 755 $(DESTDIR)$(mandir)/man3
 	$(SHTOOL) mkdir -f -p -m 755 $(DESTDIR)$(mandir)/man1
 	$(SHTOOL) install -c -m 755 uuid-config $(DESTDIR)$(bindir)/
+	$(SHTOOL) install -c -m 644 uuid-config.1 $(DESTDIR)$(mandir)/man1/
 	$(SHTOOL) install -c -m 644 uuid.h $(DESTDIR)$(includedir)/
 	$(SHTOOL) install -c -m 644 uuid.3 $(DESTDIR)$(mandir)/man3/
 	@$(LIBTOOL) --mode=install $(SHTOOL) install -c -m 644 libuuid.la $(DESTDIR)$(libdir)/
@@ -128,6 +145,7 @@ uninstall:
 	-@$(LIBTOOL) --mode=uninstall $(RM) $(DESTDIR)$(libdir)/libuuid.la
 	-$(RM) $(DESTDIR)$(mandir)/man3/uuid.3
 	-$(RM) $(DESTDIR)$(includedir)/uuid.h
+	-$(RM) $(DESTDIR)$(mandir)/man1/uuid-config.1
 	-$(RM) $(DESTDIR)$(bindir)/uuid-config
 	-$(RMDIR) $(DESTDIR)$(mandir)/man1 >/dev/null 2>&1 || $(TRUE)
 	-$(RMDIR) $(DESTDIR)$(mandir)/man3 >/dev/null 2>&1 || $(TRUE)

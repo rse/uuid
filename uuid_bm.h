@@ -31,7 +31,7 @@
 #define __UUID_BM_H__
 
 /*
- *  Bitmask Calculation Macros
+ *  Bitmask Calculation Macros (up to 32 bit only)
  *  (Notice: bit positions are counted n...0, i.e. lowest bit is position 0)
  */
 
@@ -62,7 +62,7 @@
 
 /* generate the value 2^n */
 #define BM_POW2(n) \
-    BM_BIT(1,n)
+    BM_BIT(n,1)
 
 /* shift word w k bits to the left or to the right */
 #define BM_SHL(w,k) \
