@@ -24,14 +24,14 @@
 ##  OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 ##  SUCH DAMAGE.
 ##
-##  uuid.tm: Perl XS typemap for xsubpp(1) 
+##  uuid.tm: Perl XS typemap for xsubpp(1)
 ##
 
 TYPEMAP
-uuid_t *        T_PTRREF  
-uuid_t **       T_PTRREF  
-uuid_rc_t       T_IV  
-uuid_fmt_t      T_IV  
+uuid_t *        T_PTRREF
+uuid_t **       T_PTRREF
+uuid_rc_t       T_IV
+uuid_fmt_t      T_IV
 int *           T_PV
 size_t *        T_PV
 const void *    T_PV

@@ -46,7 +46,7 @@ WriteMakefile(
     NO_META           => 1,
     #    cruel hack to workaround the conflict between OSSP uuid's
     #    uuid_create() function and one from FreeBSD's libc
-    ((   "$Config{'osname'}$Config{'osvers'}" =~ m/^freebsd5\./
+    ((   "$Config{'osname'}$Config{'osvers'}" =~ m/^freebsd[56]\./
       and $Config{'ld'} =~ m/cc$/ and -f "/usr/include/uuid.h") ?
       ( LDDLFLAGS => $Config{'lddlflags'} . ' -Wl,-Bsymbolic') : ())
 );

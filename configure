@@ -24232,7 +24232,7 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
-    if test ".$PERL" = .NA; then
+    if test ".$ac_cv_with_perl" = ".yes" -a ".$PERL" = ".NA"; then
         { { echo "$as_me:$LINENO: error: required Perl interpreter not found in \$PATH" >&5
 echo "$as_me: error: required Perl interpreter not found in \$PATH" >&2;}
    { (exit 1); exit 1; }; }

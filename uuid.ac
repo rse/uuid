@@ -102,7 +102,7 @@ AC_DEFUN(UUID_CHECK_ALL,[
     AC_SUBST(WITH_PERL)
     AC_SUBST(PERL_NAME)
     AC_PATH_PROG(PERL, perl, NA)
-    if test ".$PERL" = .NA; then
+    if test ".$ac_cv_with_perl" = ".yes" -a ".$PERL" = ".NA"; then
         AC_ERROR([required Perl interpreter not found in \$PATH])
     fi
 ])

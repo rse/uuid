@@ -11,6 +11,17 @@
   This is a list of all changes to OSSP uuid.
   For a more brief summary please have a look at the NEWS file.
 
+  Changes between 1.1.0 and 1.1.1 (03-Nov-2004 to 18-Nov-2004)
+
+   o Apply the FreeBSD libc uuid_create() related workaround
+     in the Perl bindings also under FreeBSD 6.0-CURRENT. 
+     [Ralf S. Engelschall]
+
+   o Fix --with-perl configure option processing: Perl is
+     only required if --with-perl is used although we search for Perl
+     always in order to provide the PERL variable substitution.
+     [Ralf S. Engelschall]
+
   Changes between 1.0.4 and 1.1.0 (16-Oct-2004 to 03-Nov-2004)
 
    o Add --with-perl configure option for optionally enabling
