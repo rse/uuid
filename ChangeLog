@@ -11,6 +11,11 @@
   This is a list of all changes to OSSP uuid.
   For a more brief summary please have a look at the NEWS file.
 
+  Changes between 1.0.4 and 1.0.4 (15-Oct-2004 to 16-Oct-2004)
+
+   o Fix version detection from uuid_vers.h
+     [Ralf S. Engelschall]
+
   Changes between 1.0.2 and 1.0.3 (12-Sep-2004 to 15-Oct-2004)
 
    o Support configuring/building/installing from an arbitrary

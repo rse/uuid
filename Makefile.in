@@ -82,11 +82,11 @@ all: $(TARGETS)
 
 $(LIB_NAME): $(LIB_OBJS)
 	@$(LIBTOOL) --mode=link $(CC) -o $(LIB_NAME) $(LIB_OBJS) -rpath $(libdir) \
-	    -version-info `$(SHTOOL) version -l txt -d libtool VERSION`
+	    -version-info `$(SHTOOL) version -l c -d libtool $(top_srcdir)/uuid_vers.h`
 
 $(DCE_NAME): $(DCE_OBJS)
 	@$(LIBTOOL) --mode=link $(CC) -o $(DCE_NAME) $(DCE_OBJS) -rpath $(libdir) \
-	    -version-info `$(SHTOOL) version -l txt -d libtool VERSION`
+	    -version-info `$(SHTOOL) version -l c -d libtool $(top_srcdir)/uuid_vers.h`
 
 $(PRG_NAME): $(PRG_OBJS) $(LIB_NAME)
 	@$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) -o $(PRG_NAME) $(PRG_OBJS) $(LIB_NAME) $(LIBS)
@@ -102,25 +102,25 @@ uuid_cli.o: uuid_cli.c uuid.h
 
 man: uuid.3 uuid-config.1 uuid.1
 uuid.3: uuid.pod
-	V1=`$(SHTOOL) version -l txt -d short $(top_srcdir)/VERSION`; \
-	V2=`$(SHTOOL) version -l txt -d long $(top_srcdir)/VERSION`; \
-	D=`$(SHTOOL) version -l txt -d long $(top_srcdir)/VERSION | sed -e 's;.*(;;' -e 's;).*;;'`; \
+	V1=`$(SHTOOL) version -l c -d short $(top_srcdir)/uuid_vers.h`; \
+	V2=`$(SHTOOL) version -l c -d long $(top_srcdir)/uuid_vers.h`; \
+	D=`$(SHTOOL) version -l c -d long $(top_srcdir)/uuid_vers.h | sed -e 's;.*(;;' -e 's;).*;;'`; \
 	$(POD2MAN) --quotes=none \
 	           --section=3 --center="Universally Unique Identifier" \
 	           --release="$$D" --date="OSSP uuid $$V1" $(srcdir)/uuid.pod | \
 	sed -e "s;UUID_VERSION_STR;$$V2;" >uuid.3
 uuid-config.1: uuid-config.pod
-	V1=`$(SHTOOL) version -l txt -d short $(top_srcdir)/VERSION`; \
-	V2=`$(SHTOOL) version -l txt -d long $(top_srcdir)/VERSION`; \
-	D=`$(SHTOOL) version -l txt -d long $(top_srcdir)/VERSION | sed -e 's;.*(;;' -e 's;).*;;'`; \
+	V1=`$(SHTOOL) version -l c -d short $(top_srcdir)/uuid_vers.h`; \
+	V2=`$(SHTOOL) version -l c -d long $(top_srcdir)/uuid_vers.h`; \
+	D=`$(SHTOOL) version -l c -d long $(top_srcdir)/uuid_vers.h | sed -e 's;.*(;;' -e 's;).*;;'`; \
 	$(POD2MAN) --quotes=none \
 	           --section=3 --center="Universally Unique Identifier" \
 	           --release="$$D" --date="OSSP uuid $$V1" $(srcdir)/uuid-config.pod | \
 	sed -e "s;UUID_VERSION_STR;$$V2;" >uuid-config.1
 uuid.1: uuid_cli.pod
-	V1=`$(SHTOOL) version -l txt -d short $(top_srcdir)/VERSION`; \
-	V2=`$(SHTOOL) version -l txt -d long $(top_srcdir)/VERSION`; \
-	D=`$(SHTOOL) version -l txt -d long $(top_srcdir)/VERSION | sed -e 's;.*(;;' -e 's;).*;;'`; \
+	V1=`$(SHTOOL) version -l c -d short $(top_srcdir)/uuid_vers.h`; \
+	V2=`$(SHTOOL) version -l c -d long $(top_srcdir)/uuid_vers.h`; \
+	D=`$(SHTOOL) version -l c -d long $(top_srcdir)/uuid_vers.h | sed -e 's;.*(;;' -e 's;).*;;'`; \
 	$(CP) $(srcdir)/uuid_cli.pod /tmp/uuid.pod; \
 	$(POD2MAN) --quotes=none \
 	           --section=1 --center="Universally Unique Identifier" \
