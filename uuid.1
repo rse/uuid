@@ -129,12 +129,12 @@
 .\" ========================================================================
 .\"
 .IX Title "UUID 1"
-.TH UUID 1 "OSSP uuid 0.1.0" "11-Feb-2004" "Universally Unique Identifier"
+.TH UUID 1 "OSSP uuid 0.1.0" "13-Feb-2004" "Universally Unique Identifier"
 .SH "NAME"
 \&\fBOSSP uuid\fR \- \fBUniversally Unique Identifier Command\-Line Tool\fR
 .SH "VERSION"
 .IX Header "VERSION"
-\&\s-1OSSP\s0 uuid \s-10.1.0 (11-Feb-2004)\s0
+\&\s-1OSSP\s0 uuid \s-10.1.0 (13-Feb-2004)\s0
 .SH "SYNOPSIS"
 .IX Header "SYNOPSIS"
 \&\fBuuid\fR
@@ -150,7 +150,7 @@
 \&\fB\-d\fR
 [\fB\-r\fR]
 [\fB\-o\fR \fIfilename\fR]
-[\fIuuid\fR]
+\&\fIuuid\fR
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
 \&\fB\s-1OSSP\s0 uuid\fR is a ISO-C application programming interface (\s-1API\s0) and
@@ -209,8 +209,9 @@ the standardized \s-1ASCII\s0 string representation.
 Write output to \fIfilename\fR instead of to \fIstdout\fR.
 .IP "\fB\-d\fR" 3
 .IX Item "-d"
-Decode a given \s-1UUID\s0 (either on \fIstdin\fR or as an argument on the command
-line) and dump textual information about the \s-1UUID\s0.
+Decode a given \s-1UUID\s0 (given as a command line argument or if the command
+line argument is "\f(CW\*(C`\-\*(C'\fR" the \s-1UUID\s0 is read from \fIstdin\fR) and dump textual
+information about the \s-1UUID\s0.
 .SH "EXAMPLES"
 .IX Header "EXAMPLES"
 .Vb 3

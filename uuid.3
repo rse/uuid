@@ -129,12 +129,12 @@
 .\" ========================================================================
 .\"
 .IX Title "uuid 3"
-.TH uuid 3 "OSSP uuid 0.1.0" "11-Feb-2004" "Universally Unique Identifier"
+.TH uuid 3 "OSSP uuid 0.1.0" "13-Feb-2004" "Universally Unique Identifier"
 .SH "NAME"
 \&\fBOSSP uuid\fR \- \fBUniversally Unique Identifier\fR
 .SH "VERSION"
 .IX Header "VERSION"
-\&\s-1OSSP\s0 uuid \s-10.1.0 (11-Feb-2004)\s0
+\&\s-1OSSP\s0 uuid \s-10.1.0 (13-Feb-2004)\s0
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
 \&\fB\s-1OSSP\s0 uuid\fR is a ISO-C application programming interface (\s-1API\s0) and
@@ -174,8 +174,9 @@ multiple of an octet in size and stored in network byte order:
 .PP
 An example of a \s-1UUID\s0 binary representation is the octet stream "\f(CW\*(C`0xEC
 0xB9 0xF3 0x5F 0x44 0x2A 0x11 0xD8 0x8A 0x24 0x00 0x90 0x27 0x2F 0xF7
-0x25\*(C'\fR". The binary representation format is exactly what the \fB\s-1OSSP\s0 uuid\fR
-\&\s-1API\s0 functions \fBuuid_pack\fR() and \fBuuid_unpack\fR() deal with.
+0x25\*(C'\fR". The binary representation format is exactly what the \fB\s-1OSSP\s0
+uuid\fR \s-1API\s0 functions \fBuuid_import\fR() and \fBuuid_export\fR() deal with
+under \f(CW\*(C`UUID_FMT_BIN\*(C'\fR.
 .Sh "\s-1UUID\s0 \s-1ASCII\s0 String Representation"
 .IX Subsection "UUID ASCII String Representation"
 According to the \s-1DCE\s0 1.1 and \s-1ISO/IEC\s0 11578:1996 standards, a \s-1DCE\s0
@@ -204,8 +205,8 @@ the following grammar:
 .PP
 An example of a \s-1UUID\s0 string representation is the \s-1ASCII\s0 string
 "\f(CW\*(C`54531d28\-402b\-11d8\-af12\-0002a5094c23\*(C'\fR". The string representation
-format is exactly what the \fB\s-1OSSP\s0 uuid\fR \s-1API\s0 functions \fBuuid_parse\fR() and
-\&\fBuuid_format\fR() deal with.
+format is exactly what the \fB\s-1OSSP\s0 uuid\fR \s-1API\s0 functions \fBuuid_import\fR()
+and \fBuuid_export\fR() deal with under \f(CW\*(C`UUID_FMT_STR\*(C'\fR.
 .Sh "\s-1UUID\s0 Variants and Versions"
 .IX Subsection "UUID Variants and Versions"
 A \s-1UUID\s0 has a variant and version. The variant defines the layout of the
@@ -263,20 +264,32 @@ consists of the following components.
 .Sh "\s-1CONSTANTS\s0"
 .IX Subsection "CONSTANTS"
 The following constants are provided:
+.IP "\fB\s-1UUID_VERSION\s0\fR" 4
+.IX Item "UUID_VERSION"
+The hexadecimal encoded \fB\s-1OSSP\s0 uuid\fR version. This allows compile-time
+checking of the \fB\s-1OSSP\s0 uuid\fR version. For run-time checking use
+\&\fBuuid_version\fR() instead.
+.Sp
+The hexadecimal encoding for a version "$\fIv\fR.$\fIr\fR$\fIt\fR$\fIl\fR" is
+calculated with the \fB\s-1GNU\s0 shtool\fR \fBversion\fR command and is (in
+Perl-style for concise description) "sprintf('0x%x%02x%d%02x', $\fIv\fR,
+$\fIr\fR, {qw(s 9 . 2 b 1 a 0)}\->{$\fIt\fR}, ($\fIt\fR eq 's' ? 99 : $\fIl\fR))\*(L",
+i.e., the version 0.9.6 is encoded as \*(R"0x009206".
 .IP "\fB\s-1UUID_LEN_BIN\s0\fR, \fB\s-1UUID_LEN_STR\s0\fR" 4
 .IX Item "UUID_LEN_BIN, UUID_LEN_STR"
 The number of octets of the \s-1UUID\s0 binary and string representations.
 Notice that the lengths of the string representation does \fInot\fR include
 the necessary \f(CW\*(C`NUL\*(C'\fR termination character.
-.IP "\fB\s-1UUID_VERSION1\s0\fR, \fB\s-1UUID_VERSION3\s0\fR, \fB\s-1UUID_VERSION4\s0\fR, \fB\s-1UUID_MCASTRND\s0\fR" 4
-.IX Item "UUID_VERSION1, UUID_VERSION3, UUID_VERSION4, UUID_MCASTRND"
-The \fImode\fR bits for use with \fBuuid_make\fR(). The
-\&\fB\s-1UUID_VERSION\s0\fR\fIN\fR specify which \s-1UUID\s0 version to generate. The
-\&\fB\s-1UUID_MCASTRND\s0\fR forces the use of a random multi-cast \s-1MAC\s0 address
-instead of the real physical \s-1MAC\s0 address in version 1 UUIDs.
-.IP "\fB\s-1UUID_RC_OK\s0\fR, \fB\s-1UUID_RC_ARG\s0\fR, \fB\s-1UUID_RC_MEM\s0\fR, \fB\s-1UUID_RC_SYS\s0\fR, \fB\s-1UUID_RC_INT\s0\fR" 4
-.IX Item "UUID_RC_OK, UUID_RC_ARG, UUID_RC_MEM, UUID_RC_SYS, UUID_RC_INT"
+.IP "\fB\s-1UUID_MAKE_V1\s0\fR, \fB\s-1UUID_MAKE_V3\s0\fR, \fB\s-1UUID_MAKE_V4\s0\fR, \fB\s-1UUID_MAKE_MC\s0\fR" 4
+.IX Item "UUID_MAKE_V1, UUID_MAKE_V3, UUID_MAKE_V4, UUID_MAKE_MC"
+The \fImode\fR bits for use with \fBuuid_make\fR(). The \fB\s-1UUID_MAKE_V\s0\fR\fIN\fR
+specify which \s-1UUID\s0 version to generate. The \fB\s-1UUID_MAKE_MC\s0\fR forces the
+use of a random multi-cast \s-1MAC\s0 address instead of the real physical \s-1MAC\s0
+address in version 1 UUIDs.
+.IP "\fB\s-1UUID_RC_OK\s0\fR, \fB\s-1UUID_RC_ARG\s0\fR, \fB\s-1UUID_RC_MEM\s0\fR, \fB\s-1UUID_RC_SYS\s0\fR, \fB\s-1UUID_RC_INT\s0\fR, \fB\s-1UUID_RC_IMP\s0\fR" 4
+.IX Item "UUID_RC_OK, UUID_RC_ARG, UUID_RC_MEM, UUID_RC_SYS, UUID_RC_INT, UUID_RC_IMP"
 The possible numerical return-codes of \s-1API\s0 functions.
+The \f(CW\*(C`UUID_RC_OK\*(C'\fR indicates success, the others indicate errors.
 Use \fBuuid_error\fR() to translate them into string versions.
 .IP "\fB\s-1UUID_FMT_BIN\s0\fR, \fB\s-1UUID_FMT_STR\s0\fR, \fB\s-1UUID_FMT_TXT\s0\fR" 4
 .IX Item "UUID_FMT_BIN, UUID_FMT_STR, UUID_FMT_TXT"
@@ -381,6 +394,11 @@ data.
 .IX Item "char *uuid_error(uuid_rc_t rc);"
 Returns a constant string representation corresponding to the
 return-code \fIrc\fR for use in displaying \fB\s-1OSSP\s0 uuid\fR errors.
+.IP "unsigned long \fBuuid_version\fR(void);" 4
+.IX Item "unsigned long uuid_version(void);"
+Returns the hexadecimal encoded \fB\s-1OSSP\s0 uuid\fR version as compiled into
+the library object files. This allows run-time checking of the \fB\s-1OSSP\s0
+uuid\fR version. For compile-time checking use \f(CW\*(C`UUID_VERSION\*(C'\fR instead.
 .SH "EXAMPLE"
 .IX Header "EXAMPLE"
 The following shows an example usage of the \s-1API\s0. Error handling is
@@ -455,9 +473,9 @@ http://www.ietf.org/rfc/rfc2518.txt
 .IP "\(bu" 4
 \&\fBA \s-1UUID\s0 \s-1URN\s0 Namespace\fR,
 P. Leach, M. Mealling, R. Salz,
-\&\s-1IETF\s0 Internet Draft draft\-mealling\-uuid\-urn\-01,
-October 2003, 31 pages,
-http://www.ietf.org/internet\-drafts/draft\-mealling\-uuid\-urn\-01.txt
+\&\s-1IETF\s0 Internet Draft draft\-mealling\-uuid\-urn\-02,
+January 2004, 31 pages,
+http://www.ietf.org/internet\-drafts/draft\-mealling\-uuid\-urn\-02.txt
 .IP "\(bu" 4
 \&\fB\s-1DCE\s0 1.1 compliant \s-1UUID\s0 functions\fR,
 FreeBSD manual pages \fIuuid\fR\|(3) and \fIuuidgen\fR\|(2),

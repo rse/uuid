@@ -75,8 +75,9 @@ multiple of an octet in size and stored in network byte order:
 
 An example of a UUID binary representation is the octet stream "C<0xEC
 0xB9 0xF3 0x5F 0x44 0x2A 0x11 0xD8 0x8A 0x24 0x00 0x90 0x27 0x2F 0xF7
-0x25>". The binary representation format is exactly what the B<OSSP uuid>
-API functions B<uuid_pack>() and B<uuid_unpack>() deal with.
+0x25>". The binary representation format is exactly what the B<OSSP
+uuid> API functions B<uuid_import>() and B<uuid_export>() deal with
+under C<UUID_FMT_BIN>.
 
 =head2 UUID ASCII String Representation
 
@@ -104,8 +105,8 @@ the following grammar:
 
 An example of a UUID string representation is the ASCII string
 "C<54531d28-402b-11d8-af12-0002a5094c23>". The string representation
-format is exactly what the B<OSSP uuid> API functions B<uuid_parse>() and
-B<uuid_format>() deal with.
+format is exactly what the B<OSSP uuid> API functions B<uuid_import>()
+and B<uuid_export>() deal with under C<UUID_FMT_STR>.
 
 =head2 UUID Variants and Versions
 
@@ -178,22 +179,35 @@ The following constants are provided:
 
 =over 4
 
+=item B<UUID_VERSION>
+
+The hexadecimal encoded B<OSSP uuid> version. This allows compile-time
+checking of the B<OSSP uuid> version. For run-time checking use
+B<uuid_version>() instead.
+
+The hexadecimal encoding for a version "$I<v>.$I<r>$I<t>$I<l>" is
+calculated with the B<GNU shtool> B<version> command and is (in
+Perl-style for concise description) "sprintf('0x%x%02x%d%02x', $I<v>,
+$I<r>, {qw(s 9 . 2 b 1 a 0)}->{$I<t>}, ($I<t> eq 's' ? 99 : $I<l>))",
+i.e., the version 0.9.6 is encoded as "0x009206".
+
 =item B<UUID_LEN_BIN>, B<UUID_LEN_STR>
 
 The number of octets of the UUID binary and string representations.
 Notice that the lengths of the string representation does I<not> include
 the necessary C<NUL> termination character.
 
-=item B<UUID_VERSION1>, B<UUID_VERSION3>, B<UUID_VERSION4>, B<UUID_MCASTRND>
+=item B<UUID_MAKE_V1>, B<UUID_MAKE_V3>, B<UUID_MAKE_V4>, B<UUID_MAKE_MC>
 
-The I<mode> bits for use with B<uuid_make>(). The
-B<UUID_VERSION>I<N> specify which UUID version to generate. The
-B<UUID_MCASTRND> forces the use of a random multi-cast MAC address
-instead of the real physical MAC address in version 1 UUIDs.
+The I<mode> bits for use with B<uuid_make>(). The B<UUID_MAKE_V>I<N>
+specify which UUID version to generate. The B<UUID_MAKE_MC> forces the
+use of a random multi-cast MAC address instead of the real physical MAC
+address in version 1 UUIDs.
 
-=item B<UUID_RC_OK>, B<UUID_RC_ARG>, B<UUID_RC_MEM>, B<UUID_RC_SYS>, B<UUID_RC_INT>
+=item B<UUID_RC_OK>, B<UUID_RC_ARG>, B<UUID_RC_MEM>, B<UUID_RC_SYS>, B<UUID_RC_INT>, B<UUID_RC_IMP>
 
 The possible numerical return-codes of API functions.
+The C<UUID_RC_OK> indicates success, the others indicate errors.
 Use B<uuid_error>() to translate them into string versions.
 
 =item B<UUID_FMT_BIN>, B<UUID_FMT_STR>, B<UUID_FMT_TXT>
@@ -312,6 +326,12 @@ data.
 Returns a constant string representation corresponding to the
 return-code I<rc> for use in displaying B<OSSP uuid> errors.
 
+=item unsigned long B<uuid_version>(void);
+
+Returns the hexadecimal encoded B<OSSP uuid> version as compiled into
+the library object files. This allows run-time checking of the B<OSSP
+uuid> version. For compile-time checking use C<UUID_VERSION> instead.
+
 =back
 
 =head1 EXAMPLE
@@ -393,9 +413,9 @@ http://www.ietf.org/rfc/rfc2518.txt
 
 B<A UUID URN Namespace>,
 P. Leach, M. Mealling, R. Salz,
-IETF Internet Draft draft-mealling-uuid-urn-01,
-October 2003, 31 pages,
-http://www.ietf.org/internet-drafts/draft-mealling-uuid-urn-01.txt
+IETF Internet Draft draft-mealling-uuid-urn-02,
+January 2004, 31 pages,
+http://www.ietf.org/internet-drafts/draft-mealling-uuid-urn-02.txt
 
 =item
 

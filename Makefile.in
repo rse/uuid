@@ -200,7 +200,7 @@ clean:
 
 distclean: clean
 	-$(RM) config.log config.status config.cache
-	-$(RM) Makefile config.h uuid-config
+	-$(RM) Makefile config.h uuid-config uuid.h
 	-$(RM) libtool
 
 realclean: distclean

@@ -71,12 +71,6 @@ AC_DEFUN(UUID_CHECK_ALL,[
     AC_CHECK_SIZEOF(unsigned long long, 8)
 
     dnl #   options
-    AC_ARG_WITH(rfc2518,
-        AC_HELP_STRING([--with-rfc2518], [use incorrect generation of IEEE 802 multicast addresses according to RFC2518]),
-        [ac_cv_with_rfc2518=$withval], [ac_cv_with_rfc2518=no])
-    if test ".$ac_cv_with_rfc2518" = ".yes"; then
-        AC_DEFINE(WITH_RFC2518, 1, [whether to use incorrect generation of IEEE 802 multicast addresses according to RFC2518])
-    fi
     AC_ARG_WITH(dce,
         AC_HELP_STRING([--with-dce], [build DCE 1.1 backward compatibility API]),
         [ac_cv_with_dce=$withval], [ac_cv_with_dce=no])

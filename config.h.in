@@ -134,7 +134,3 @@
 
 /* whether to build DCE 1.1 backward compatibility API */
 #undef WITH_DCE
-
-/* whether to use incorrect generation of IEEE 802 multicast addresses
-   according to RFC2518 */
-#undef WITH_RFC2518

@@ -62,7 +62,8 @@ usage(const char *str, ...)
         vfprintf(stderr, str, ap);
         fprintf(stderr, "\n");
     }
-    fprintf(stderr, "usage: uuid [-1] [-n count] [-a] [-d] [-o filename] [UUID]\n");
+    fprintf(stderr, "usage: uuid [-v version] [-m] [-n count] [-1] [-r] [-o filename] [namespace-name]\n");
+    fprintf(stderr, "usage: uuid -d [-r] [-o filename] [uuid]\n");
     va_end(ap);
     exit(1);
 }
@@ -70,6 +71,8 @@ usage(const char *str, ...)
 /* main procedure */
 int main(int argc, char *argv[])
 {
+    char uuid_buf_bin[UUID_LEN_BIN];
+    char uuid_buf_str[UUID_LEN_STR+1];
     uuid_t *uuid;
     uuid_t *uuid_ns;
     uuid_rc_t rc;
@@ -92,7 +95,7 @@ int main(int argc, char *argv[])
     raw = 0;        /* default is ASCII output */
     decode = 0;     /* default is to encode */
     version = UUID_MAKE_V1;
-    while ((ch = getopt(argc, argv, "1n:rdmo:v:")) != -1) {
+    while ((ch = getopt(argc, argv, "1n:rdmo:v:h")) != -1) {
         switch (ch) {
             case '1':
                 iterate = 1;
@@ -132,6 +135,9 @@ int main(int argc, char *argv[])
                         break;
                 }
                 break;
+            case 'h':
+                usage(NULL);
+                break;
             default:
                 usage("invalid option '%c'", optopt);
         }
@@ -143,14 +149,33 @@ int main(int argc, char *argv[])
 
     if (decode) {
         /* decoding */
-        if (argc != 1)
-            usage("invalid number of arguments");
         if ((rc = uuid_create(&uuid)) != UUID_RC_OK)
             error(1, "uuid_create: %s", uuid_error(rc));
-        if (strlen(argv[0]) != UUID_LEN_STR)
-            error(1, "invalid length of UUID string representation");
-        if ((rc = uuid_import(uuid, UUID_FMT_STR, argv[0], strlen(argv[0]))) != UUID_RC_OK)
-            error(1, "uuid_import: %s", uuid_error(rc));
+        if (argc != 1)
+            usage("invalid number of arguments");
+        if (strcmp(argv[0], "-") == 0) {
+            if (raw) {
+                if (fread(uuid_buf_bin, UUID_LEN_BIN, 1, stdin) != 1)
+                    error(1, "fread: failed to read %d (UUID_LEN_BIN) bytes from stdin", UUID_LEN_BIN);
+                if ((rc = uuid_import(uuid, UUID_FMT_BIN, uuid_buf_bin, UUID_LEN_BIN)) != UUID_RC_OK)
+                    error(1, "uuid_import: %s", uuid_error(rc));
+            }
+            else {
+                if (fread(uuid_buf_str, UUID_LEN_STR, 1, stdin) != 1)
+                    error(1, "fread: failed to read %d (UUID_LEN_STR) bytes from stdin", UUID_LEN_STR);
+                uuid_buf_str[UUID_LEN_STR] = '\0';
+                if ((rc = uuid_import(uuid, UUID_FMT_STR, uuid_buf_str, UUID_LEN_STR)) != UUID_RC_OK)
+                    error(1, "uuid_import: %s", uuid_error(rc));
+            }
+        }
+        else {
+            if (raw)
+                error(1, "raw input mode only possible if reading from stdin");
+            if (strlen(argv[0]) != UUID_LEN_STR)
+                error(1, "invalid length of UUID string representation");
+            if ((rc = uuid_import(uuid, UUID_FMT_STR, argv[0], strlen(argv[0]))) != UUID_RC_OK)
+                error(1, "uuid_import: %s", uuid_error(rc));
+        }
         vp = NULL;
         if ((rc = uuid_export(uuid, UUID_FMT_TXT, &vp, NULL)) != UUID_RC_OK)
             error(1, "uuid_export: %s", uuid_error(rc));

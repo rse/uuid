@@ -52,7 +52,7 @@ B<uuid>
 B<-d>
 [B<-r>]
 [B<-o> I<filename>]
-[I<uuid>]
+I<uuid>
 
 =head1 DESCRIPTION
 
@@ -121,8 +121,9 @@ Write output to I<filename> instead of to F<stdout>.
 
 =item B<-d>
 
-Decode a given UUID (either on F<stdin> or as an argument on the command
-line) and dump textual information about the UUID.
+Decode a given UUID (given as a command line argument or if the command
+line argument is "C<->" the UUID is read from F<stdin>) and dump textual
+information about the UUID.
 
 =back
 
