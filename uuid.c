@@ -170,7 +170,7 @@ uuid_rc_t uuid_compare(uuid_t *uuid1, uuid_t *uuid2, int *result)
     if (result == NULL)
         return UUID_RC_ARG;
 
-    /* convinience macro for setting result */
+    /* convenience macro for setting result */
 #   define RESULT(r) \
     do { \
         *result = (r); \
@@ -472,7 +472,7 @@ static uuid_rc_t uuid_export_txt(uuid_t *uuid, void **data_ptr, size_t *data_len
     time_t t_sec;
     char t_buf[19+1]; /* YYYY-MM-DD HH:MM:SS */
     struct tm *tm;
-    unsigned int i;
+    int i;
 
     /* sanity check argument(s) */
     if (uuid == NULL || data_ptr == NULL)
@@ -505,7 +505,7 @@ static uuid_rc_t uuid_export_txt(uuid_t *uuid, void **data_ptr, size_t *data_len
                 break;
             }
         }
-        for (i = 0; i < sizeof(uuid_dectab_variant)/sizeof(uuid_dectab_variant[0]); i++) {
+        for (i = 0; i < (int)(sizeof(uuid_dectab_variant)/sizeof(uuid_dectab_variant[0])); i++) {
             if (uuid_dectab_variant[i].num == tmp8) {
                 variant = uuid_dectab_variant[i].desc;
                 break;
@@ -520,7 +520,7 @@ static uuid_rc_t uuid_export_txt(uuid_t *uuid, void **data_ptr, size_t *data_len
         version = "n.a.";
     else {
         version = "unknown";
-        for (i = 0; i < sizeof(uuid_dectab_version)/sizeof(uuid_dectab_version[0]); i++) {
+        for (i = 0; i < (int)(sizeof(uuid_dectab_version)/sizeof(uuid_dectab_version[0])); i++) {
             if (uuid_dectab_version[i].num == (int)tmp16) {
                 version = uuid_dectab_version[i].desc;
                 break;

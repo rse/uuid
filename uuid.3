@@ -129,12 +129,12 @@
 .\" ========================================================================
 .\"
 .IX Title "uuid 3"
-.TH uuid 3 "OSSP uuid 0.1.0" "16-Feb-2004" "Universally Unique Identifier"
+.TH uuid 3 "OSSP uuid 0.1.0" "16-Jul-2004" "Universally Unique Identifier"
 .SH "NAME"
 \&\fBOSSP uuid\fR \- \fBUniversally Unique Identifier\fR
 .SH "VERSION"
 .IX Header "VERSION"
-\&\s-1OSSP\s0 uuid \s-10.1.0 (16-Feb-2004)\s0
+\&\s-1OSSP\s0 uuid \s-10.1.0 (16-Jul-2004)\s0
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
 \&\fB\s-1OSSP\s0 uuid\fR is a ISO-C application programming interface (\s-1API\s0) and
@@ -333,11 +333,13 @@ minimum expected length in \fIdata_len\fR depends on it. Valid values for
 .IP "uuid_rc_t \fBuuid_export\fR(uuid_t *\fIuuid\fR, uuid_fmt_t \fIfmt\fR, void **\fIdata_ptr\fR, size_t *\fIdata_len\fR);" 4
 .IX Item "uuid_rc_t uuid_export(uuid_t *uuid, uuid_fmt_t fmt, void **data_ptr, size_t *data_len);"
 Exports a \s-1UUID\s0 \fIuuid\fR into an external representation of format \fIfmt\fR.
-The data is written to the buffer at \f(CW\*(C`*\*(C'\fR\fIdata_ptr\fR which has room
-for at least \f(CW\*(C`*\*(C'\fR\fIdata_len\fR bytes. If \f(CW\*(C`*\*(C'\fR\fIdata_ptr\fR is \f(CW\*(C`NULL\*(C'\fR,
-a new buffer is allocated (and \fIdata_len\fR ignored as input). If
-\&\fIdata_len\fR is not \f(CW\*(C`NULL\*(C'\fR, the number of written bytes are stored into
-\&\f(CW\*(C`*\*(C'\fR\fIdata_len\fR.
+The data is written to the buffer at \f(CW\*(C`*\*(C'\fR\fIdata_ptr\fR which has to
+be room for at least \f(CW\*(C`*\*(C'\fR\fIdata_len\fR bytes. If \f(CW\*(C`*\*(C'\fR\fIdata_ptr\fR is
+\&\f(CW\*(C`NULL\*(C'\fR, \fIdata_len\fR is ignored as input and a new buffer is allocated
+and returned in \f(CW\*(C`*\*(C'\fR\fIdata_ptr\fR (the caller has to \fIfree\fR\|(3) it later
+on). If \fIdata_len\fR is not \f(CW\*(C`NULL\*(C'\fR, the number of available bytes at
+\&\f(CW\*(C`*\*(C'\fR\fIdata_ptr\fR has to be provided in \f(CW\*(C`*\*(C'\fR\fIdata_len\fR and the number of
+actually written bytes are returned in \f(CW\*(C`*\*(C'\fR\fIdata_len\fR again.
 .Sp
 The format of the external representation is specified by \fIfmt\fR and the
 minimum required length in \f(CW\*(C`*\*(C'\fR\fIdata_len\fR depends on it. Valid values
@@ -410,12 +412,13 @@ code.
 \& char *uuid_v1(void)
 \& {
 \&     uuid_t *uuid;
-\&     char *str = NULL;
+\&     char *str;
 .Ve
 .PP
-.Vb 6
+.Vb 7
 \&     uuid_create(&uuid);
 \&     uuid_make(uuid, UUID_MAKE_V1);
+\&     str = NULL;
 \&     uuid_export(uuid, UUID_FMT_STR, (void **)&str, NULL);
 \&     uuid_destroy(uuid);
 \&     return str;
@@ -428,14 +431,15 @@ code.
 \& {
 \&     uuid_t *uuid;
 \&     uuid_t *uuid_ns;
-\&     char *str = NULL;
+\&     char *str;
 .Ve
 .PP
-.Vb 9
+.Vb 10
 \&     uuid_create(&uuid);
 \&     uuid_create(&uuid_ns);
 \&     uuid_load(uuid_ns, "ns:URL");
 \&     uuid_make(uuid, UUID_MAKE_V3, uuid_ns, url);
+\&     str = NULL;
 \&     uuid_export(uuid, UUID_FMT_STR, (void **)&str, NULL);
 \&     uuid_destroy(uuid_ns);
 \&     uuid_destroy(uuid);
@@ -444,7 +448,7 @@ code.
 .Ve
 .SH "SEE ALSO"
 .IX Header "SEE ALSO"
-See the following are references to more \fB\s-1UUID\s0\fR documentation and specifications:
+The following are references to \fB\s-1UUID\s0\fR documentation and specifications:
 .IP "\(bu" 4
 \&\fBUUIDs and GUIDs\fR,
 \&\s-1IETF\s0 Internet Draft (expired),
@@ -475,7 +479,7 @@ http://www.ietf.org/rfc/rfc2518.txt
 P. Leach, M. Mealling, R. Salz,
 \&\s-1IETF\s0 Internet Draft draft\-mealling\-uuid\-urn\-02,
 January 2004, 31 pages,
-http://www.ietf.org/internet\-drafts/draft\-mealling\-uuid\-urn\-02.txt
+http://www.ietf.org/internet\-drafts/draft\-mealling\-uuid\-urn\-03.txt
 .IP "\(bu" 4
 \&\fB\s-1DCE\s0 1.1 compliant \s-1UUID\s0 functions\fR,
 FreeBSD manual pages \fIuuid\fR\|(3) and \fIuuidgen\fR\|(2),

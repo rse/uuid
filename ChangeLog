@@ -11,6 +11,17 @@
   This is a list of all changes to OSSP uuid.
   For a more brief summary please have a look at the NEWS file.
 
+  Changes between 1.0.0 and 1.0.1 (16-Feb-2004 to 16-Jul-2004)
+
+   o Made documentation of uuid_export() more clear.
+     [Ralf S. Engelschall]
+
+   o Upgrade build environment to GNU libtool 1.5.6 and GNU shtool 2.0.0
+     [Ralf S. Engelschall]
+
+   o Remove some warnings occurring under GCC 3.5
+     [Ralf S. Engelschall]
+
   Changes between 0.9.7 and 1.0.0 (13-Feb-2004 to 16-Feb-2004)
 
    o Replace remaining (old) UUID_VERSIONX names with UUID_MAKE_VX
@@ -183,7 +194,7 @@
      [Ralf S. Engelschall]
 
    o Implement uuid_dump() and corresponding uuid CLI "-d"
-     option for dumping a given UUID into clear text. For convinience
+     option for dumping a given UUID into clear text. For convenience
      reasons add uuid_bm.h (bit mask API) and uuid_str (string
      formatting API) sub-modules.
      [Ralf S. Engelschall]

@@ -263,11 +263,13 @@ I<fmt> are B<UUID_FMT_BIN> and B<UUID_FMT_STR>.
 =item uuid_rc_t B<uuid_export>(uuid_t *I<uuid>, uuid_fmt_t I<fmt>, void **I<data_ptr>, size_t *I<data_len>);
 
 Exports a UUID I<uuid> into an external representation of format I<fmt>.
-The data is written to the buffer at C<*>I<data_ptr> which has room
-for at least C<*>I<data_len> bytes. If C<*>I<data_ptr> is C<NULL>,
-a new buffer is allocated (and I<data_len> ignored as input). If
-I<data_len> is not C<NULL>, the number of written bytes are stored into
-C<*>I<data_len>.
+The data is written to the buffer at C<*>I<data_ptr> which has to
+be room for at least C<*>I<data_len> bytes. If C<*>I<data_ptr> is
+C<NULL>, I<data_len> is ignored as input and a new buffer is allocated
+and returned in C<*>I<data_ptr> (the caller has to free(3) it later
+on). If I<data_len> is not C<NULL>, the number of available bytes at
+C<*>I<data_ptr> has to be provided in C<*>I<data_len> and the number of
+actually written bytes are returned in C<*>I<data_len> again.
 
 The format of the external representation is specified by I<fmt> and the
 minimum required length in C<*>I<data_len> depends on it. Valid values
@@ -344,10 +346,11 @@ code.
  char *uuid_v1(void)
  {
      uuid_t *uuid;
-     char *str = NULL;
+     char *str;
 
      uuid_create(&uuid);
      uuid_make(uuid, UUID_MAKE_V1);
+     str = NULL;
      uuid_export(uuid, UUID_FMT_STR, (void **)&str, NULL);
      uuid_destroy(uuid);
      return str;
@@ -358,12 +361,13 @@ code.
  {
      uuid_t *uuid;
      uuid_t *uuid_ns;
-     char *str = NULL;
+     char *str;
 
      uuid_create(&uuid);
      uuid_create(&uuid_ns);
      uuid_load(uuid_ns, "ns:URL");
      uuid_make(uuid, UUID_MAKE_V3, uuid_ns, url);
+     str = NULL;
      uuid_export(uuid, UUID_FMT_STR, (void **)&str, NULL);
      uuid_destroy(uuid_ns);
      uuid_destroy(uuid);
@@ -372,7 +376,7 @@ code.
 
 =head1 SEE ALSO
 
-See the following are references to more B<UUID> documentation and specifications:
+The following are references to B<UUID> documentation and specifications:
 
 =over 4
 
@@ -415,7 +419,7 @@ B<A UUID URN Namespace>,
 P. Leach, M. Mealling, R. Salz,
 IETF Internet Draft draft-mealling-uuid-urn-02,
 January 2004, 31 pages,
-http://www.ietf.org/internet-drafts/draft-mealling-uuid-urn-02.txt
+http://www.ietf.org/internet-drafts/draft-mealling-uuid-urn-03.txt
 
 =item
 
