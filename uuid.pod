@@ -39,8 +39,8 @@ OSSP uuid UUID_VERSION_STR
 
 =head1 DESCRIPTION
 
-B<OSSP uuid> is a ISO-C application programming interface (API) and
-corresponding command line interface (CLI) for the generation of DCE
+B<OSSP uuid> is a ISO-C and Perl application programming interface (API)
+and corresponding command line interface (CLI) for the generation of DCE
 1.1 and ISO/IEC 11578:1996 compliant I<Universally Unique Identifier>
 (UUID). It supports DCE 1.1 variant UUIDs of version 1 (time and node
 based), version 3 (name based) and version 4 (random number based).
@@ -439,7 +439,7 @@ portable.
 
 =head1 SEE ALSO
 
-uuid(1), uuid-config(1).
+uuid(1), uuid-config(1), OSSP::uuid(3).
 
 =cut
 

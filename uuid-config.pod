@@ -149,7 +149,7 @@ applications C<Makefile>.
 
 =head1 SEE ALSO
 
-uuid(3), uuid(1).
+uuid(3), uuid(1), OSSP::uuid(3).
 
 =cut
 

@@ -11,7 +11,10 @@
   To install OSSP uuid into /path/to/uuid/ perform
   the following steps in your shell:
 
-    $ ./configure --prefix=/path/to/uuid
+    $ ./configure \
+         --prefix=/path/to/uuid \
+         [--with-dce] \
+         [--with-perl[=/path/to/[bin[/perl]]]
     $ make
     $ make check
     $ make install [DESTDIR=/path/to/temp/root]

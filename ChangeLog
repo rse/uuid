@@ -11,7 +11,16 @@
   This is a list of all changes to OSSP uuid.
   For a more brief summary please have a look at the NEWS file.
 
-  Changes between 1.0.4 and 1.0.4 (15-Oct-2004 to 16-Oct-2004)
+  Changes between 1.0.4 and 1.1.0 (16-Oct-2004 to 03-Nov-2004)
+
+   o Add --with-perl configure option for optionally enabling
+     the Perl language bindings.
+     [Ralf S. Engelschall]
+
+   o Add Perl language bindings providing both a C-style and OO-style API.
+     [Ralf S. Engelschall]
+
+  Changes between 1.0.3 and 1.0.4 (15-Oct-2004 to 16-Oct-2004)
 
    o Fix version detection from uuid_vers.h
      [Ralf S. Engelschall]

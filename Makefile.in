@@ -53,6 +53,7 @@ SHTOOL      = $(top_srcdir)/shtool
 LIBTOOL     = ./libtool
 TRUE        = true
 POD2MAN     = pod2man
+PERL        = @PERL@
 
 LIB_NAME    = libuuid.la
 LIB_OBJS    = uuid.lo uuid_md5.lo uuid_prng.lo uuid_mac.lo uuid_ui64.lo uuid_str.lo
@@ -65,9 +66,13 @@ PRG_OBJS    = uuid_cli.o
 
 MAN_NAME    = uuid.3 uuid.1
 
-TARGETS     = $(LIB_NAME) @DCE_NAME@ $(PRG_NAME)
+PERL_NAME   = perl/blib/lib/OSSP/uuid.pm
+PERL_OBJS   = perl/uuid.pm
+
+TARGETS     = $(LIB_NAME) @DCE_NAME@ $(PRG_NAME) @PERL_NAME@
 
 WITH_DCE    = @WITH_DCE@
+WITH_PERL   = @WITH_PERL@
 
 .SUFFIXES:
 .SUFFIXES: .c .o .lo
@@ -90,6 +95,9 @@ $(DCE_NAME): $(DCE_OBJS)
 
 $(PRG_NAME): $(PRG_OBJS) $(LIB_NAME)
 	@$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) -o $(PRG_NAME) $(PRG_OBJS) $(LIB_NAME) $(LIBS)
+
+$(PERL_NAME): $(PERL_OBJS) $(LIB_NAME)
+	@cd perl && $(PERL) Makefile.PL PREFIX=$(prefix) && $(MAKE) $(MFLAGS) all
 
 uuid.lo: uuid.c config.h uuid.h uuid_md5.h uuid_prng.h uuid_mac.h uuid_ui64.h uuid_str.h uuid_bm.h uuid_ac.h
 uuid_mac.lo: uuid_mac.c config.h uuid_mac.h
@@ -128,7 +136,7 @@ uuid.1: uuid_cli.pod
 	sed -e "s;UUID_VERSION_STR;$$V2;" >uuid.1; \
 	$(RM) /tmp/uuid.pod
 
-check: $(PRG_NAME)
+check: all
 	@echo "==== UUID version 1 (time and node based): 4 single iterations"; \
 	$(LIBTOOL) --mode=execute ./$(PRG_NAME) -v1 -n 4 -1
 	@echo "==== UUID version 1 (time and node based): 4 subsequent iterations"; \
@@ -146,6 +154,10 @@ check: $(PRG_NAME)
 	$(LIBTOOL) --mode=execute ./$(PRG_NAME) -d `$(LIBTOOL) --mode=execute ./$(PRG_NAME) -v3 ns:URL http://www.ossp.org/`
 	@echo "==== UUID version 3 generation and decoding"; \
 	$(LIBTOOL) --mode=execute ./$(PRG_NAME) -d `$(LIBTOOL) --mode=execute ./$(PRG_NAME) -v4`
+	-@if [ ".$(WITH_PERL)" = .yes ]; then \
+	    echo "==== Perl bindings to C API"; \
+	    (cd perl && $(MAKE) $(MFLAGS) test); \
+	fi
 
 install:
 	$(SHTOOL) mkdir -f -p -m 755 $(DESTDIR)$(prefix)
@@ -168,6 +180,9 @@ install:
 	fi
 	@$(LIBTOOL) --mode=install $(SHTOOL) install -c -s -m 755 uuid $(DESTDIR)$(bindir)/
 	$(SHTOOL) install -c -m 644 $(srcdir)/uuid.1 $(DESTDIR)$(mandir)/man1/
+	-@if [ ".$(WITH_PERL)" = .yes ]; then \
+	    (cd perl && $(MAKE) $(MFLAGS) install); \
+	fi
 
 uninstall:
 	-$(RM) $(DESTDIR)$(mandir)/man1/uuid.1
@@ -201,11 +216,17 @@ clean:
 	-$(RM) $(PRG_NAME) $(PRG_OBJS)
 	-$(RM) -r .libs >/dev/null 2>&1 || $(TRUE)
 	-$(RM) *.o *.lo
+	-@if [ ".$(WITH_PERL)" = .yes ]; then \
+	    (cd perl && $(MAKE) $(MFLAGS) clean || true); \
+	fi
 
 distclean: clean
 	-$(RM) config.log config.status config.cache
 	-$(RM) Makefile config.h uuid-config uuid.h
 	-$(RM) libtool
+	-@if [ ".$(WITH_PERL)" = .yes ]; then \
+	    (cd perl && $(MAKE) $(MFLAGS) distclean || true; rm -f Makefile.old); \
+	fi
 
 realclean: distclean
 	-$(RM) uuid.3 uuid.1

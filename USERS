@@ -23,3 +23,8 @@
     Grid Application Toolkit (GAT) 
     https://www.gridlab.org/WorkPackages/wp-1/ 
 
+  o Menes
+    High-Level C++ Library for mutexes, networking, etc.
+    http://www.saurik.com/
+    http://svn.saurik.com/repos/menes/trunk/
+

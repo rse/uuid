@@ -70,10 +70,11 @@ AC_DEFUN(UUID_CHECK_ALL,[
     AC_CHECK_SIZEOF(long long, 8)
     AC_CHECK_SIZEOF(unsigned long long, 8)
 
-    dnl #   options
-    AC_ARG_WITH(dce,
+    dnl #   configure option --with-dce
+    AC_ARG_WITH([dce],
         AC_HELP_STRING([--with-dce], [build DCE 1.1 backward compatibility API]),
         [ac_cv_with_dce=$withval], [ac_cv_with_dce=no])
+    AC_CACHE_CHECK([whether to build DCE 1.1 backward compatibility API], [ac_cv_with_dce], [ac_cv_with_dce=no])
     if test ".$ac_cv_with_dce" = ".yes"; then
         AC_DEFINE(WITH_DCE, 1, [whether to build DCE 1.1 backward compatibility API])
         WITH_DCE='yes'
@@ -84,5 +85,25 @@ AC_DEFUN(UUID_CHECK_ALL,[
     fi
     AC_SUBST(WITH_DCE)
     AC_SUBST(DCE_NAME)
+
+    dnl #   configure option --with-perl
+    AC_ARG_WITH([perl],
+        AS_HELP_STRING([--with-perl], [build Perl bindings to C API]),
+        [ac_cv_with_perl=$withval], [ac_cv_with_perl=no])
+    AC_CACHE_CHECK([whether to build Perl bindings to C API], [ac_cv_with_perl], [ac_cv_with_perl=no])
+    if test ".$ac_cv_with_perl" = ".yes"; then
+        AC_DEFINE(WITH_PERL, 1, [whether to build Perl bindings to C API])
+        WITH_PERL='yes'
+        PERL_NAME='$(PERL_NAME)'
+    else
+        WITH_PERL='no'
+        PERL_NAME=''
+    fi
+    AC_SUBST(WITH_PERL)
+    AC_SUBST(PERL_NAME)
+    AC_PATH_PROG(PERL, perl, NA)
+    if test ".$PERL" = .NA; then
+        AC_ERROR([required Perl interpreter not found in \$PATH])
+    fi
 ])
 
