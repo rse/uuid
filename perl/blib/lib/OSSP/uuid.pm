@@ -41,7 +41,7 @@ use Exporter;
 ##
 
 #   API version
-our $VERSION = do { my @v = ('1.1.2' =~ m/\d+/g); sprintf("%d.".("%02d"x$#v), @v); };
+our $VERSION = do { my @v = ('1.2.0' =~ m/\d+/g); sprintf("%d.".("%02d"x$#v), @v); };
 
 #   API inheritance
 our @ISA = qw(Exporter);
@@ -61,6 +61,7 @@ my $symbols = {
         UUID_MAKE_V1
         UUID_MAKE_V3
         UUID_MAKE_V4
+        UUID_MAKE_V5
         UUID_MAKE_MC
         UUID_FMT_BIN
         UUID_FMT_STR
@@ -136,12 +137,13 @@ sub make ($$;@) {
         if    ($spec eq 'v1') { $mode_code |= $self->UUID_MAKE_V1; }
         elsif ($spec eq 'v3') { $mode_code |= $self->UUID_MAKE_V3; }
         elsif ($spec eq 'v4') { $mode_code |= $self->UUID_MAKE_V4; }
+        elsif ($spec eq 'v5') { $mode_code |= $self->UUID_MAKE_V5; }
         elsif ($spec eq 'mc') { $mode_code |= $self->UUID_MAKE_MC; }
         else  { croak("invalid mode specification \"$spec\""); }
     }
-    if ($mode_code & $self->UUID_MAKE_V3) {
+    if (($mode_code & $self->UUID_MAKE_V3) or ($mode_code & $self->UUID_MAKE_V5)) {
         if (not (ref($valist[0]) and $valist[0]->isa("OSSP::uuid"))) {
-            croak("UUID_MAKE_V3 requires namespace argument to be OSSP::uuid object");
+            croak("UUID_MAKE_V3/UUID_MAKE_V5 requires namespace argument to be OSSP::uuid object");
         }
         my $ns   = $valist[0]->{-uuid};
         my $name = $valist[1];

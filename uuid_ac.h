@@ -34,7 +34,7 @@
 
 /* define boolean values */
 #define UUID_FALSE 0
-#define UUID_TRUE  !UUID_FALSE
+#define UUID_TRUE  (/*lint -save -e506*/ !UUID_FALSE /*lint -restore*/)
 
 /* determine types of 8-bit size */
 #if SIZEOF_CHAR == 1

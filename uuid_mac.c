@@ -81,7 +81,7 @@
 #define FALSE 0
 #endif
 #ifndef TRUE
-#define TRUE !FALSE
+#define TRUE (/*lint -save -e506*/ !FALSE /*lint -restore*/)
 #endif
 
 /* return the Media Access Control (MAC) address of
@@ -107,7 +107,7 @@ int mac_address(unsigned char *data_ptr, size_t data_len)
             if (ifap->ifa_addr != NULL && ifap->ifa_addr->sa_family == AF_LINK) {
                 sdl = (const struct sockaddr_dl *)(void *)ifap->ifa_addr;
                 ucp = (unsigned char *)(sdl->sdl_data + sdl->sdl_nlen);
-                if (ucp != NULL && sdl->sdl_alen > 0) {
+                if (sdl->sdl_alen > 0) {
                     for (i = 0; i < MAC_LEN && i < sdl->sdl_alen; i++, ucp++)
                         data_ptr[i] = (unsigned char)(*ucp & 0xff);
                     freeifaddrs(ifap_head);
@@ -166,9 +166,11 @@ int mac_address(unsigned char *data_ptr, size_t data_len)
             close(s);
             return FALSE;
         }
+        close(s);
+        if (!(ar.arp_flags & ATF_COM))
+            return FALSE;
         for (i = 0; i < MAC_LEN; i++)
             data_ptr[i] = (unsigned char)(ar.arp_ha.sa_data[i] & 0xff);
-        close(s);
         return TRUE;
     }
 #endif

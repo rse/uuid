@@ -28,7 +28,7 @@
 
 # --- MakeMaker const_config section:
 
-# These definitions are from config.sh (via /usr/opkg/lib/perl/5.8.6/i386-freebsd/Config.pm)
+# These definitions are from config.sh (via /usr/opkg/lib/perl/5.8.7/i386-freebsd/Config.pm)
 
 # They may have been overridden via Makefile.PL or on the command line
 AR = ar
@@ -44,15 +44,15 @@ LIBC =
 LIB_EXT = .a
 OBJ_EXT = .o
 OSNAME = freebsd
-OSVERS = 5.3-stable
+OSVERS = 5.4-stable
 RANLIB = :
-SITELIBEXP = /usr/opkg/lib/perl/site_perl/5.8.6
-SITEARCHEXP = /usr/opkg/lib/perl/site_perl/5.8.6/i386-freebsd
+SITELIBEXP = /usr/opkg/lib/perl/site_perl/5.8.7
+SITEARCHEXP = /usr/opkg/lib/perl/site_perl/5.8.7/i386-freebsd
 SO = so
 EXE_EXT = 
 FULL_AR = /usr/opkg/bin/ar
-VENDORARCHEXP = /usr/opkg/lib/perl/vendor_perl/5.8.6/i386-freebsd
-VENDORLIBEXP = /usr/opkg/lib/perl/vendor_perl/5.8.6
+VENDORARCHEXP = /usr/opkg/lib/perl/vendor_perl/5.8.7/i386-freebsd
+VENDORLIBEXP = /usr/opkg/lib/perl/vendor_perl/5.8.7
 
 
 # --- MakeMaker constants section:
@@ -60,11 +60,11 @@ AR_STATIC_ARGS = cr
 DIRFILESEP = /
 NAME = OSSP::uuid
 NAME_SYM = OSSP_uuid
-VERSION = 1.0102
+VERSION = 1.0200
 VERSION_MACRO = VERSION
-VERSION_SYM = 1_0102
+VERSION_SYM = 1_0200
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 1.0102
+XS_VERSION = 1.0200
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -81,17 +81,17 @@ PREFIX = /tmp/uuid
 PERLPREFIX = $(PREFIX)
 SITEPREFIX = $(PREFIX)
 VENDORPREFIX = $(PREFIX)
-INSTALLPRIVLIB = $(PERLPREFIX)/lib/perl/5.8.6
+INSTALLPRIVLIB = $(PERLPREFIX)/lib/perl/5.8.7
 DESTINSTALLPRIVLIB = $(DESTDIR)$(INSTALLPRIVLIB)
-INSTALLSITELIB = $(SITEPREFIX)/lib/perl/site_perl/5.8.6
+INSTALLSITELIB = $(SITEPREFIX)/lib/perl/site_perl/5.8.7
 DESTINSTALLSITELIB = $(DESTDIR)$(INSTALLSITELIB)
-INSTALLVENDORLIB = $(VENDORPREFIX)/lib/perl/vendor_perl/5.8.6
+INSTALLVENDORLIB = $(VENDORPREFIX)/lib/perl/vendor_perl/5.8.7
 DESTINSTALLVENDORLIB = $(DESTDIR)$(INSTALLVENDORLIB)
-INSTALLARCHLIB = $(PERLPREFIX)/lib/perl/5.8.6/i386-freebsd
+INSTALLARCHLIB = $(PERLPREFIX)/lib/perl/5.8.7/i386-freebsd
 DESTINSTALLARCHLIB = $(DESTDIR)$(INSTALLARCHLIB)
-INSTALLSITEARCH = $(SITEPREFIX)/lib/perl/site_perl/5.8.6/i386-freebsd
+INSTALLSITEARCH = $(SITEPREFIX)/lib/perl/site_perl/5.8.7/i386-freebsd
 DESTINSTALLSITEARCH = $(DESTDIR)$(INSTALLSITEARCH)
-INSTALLVENDORARCH = $(VENDORPREFIX)/lib/perl/vendor_perl/5.8.6/i386-freebsd
+INSTALLVENDORARCH = $(VENDORPREFIX)/lib/perl/vendor_perl/5.8.7/i386-freebsd
 DESTINSTALLVENDORARCH = $(DESTDIR)$(INSTALLVENDORARCH)
 INSTALLBIN = $(PERLPREFIX)/bin
 DESTINSTALLBIN = $(DESTDIR)$(INSTALLBIN)
@@ -113,14 +113,14 @@ INSTALLSITEMAN3DIR = $(SITEPREFIX)/man/man3
 DESTINSTALLSITEMAN3DIR = $(DESTDIR)$(INSTALLSITEMAN3DIR)
 INSTALLVENDORMAN3DIR = $(VENDORPREFIX)/man/man3
 DESTINSTALLVENDORMAN3DIR = $(DESTDIR)$(INSTALLVENDORMAN3DIR)
-PERL_LIB = /usr/opkg/lib/perl/5.8.6
-PERL_ARCHLIB = /usr/opkg/lib/perl/5.8.6/i386-freebsd
+PERL_LIB = /usr/opkg/lib/perl/5.8.7
+PERL_ARCHLIB = /usr/opkg/lib/perl/5.8.7/i386-freebsd
 LIBPERL_A = libperl.a
 FIRST_MAKEFILE = Makefile
 MAKEFILE_OLD = $(FIRST_MAKEFILE).old
 MAKE_APERL_FILE = $(FIRST_MAKEFILE).aperl
 PERLMAINCC = $(CC)
-PERL_INC = /usr/opkg/lib/perl/5.8.6/i386-freebsd/CORE
+PERL_INC = /usr/opkg/lib/perl/5.8.7/i386-freebsd/CORE
 PERL = /usr/opkg/bin/perl
 FULLPERL = /usr/opkg/bin/perl
 ABSPERL = $(PERL)
@@ -134,7 +134,7 @@ PERL_CORE = 0
 PERM_RW = 644
 PERM_RWX = 755
 
-MAKEMAKER   = /usr/opkg/lib/perl/5.8.6/ExtUtils/MakeMaker.pm
+MAKEMAKER   = /usr/opkg/lib/perl/5.8.7/ExtUtils/MakeMaker.pm
 MM_VERSION  = 6.17
 MM_REVISION = 1.133
 
@@ -203,11 +203,11 @@ AUTOSPLITFILE = $(PERLRUN)  -e 'use AutoSplit;  autosplit($$ARGV[0], $$ARGV[1], 
 
 # --- MakeMaker tool_xsubpp section:
 
-XSUBPPDIR = /usr/opkg/lib/perl/5.8.6/ExtUtils
+XSUBPPDIR = /usr/opkg/lib/perl/5.8.7/ExtUtils
 XSUBPP = $(XSUBPPDIR)/xsubpp
 XSPROTOARG = 
-XSUBPPDEPS = /usr/opkg/lib/perl/5.8.6/ExtUtils/typemap uuid.tm $(XSUBPP)
-XSUBPPARGS = -typemap /usr/opkg/lib/perl/5.8.6/ExtUtils/typemap -typemap uuid.tm
+XSUBPPDEPS = /usr/opkg/lib/perl/5.8.7/ExtUtils/typemap uuid.tm $(XSUBPP)
+XSUBPPARGS = -typemap /usr/opkg/lib/perl/5.8.7/ExtUtils/typemap -typemap uuid.tm
 XSUBPP_EXTRA_ARGS = 
 
 
@@ -257,7 +257,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = OSSP-uuid
-DISTVNAME = OSSP-uuid-1.0102
+DISTVNAME = OSSP-uuid-1.0200
 
 
 # --- MakeMaker macro section:
@@ -372,21 +372,21 @@ config :: $(INST_ARCHAUTODIR)$(DIRFILESEP).exists
 config :: $(INST_AUTODIR)$(DIRFILESEP).exists
 	$(NOECHO) $(NOOP)
 
-$(INST_AUTODIR)/.exists :: /usr/opkg/lib/perl/5.8.6/i386-freebsd/CORE/perl.h
+$(INST_AUTODIR)/.exists :: /usr/opkg/lib/perl/5.8.7/i386-freebsd/CORE/perl.h
 	$(NOECHO) $(MKPATH) $(INST_AUTODIR)
-	$(NOECHO) $(EQUALIZE_TIMESTAMP) /usr/opkg/lib/perl/5.8.6/i386-freebsd/CORE/perl.h $(INST_AUTODIR)/.exists
+	$(NOECHO) $(EQUALIZE_TIMESTAMP) /usr/opkg/lib/perl/5.8.7/i386-freebsd/CORE/perl.h $(INST_AUTODIR)/.exists
 
 	-$(NOECHO) $(CHMOD) $(PERM_RWX) $(INST_AUTODIR)
 
-$(INST_LIBDIR)/.exists :: /usr/opkg/lib/perl/5.8.6/i386-freebsd/CORE/perl.h
+$(INST_LIBDIR)/.exists :: /usr/opkg/lib/perl/5.8.7/i386-freebsd/CORE/perl.h
 	$(NOECHO) $(MKPATH) $(INST_LIBDIR)
-	$(NOECHO) $(EQUALIZE_TIMESTAMP) /usr/opkg/lib/perl/5.8.6/i386-freebsd/CORE/perl.h $(INST_LIBDIR)/.exists
+	$(NOECHO) $(EQUALIZE_TIMESTAMP) /usr/opkg/lib/perl/5.8.7/i386-freebsd/CORE/perl.h $(INST_LIBDIR)/.exists
 
 	-$(NOECHO) $(CHMOD) $(PERM_RWX) $(INST_LIBDIR)
 
-$(INST_ARCHAUTODIR)/.exists :: /usr/opkg/lib/perl/5.8.6/i386-freebsd/CORE/perl.h
+$(INST_ARCHAUTODIR)/.exists :: /usr/opkg/lib/perl/5.8.7/i386-freebsd/CORE/perl.h
 	$(NOECHO) $(MKPATH) $(INST_ARCHAUTODIR)
-	$(NOECHO) $(EQUALIZE_TIMESTAMP) /usr/opkg/lib/perl/5.8.6/i386-freebsd/CORE/perl.h $(INST_ARCHAUTODIR)/.exists
+	$(NOECHO) $(EQUALIZE_TIMESTAMP) /usr/opkg/lib/perl/5.8.7/i386-freebsd/CORE/perl.h $(INST_ARCHAUTODIR)/.exists
 
 	-$(NOECHO) $(CHMOD) $(PERM_RWX) $(INST_ARCHAUTODIR)
 
@@ -394,9 +394,9 @@ config :: $(INST_MAN3DIR)$(DIRFILESEP).exists
 	$(NOECHO) $(NOOP)
 
 
-$(INST_MAN3DIR)/.exists :: /usr/opkg/lib/perl/5.8.6/i386-freebsd/CORE/perl.h
+$(INST_MAN3DIR)/.exists :: /usr/opkg/lib/perl/5.8.7/i386-freebsd/CORE/perl.h
 	$(NOECHO) $(MKPATH) $(INST_MAN3DIR)
-	$(NOECHO) $(EQUALIZE_TIMESTAMP) /usr/opkg/lib/perl/5.8.6/i386-freebsd/CORE/perl.h $(INST_MAN3DIR)/.exists
+	$(NOECHO) $(EQUALIZE_TIMESTAMP) /usr/opkg/lib/perl/5.8.7/i386-freebsd/CORE/perl.h $(INST_MAN3DIR)/.exists
 
 	-$(NOECHO) $(CHMOD) $(PERM_RWX) $(INST_MAN3DIR)
 
@@ -846,7 +846,7 @@ testdb_static :: pure_all $(MAP_TARGET)
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd:
-	$(NOECHO) $(ECHO) '<SOFTPKG NAME="$(DISTNAME)" VERSION="1,0102,0,0">' > $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '<SOFTPKG NAME="$(DISTNAME)" VERSION="1,0200,0,0">' > $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    <TITLE>$(DISTNAME)</TITLE>' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    <ABSTRACT>B&lt;OSSP uuid&gt; Perl Binding</ABSTRACT>' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR></AUTHOR>' >> $(DISTNAME).ppd

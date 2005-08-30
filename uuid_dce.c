@@ -43,6 +43,9 @@
 /* include regular API */
 #include "uuid.h"
 
+/* helper macro */
+#define LEAVE /*lint -save -e801*/ goto leave /*lint -restore*/
+
 /* create a UUID (v1 only) */
 void uuid_dce_create(uuid_dce_t *uuid_dce, int *status)
 {
@@ -149,15 +152,15 @@ int uuid_dce_compare(uuid_dce_t *uuid_dce1, uuid_dce_t *uuid_dce2, int *status)
 
     /* import both UUID binary representations and compare them */
     if (uuid_create(&uuid1) != UUID_RC_OK)
-        goto leave;
+        LEAVE;
     if (uuid_create(&uuid2) != UUID_RC_OK)
-        goto leave;
+        LEAVE;
     if (uuid_import(uuid1, UUID_FMT_BIN, uuid_dce1, UUID_LEN_BIN) != UUID_RC_OK)
-        goto leave;
+        LEAVE;
     if (uuid_import(uuid2, UUID_FMT_BIN, uuid_dce2, UUID_LEN_BIN) != UUID_RC_OK)
-        goto leave;
+        LEAVE;
     if (uuid_compare(uuid1, uuid2, &result) != UUID_RC_OK)
-        goto leave;
+        LEAVE;
 
     /* indicate successful operation */
     if (status != NULL)
@@ -204,13 +207,13 @@ void uuid_dce_from_string(const char *str, uuid_dce_t *uuid_dce, int *status)
 
     /* import string representation and export binary representation */
     if (uuid_create(&uuid) != UUID_RC_OK)
-        goto leave;
+        LEAVE;
     if (uuid_import(uuid, UUID_FMT_STR, str, UUID_LEN_STR) != UUID_RC_OK)
-        goto leave;
+        LEAVE;
     vp  = uuid_dce;
     len = UUID_LEN_BIN;
     if (uuid_export(uuid, UUID_FMT_BIN, &vp, &len) != UUID_RC_OK)
-        goto leave;
+        LEAVE;
 
     /* indicate successful operation */
     if (status != NULL)
@@ -240,13 +243,13 @@ void uuid_dce_to_string(uuid_dce_t *uuid_dce, char **str, int *status)
 
     /* import binary representation and export string representation */
     if (uuid_create(&uuid) != UUID_RC_OK)
-        goto leave;
+        LEAVE;
     if (uuid_import(uuid, UUID_FMT_BIN, uuid_dce, UUID_LEN_BIN) != UUID_RC_OK)
-        goto leave;
+        LEAVE;
     vp  = str;
     len = UUID_LEN_STR;
     if (uuid_export(uuid, UUID_FMT_STR, &vp, &len) != UUID_RC_OK)
-        goto leave;
+        LEAVE;
 
     /* indicate successful operation */
     if (status != NULL)

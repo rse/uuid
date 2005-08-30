@@ -127,10 +127,10 @@ int main(int argc, char *argv[])
                 if (*p != '\0')
                     usage("invalid argument to option 'v'");
                 switch (i) {
-                    case 1: version = UUID_MAKE_V1; break;;
-                    case 3: version = UUID_MAKE_V3; break;;
-                    case 4: version = UUID_MAKE_V4; break;;
-                    case 5: version = UUID_MAKE_V5; break;;
+                    case 1: version = UUID_MAKE_V1; break;
+                    case 3: version = UUID_MAKE_V3; break;
+                    case 4: version = UUID_MAKE_V4; break;
+                    case 5: version = UUID_MAKE_V5; break;
                     default:
                         usage("invalid version on option 'v'");
                         break;

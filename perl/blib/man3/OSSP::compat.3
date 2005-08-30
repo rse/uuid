@@ -38,8 +38,8 @@
 .    if (\n(.H=4u)&(1m=20u) .ds -- \(*W\h'-12u'\(*W\h'-8u'-\"  diablo 12 pitch
 .    ds L" ""
 .    ds R" ""
-.    ds C` 
-.    ds C' 
+.    ds C` ""
+.    ds C' ""
 'br\}
 .el\{\
 .    ds -- \|\(em\|
@@ -128,104 +128,20 @@
 .rm #[ #] #H #V #F C
 .\" ========================================================================
 .\"
-.IX Title "UUID-CONFIG 1"
-.TH UUID-CONFIG 1 "OSSP uuid 1.2.1" "30-Aug-2005" "Universally Unique Identifier"
+.IX Title "compat 3"
+.TH compat 3 "2005-08-30" "perl v5.8.7" "User Contributed Perl Documentation"
 .SH "NAME"
-\&\fBuuid\-config\fR \- \fBOSSP uuid API build utility\fR
-.SH "VERSION"
-.IX Header "VERSION"
-\&\s-1OSSP\s0 uuid \s-11.2.1 (30-Aug-2005)\s0
-.SH "SYNOPSIS"
-.IX Header "SYNOPSIS"
-\&\fBuuid-config\fR
-[\fB\-\-help\fR]
-[\fB\-\-version\fR]
-[\fB\-\-all\fR]
-[\fB\-\-prefix\fR]
-[\fB\-\-exec\-prefix\fR]
-[\fB\-\-bindir\fR]
-[\fB\-\-libdir\fR]
-[\fB\-\-includedir\fR]
-[\fB\-\-mandir\fR]
-[\fB\-\-datadir\fR]
-[\fB\-\-acdir\fR]
-[\fB\-\-cflags\fR]
-[\fB\-\-ldflags\fR]
-[\fB\-\-libs\fR]
+Data::UUID \- \fBOSSP uuid\fR Backward Compatibility Perl Binding
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
-The \fBuuid-config\fR program is a little helper utility for easy configuring and
-building applications based on the \fIuuid\fR\|(3) library.  It can be used to query the
-C compiler and linker flags which are required to correctly compile and link
-the application against the \fIuuid\fR\|(3) library.
-.SH "OPTIONS"
-.IX Header "OPTIONS"
-\&\fBuuid-config\fR accepts the following options:
-.IP "\fB\-\-help\fR" 2
-.IX Item "--help"
-Prints the short usage information.
-.IP "\fB\-\-version\fR" 2
-.IX Item "--version"
-Prints the version number and date of the installed \fIuuid\fR\|(3) library.
-.IP "\fB\-\-all\fR" 2
-.IX Item "--all"
-Forces the output of all flags, that is, including extra flags which are not
-\&\fB\s-1OSSP\s0 uuid\fR specific.
-.IP "\fB\-\-prefix\fR" 2
-.IX Item "--prefix"
-Prints the installation prefix of architecture independent files
-.IP "\fB\-\-exec\-prefix\fR" 2
-.IX Item "--exec-prefix"
-Prints the installation prefix of architecture dependent files.
-.IP "\fB\-\-bindir\fR" 2
-.IX Item "--bindir"
-Prints the installation directory of binaries.
-.IP "\fB\-\-libdir\fR" 2
-.IX Item "--libdir"
-Prints the installation directory of libraries.
-.IP "\fB\-\-includedir\fR" 2
-.IX Item "--includedir"
-Prints the installation directory of include headers.
-.IP "\fB\-\-mandir\fR" 2
-.IX Item "--mandir"
-Prints the installation directory of manual pages.
-.IP "\fB\-\-datadir\fR" 2
-.IX Item "--datadir"
-Prints the installation directory of shared data.
-.IP "\fB\-\-acdir\fR" 2
-.IX Item "--acdir"
-Prints the installation directory of \fBautoconf\fR data.
-.IP "\fB\-\-cflags\fR" 2
-.IX Item "--cflags"
-Prints the C compiler flags which are needed to compile the \fIuuid\fR\|(3)\-based
-application. The output is usually added to the \f(CW\*(C`CFLAGS\*(C'\fR uuidiable of the
-applications \f(CW\*(C`Makefile\*(C'\fR.
-.IP "\fB\-\-ldflags\fR" 2
-.IX Item "--ldflags"
-Prints the linker flags (\f(CW\*(C`\-L\*(C'\fR) which are needed to link the application with
-the \fIuuid\fR\|(3) library. The output is usually added to the \f(CW\*(C`LDFLAGS\*(C'\fR uuidiable of
-the applications \f(CW\*(C`Makefile\*(C'\fR.
-.IP "\fB\-\-libs\fR" 2
-.IX Item "--libs"
-Prints the library flags (\f(CW\*(C`\-l\*(C'\fR) which are needed to link the application with
-the C \fIuuid\fR\|(3) library. The output is usually added to the \f(CW\*(C`LIBS\*(C'\fR uuidiable of the
-applications \f(CW\*(C`Makefile\*(C'\fR.
-.SH "EXAMPLE"
-.IX Header "EXAMPLE"
-.Vb 4
-\& CC      = cc
-\& CFLAGS  = -O `uuid-config --cflags`
-\& LDFLAGS = `uuid-config --ldflags`
-\& LIBS    = -lm `uuid-config --libs`
-.Ve
-.PP
-.Vb 5
-\& all: foo
-\& foo: foo.o
-\&     $(CC) $(LDFLAGS) -o foo foo.o $(LIBS)
-\& foo.o: foo.c
-\&     $(CC) $(CFLAGS) -c foo.c
-.Ve
+\&\fBData::UUID\fR is the \fB\s-1OSSP\s0 uuid\fR backward compatibility Perl binding
+to the \s-1API\s0 of the original \fBData::UUID\fR module. It allows other
+\&\fBData::UUID\fR based Perl modules to run with \fBOSSP::uuid\fR without any
+changes.
 .SH "SEE ALSO"
 .IX Header "SEE ALSO"
-\&\fIuuid\fR\|(3), \fIuuid\fR\|(1), \fIOSSP::uuid\fR\|(3).
+\&\fBOSSP::uuid\fR.
+.SH "HISTORY"
+.IX Header "HISTORY"
+The backward compatibility Perl binding \fBData::UUID\fR for \fB\s-1OSSP\s0 uuid\fR
+was implemented in 2004 by Piotr Roszatycki <dexter@debian.org>.

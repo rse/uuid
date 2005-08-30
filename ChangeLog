@@ -11,6 +11,31 @@
   This is a list of all changes to OSSP uuid.
   For a more brief summary please have a look at the NEWS file.
 
+  Changes between 1.2.0 and 1.2.1 (23-Jan-2005 to 30-Aug-2005)
+
+   o Add SEEALSO document which references all known
+     UUID implementations.
+     [Ralf S. Engelschall]
+
+   o Improve the PRNG in case no stronger system PRNG device is
+     available by passing time and rand(3) based entropy into the MD5
+     one-way hash function to achieve at least some sort of weaker PRN data.
+     [Ralf S. Engelschall]
+
+   o Fix MAC address determination under Solaris by using the result of
+     ioctl(...,SIOCGARP,...) only if arp_flags had ATF_COM set.
+     [Ralf S. Engelschall]
+
+   o Upgrade to GNU libtool 1.5.18 and GNU shtool 2.0.2.
+     [Ralf S. Engelschall]
+
+   o Cleanup the source code even more by following a large
+     set of FlexeLint's suggestions.
+     [Ralf S. Engelschall]
+
+   o Fixed generated "section" number in uuid-config(1).
+     [Piotr Roszatycki <dexter@debian.org>]
+
   Changes between 1.1.2 and 1.2.0 (13-Jan-2005 to 23-Jan-2005)
 
    o Added support for new version 5 UUIDs (name-based, SHA-1)

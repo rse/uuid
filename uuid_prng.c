@@ -35,9 +35,12 @@
 #include <fcntl.h>
 
 #include "uuid_prng.h"
+#include "uuid_md5.h"
 
 struct prng_st {
-    int devfd;
+    int    dev; /* system PRNG device */
+    md5_t *md5; /* local MD5 PRNG engine */
+    long   cnt; /* time resolution compensation counter */
 };
 
 prng_rc_t prng_create(prng_t **prng)
@@ -56,26 +59,30 @@ prng_rc_t prng_create(prng_t **prng)
         return PRNG_RC_MEM;
 
     /* try to open the system PRNG device */
-    (*prng)->devfd = -1;
+    (*prng)->dev = -1;
     if ((fd = open("/dev/urandom", O_RDONLY)) == -1)
         fd = open("/dev/random", O_RDONLY|O_NONBLOCK);
     if (fd != -1) {
-        fcntl(fd, F_SETFD, FD_CLOEXEC);
-        (*prng)->devfd = fd;
+        (void)fcntl(fd, F_SETFD, FD_CLOEXEC);
+        (*prng)->dev = fd;
     }
 
+    /* initialize MD5 engine */
+    if (md5_create(&((*prng)->md5)) != MD5_RC_OK)
+        return PRNG_RC_INT;
+
+    /* initialize time resolution compensation counter */
+    (*prng)->cnt = 0;
+
     /* seed the C library PRNG once */
-    gettimeofday(&tv, NULL);
+    (void)gettimeofday(&tv, NULL);
     pid = getpid();
     srand((unsigned int)(
         ((unsigned int)pid << 16)
         ^ (unsigned int)pid
         ^ (unsigned int)tv.tv_sec
         ^ (unsigned int)tv.tv_usec));
-
-    /* crank the PRNG a few times */
-    gettimeofday(&tv, NULL);
-    for (i = (unsigned int)(tv.tv_sec ^ tv.tv_usec) & 0x1F; i > 0; i--)
+    for (i = (unsigned int)((tv.tv_sec ^ tv.tv_usec) & 0x1F); i > 0; i--)
         (void)rand();
 
     return PRNG_RC_OK;
@@ -85,35 +92,61 @@ prng_rc_t prng_data(prng_t *prng, void *data_ptr, size_t data_len)
 {
     size_t n;
     unsigned char *p;
-    int cnt;
+    struct {
+        struct timeval tv;
+        long cnt;
+        int rnd;
+    } entropy;
+    unsigned char md5_buf[MD5_LEN_BIN];
+    unsigned char *md5_ptr;
+    size_t md5_len;
+    int retries;
     int i;
 
     /* sanity check argument(s) */
     if (prng == NULL || data_len == 0)
         return PRNG_RC_ARG;
 
-    /* try to gather data from the system PRNG device */
-    if (prng->devfd != -1) {
-        p = (unsigned char *)data_ptr;
-        n = data_len;
-        cnt = 0;
+    /* prepare for generation */
+    p = (unsigned char *)data_ptr;
+    n = data_len;
+
+    /* approach 1: try to gather data via stronger system PRNG device */
+    if (prng->dev != -1) {
+        retries = 0;
         while (n > 0) {
-            i = read(prng->devfd, (void *)p, n);
+            i = read(prng->dev, (void *)p, n);
             if (i <= 0) {
-                if (cnt++ > 16)
+                if (retries++ > 16)
                     break;
                 continue;
             }
-            n -= i;
-            p += i;
-            cnt = 0;
+            retries = 0;
+            n -= (unsigned int)i;
+            p += (unsigned int)i;
         }
     }
 
-    /* always also apply the weaker PRNG. In case the stronger PRNG device
-       based source failed, this is the only remaining randomness, of course */
-    for (p = (unsigned char *)data_ptr, n = 0; n < data_len; n++)
-        *p++ ^= (unsigned char)(((unsigned int)rand() >> 7) & 0xFF);
+    /* approach 2: try to gather data via weaker libc PRNG API. */
+    while (n > 0) {
+        /* gather new entropy */
+        (void)gettimeofday(&(entropy.tv), NULL);            /* source: libc time */
+        entropy.rnd = rand();                               /* source: libc PRNG */
+        entropy.cnt = prng->cnt++;                          /* source: local counter */
+
+        /* pass entropy into MD5 engine */
+        if (md5_update(prng->md5, (void *)&entropy, sizeof(entropy)) != MD5_RC_OK)
+            return PRNG_RC_INT;
+
+        /* store MD5 engine state as PRN output */
+        md5_ptr = md5_buf;
+        md5_len = sizeof(md5_buf);
+        if (md5_store(prng->md5, (void *)&md5_ptr, &md5_len) != MD5_RC_OK)
+            return PRNG_RC_INT;
+        for (i = 0; i < MD5_LEN_BIN && n > 0; i++, n--)
+            *p++ ^= md5_buf[i]; /* intentionally no assignment because arbitrary
+                                   caller buffer content is leveraged, too */
+    }
 
     return PRNG_RC_OK;
 }
@@ -125,8 +158,8 @@ prng_rc_t prng_destroy(prng_t *prng)
         return PRNG_RC_ARG;
 
     /* close PRNG device */
-    if (prng->devfd != -1)
-        close(prng->devfd);
+    if (prng->dev != -1)
+        close(prng->dev);
 
     /* free object */
     free(prng);

@@ -38,7 +38,7 @@
 /* generate a bitmask consisting of 1 bits from (and including)
    bit position `l' (left) to (and including) bit position `r' */
 #define BM_MASK(l,r) \
-    (((1<<((l)-(r)+1))-1)<<(r))
+    ((((unsigned int)1<<(((l)-(r))+1))-1)<<(r))
 
 /* extract a value v from a word w at position `l' to `r' and return value */
 #define BM_GET(w,l,r) \
@@ -72,9 +72,9 @@
 
 /* rotate word w (of bits n..0) k bits to the left or to the right */
 #define BM_ROL(w,n,k) \
-    (BM_SHL((w),(k))&BM_MASK(n,0))|BM_SHR(((w)&BM_MASK(n,0)),(n)-(k))
+    ((BM_SHL((w),(k))&BM_MASK(n,0))|BM_SHR(((w)&BM_MASK(n,0)),(n)-(k)))
 #define BM_ROR(w,n,k) \
-    (BM_SHR(((w)&BM_MASK(n,0)),(k)))|BM_SHL(((w),(n)-(k))&BM_MASK(n,0))
+    ((BM_SHR(((w)&BM_MASK(n,0)),(k)))|BM_SHL(((w),(n)-(k))&BM_MASK(n,0)))
 
 #endif /* __UUID_BM_H__ */
 

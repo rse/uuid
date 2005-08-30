@@ -71,15 +71,16 @@ XS(XS_OSSP__uuid_constant)
             { "UUID_MAKE_V1", UUID_MAKE_V1 },
             { "UUID_MAKE_V3", UUID_MAKE_V3 },
             { "UUID_MAKE_V4", UUID_MAKE_V4 },
+            { "UUID_MAKE_V5", UUID_MAKE_V5 },
             { "UUID_MAKE_MC", UUID_MAKE_MC },
             { "UUID_FMT_BIN", UUID_FMT_BIN },
             { "UUID_FMT_STR", UUID_FMT_STR },
             { "UUID_FMT_TXT", UUID_FMT_TXT }
         };
-#line 80 "uuid.c"
+#line 81 "uuid.c"
 	SV *	sv = ST(0);
 	const char *	s = SvPV(sv, len);
-#line 69 "uuid.xs"
+#line 70 "uuid.xs"
         for (i = 0; i < sizeof(constant_table)/sizeof(constant_table[0]); i++) {
             if (strcmp(s, constant_table[i].name) == 0) {
                 EXTEND(SP, 1);
@@ -92,7 +93,7 @@ XS(XS_OSSP__uuid_constant)
             sv = sv_2mortal(newSVpvf("unknown contant OSSP::uuid::%s", s));
             PUSHs(sv);
         }
-#line 96 "uuid.c"
+#line 97 "uuid.c"
 	PUTBACK;
 	return;
     }
@@ -108,9 +109,9 @@ XS(XS_OSSP__uuid_uuid_create)
 	uuid_t *	uuid;
 	uuid_rc_t	RETVAL;
 	dXSTARG;
-#line 90 "uuid.xs"
+#line 91 "uuid.xs"
         RETVAL = uuid_create(&uuid);
-#line 114 "uuid.c"
+#line 115 "uuid.c"
 	sv_setref_pv(ST(0), Nullch, (void*)uuid);
 	SvSETMAGIC(ST(0));
 	XSprePUSH; PUSHi((IV)RETVAL);
@@ -135,9 +136,9 @@ XS(XS_OSSP__uuid_uuid_destroy)
 	}
 	else
 	    Perl_croak(aTHX_ "uuid is not a reference");
-#line 102 "uuid.xs"
+#line 103 "uuid.xs"
         RETVAL = uuid_destroy(uuid);
-#line 141 "uuid.c"
+#line 142 "uuid.c"
 	XSprePUSH; PUSHi((IV)RETVAL);
     }
     XSRETURN(1);
@@ -161,9 +162,9 @@ XS(XS_OSSP__uuid_uuid_load)
 	}
 	else
 	    Perl_croak(aTHX_ "uuid is not a reference");
-#line 114 "uuid.xs"
+#line 115 "uuid.xs"
         RETVAL = uuid_load(uuid, name);
-#line 167 "uuid.c"
+#line 168 "uuid.c"
 	XSprePUSH; PUSHi((IV)RETVAL);
     }
     XSRETURN(1);
@@ -178,10 +179,10 @@ XS(XS_OSSP__uuid_uuid_make)
     {
 	uuid_t *	uuid;
 	unsigned int	mode = (unsigned int)SvUV(ST(1));
-#line 126 "uuid.xs"
+#line 127 "uuid.xs"
         uuid_t *ns;
         const char *name;
-#line 185 "uuid.c"
+#line 186 "uuid.c"
 	uuid_rc_t	RETVAL;
 	dXSTARG;
 
@@ -191,12 +192,12 @@ XS(XS_OSSP__uuid_uuid_make)
 	}
 	else
 	    Perl_croak(aTHX_ "uuid is not a reference");
-#line 129 "uuid.xs"
-        if (mode & UUID_MAKE_V3) {
+#line 130 "uuid.xs"
+        if ((mode & UUID_MAKE_V3) || (mode & UUID_MAKE_V5)) {
             if (items != 4)
-                croak("mode UUID_MAKE_V3 requires two additional arguments to uuid_make()");
+                croak("mode UUID_MAKE_V3/UUID_MAKE_V5 requires two additional arguments to uuid_make()");
 	        if (!SvROK(ST(2)))
-                croak("mode UUID_MAKE_V3 requires a UUID object as namespace");
+                croak("mode UUID_MAKE_V3/UUID_MAKE_V5 requires a UUID object as namespace");
             ns   = INT2PTR(uuid_t *, SvIV((SV*)SvRV(ST(2))));
             name = (const char *)SvPV_nolen(ST(3));
             RETVAL = uuid_make(uuid, mode, ns, name);
@@ -206,7 +207,7 @@ XS(XS_OSSP__uuid_uuid_make)
                 croak("invalid number of arguments to uuid_make()");
             RETVAL = uuid_make(uuid, mode);
         }
-#line 210 "uuid.c"
+#line 211 "uuid.c"
 	XSprePUSH; PUSHi((IV)RETVAL);
     }
     XSRETURN(1);
@@ -230,9 +231,9 @@ XS(XS_OSSP__uuid_uuid_isnil)
 	}
 	else
 	    Perl_croak(aTHX_ "uuid is not a reference");
-#line 154 "uuid.xs"
+#line 155 "uuid.xs"
         RETVAL = uuid_isnil(uuid, &result);
-#line 236 "uuid.c"
+#line 237 "uuid.c"
 	sv_setiv(ST(1), (IV)result);
 	SvSETMAGIC(ST(1));
 	XSprePUSH; PUSHi((IV)RETVAL);
@@ -266,9 +267,9 @@ XS(XS_OSSP__uuid_uuid_compare)
 	}
 	else
 	    Perl_croak(aTHX_ "uuid2 is not a reference");
-#line 168 "uuid.xs"
+#line 169 "uuid.xs"
         RETVAL = uuid_compare(uuid, uuid2, &result);
-#line 272 "uuid.c"
+#line 273 "uuid.c"
 	sv_setiv(ST(2), (IV)result);
 	SvSETMAGIC(ST(2));
 	XSprePUSH; PUSHi((IV)RETVAL);
@@ -296,11 +297,11 @@ XS(XS_OSSP__uuid_uuid_import)
 	}
 	else
 	    Perl_croak(aTHX_ "uuid is not a reference");
-#line 183 "uuid.xs"
+#line 184 "uuid.xs"
         if (ST(3) == &PL_sv_undef)
             data_len = sv_len(ST(2));
         RETVAL = uuid_import(uuid, fmt, data_ptr, data_len);
-#line 304 "uuid.c"
+#line 305 "uuid.c"
 	XSprePUSH; PUSHi((IV)RETVAL);
     }
     XSRETURN(1);
@@ -327,7 +328,7 @@ XS(XS_OSSP__uuid_uuid_export)
 	}
 	else
 	    Perl_croak(aTHX_ "uuid is not a reference");
-#line 199 "uuid.xs"
+#line 200 "uuid.xs"
         data_ptr = NULL;
         data_len = 0;
         RETVAL = uuid_export(uuid, fmt, &data_ptr, &data_len);
@@ -340,7 +341,7 @@ XS(XS_OSSP__uuid_uuid_export)
                 sv_setuv(ST(3), (UV)data_len);
         }
         PUSHi((IV)RETVAL);
-#line 344 "uuid.c"
+#line 345 "uuid.c"
 	PUTBACK;
 	return;
     }
@@ -356,9 +357,9 @@ XS(XS_OSSP__uuid_uuid_error)
 	uuid_rc_t	rc = (uuid_rc_t)SvIV(ST(0));
 	char *	RETVAL;
 	dXSTARG;
-#line 219 "uuid.xs"
+#line 220 "uuid.xs"
         RETVAL = uuid_error(rc);
-#line 362 "uuid.c"
+#line 363 "uuid.c"
 	sv_setpv(TARG, RETVAL); XSprePUSH; PUSHTARG;
     }
     XSRETURN(1);
@@ -373,9 +374,9 @@ XS(XS_OSSP__uuid_uuid_version)
     {
 	unsigned long	RETVAL;
 	dXSTARG;
-#line 228 "uuid.xs"
+#line 229 "uuid.xs"
         RETVAL = uuid_version();
-#line 379 "uuid.c"
+#line 380 "uuid.c"
 	XSprePUSH; PUSHu((UV)RETVAL);
     }
     XSRETURN(1);

@@ -92,7 +92,6 @@ typedef unsigned long long int sha1_uint32_t;
 enum {
     shaSuccess = 0,
     shaNull,            /* null pointer parameter */
-    shaInputTooLong,    /* input data too long */
     shaStateError       /* called Input after Result */
 };
 
@@ -173,7 +172,7 @@ static int SHA1Result(SHA1Context *context, sha1_uint8_t Message_Digest[SHA1Hash
         context->Computed    = 1;
     }
     for (i = 0; i < SHA1HashSize; i++)
-        Message_Digest[i] = context->Intermediate_Hash[i>>2] >> 8 * (3 - (i & 0x03));
+        Message_Digest[i] = context->Intermediate_Hash[i>>2] >> (8 * (3 - (i & 0x03)));
 
     return shaSuccess;
 }

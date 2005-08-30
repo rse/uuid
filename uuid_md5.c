@@ -77,17 +77,6 @@
 /* POINTER defines a generic pointer type */
 typedef unsigned char *POINTER;
 
-/* UINT2 defines a two byte word */
-#if SIZEOF_UNSIGNED_SHORT   == 2
-typedef unsigned short int UINT2;
-#elif SIZEOF_UNSIGNED_INT   == 2
-typedef unsigned int       UINT2;
-#elif SIZEOF_UNSIGNED_LONG  == 2
-typedef unsigned long int  UINT2;
-#else
-#error ERROR: unable to determine UINT2 type (two byte word)
-#endif
-
 /* UINT4 defines a four byte word */
 #if SIZEOF_UNSIGNED_SHORT       == 4
 typedef unsigned short int     UINT4;
@@ -193,7 +182,7 @@ static void MD5Update(
         memcpy((POINTER)&context->buffer[idx], (POINTER)input, partLen);
         MD5Transform(context->state, context->buffer);
         for (i = partLen; i + 63 < inputLen; i += 64)
-            MD5Transform (context->state, &input[i]);
+            MD5Transform(context->state, &input[i]);
         idx = 0;
     }
     else

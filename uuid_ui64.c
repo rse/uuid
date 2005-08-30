@@ -38,10 +38,12 @@
 
 /* fill an ui64_t with a sequence of a particular digit */
 #define ui64_fill(__x, __n) \
+    /*lint -save -e717*/ \
     do { int __i; \
       for (__i = 0; __i < UI64_DIGITS; __i++) \
           (__x).x[__i] = (__n); \
-    } while(0)
+    } while (0) \
+    /*lint -restore*/
 
 /* the value zero */
 ui64_t ui64_zero(void)
@@ -85,8 +87,10 @@ unsigned long ui64_i2n(ui64_t x)
 
     n = 0;
     i = (int)sizeof(n);
+    /*lint -save -e774*/
     if (i > UI64_DIGITS)
         i = UI64_DIGITS;
+    /*lint -restore*/
     while (--i >= 0) {
         n = (n * UI64_BASE) + x.x[i];
     }
@@ -144,19 +148,19 @@ char *ui64_i2s(ui64_t x, char *str, size_t len, int base)
         return NULL;
     n = ui64_len(x);
     i = 0;
-	do {
-		x = ui64_divn(x, base, &r);
-		str[i++] = map[r];
-		while (n > 1 && x.x[n-1] == 0)
-			n--;
-	} while (i < ((int)len-1) && (n > 1 || x.x[0] != 0));
-	str[i] = '\0';
+    do {
+        x = ui64_divn(x, base, &r);
+        str[i++] = map[r];
+        while (n > 1 && x.x[n-1] == 0)
+            n--;
+    } while (i < ((int)len-1) && (n > 1 || x.x[0] != 0));
+    str[i] = '\0';
     for (j = 0; j < --i; j++) {
         c = str[j];
         str[j] = str[i];
         str[i] = c;
     }
-	return str;
+    return str;
 }
 
 /* addition of two ui64_t */
@@ -469,7 +473,7 @@ ui64_t ui64_rol(ui64_t x, int s, ui64_t *ov)
 {
     UIXX_T(UI64_DIGITS+UI64_DIGITS) zx;
     ui64_t z;
-	int i;
+    int i;
     int carry;
 
     if (s <= 0) {
@@ -517,7 +521,7 @@ ui64_t ui64_ror(ui64_t x, int s, ui64_t *ov)
 {
     UIXX_T(UI64_DIGITS+UI64_DIGITS) zx;
     ui64_t z;
-	int i;
+    int i;
     int carry;
 
     if (s <= 0) {

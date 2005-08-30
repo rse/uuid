@@ -56,7 +56,8 @@ typedef struct prng_st prng_t;
 typedef enum {
     PRNG_RC_OK  = 0,
     PRNG_RC_ARG = 1,
-    PRNG_RC_MEM = 2
+    PRNG_RC_MEM = 2,
+    PRNG_RC_INT = 3
 } prng_rc_t;
 
 extern prng_rc_t prng_create  (prng_t **prng);

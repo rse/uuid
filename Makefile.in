@@ -124,7 +124,7 @@ uuid-config.1: uuid-config.pod
 	V2=`$(SHTOOL) version -l c -d long $(top_srcdir)/uuid_vers.h`; \
 	D=`$(SHTOOL) version -l c -d long $(top_srcdir)/uuid_vers.h | sed -e 's;.*(;;' -e 's;).*;;'`; \
 	$(POD2MAN) --quotes=none \
-	           --section=3 --center="Universally Unique Identifier" \
+	           --section=1 --center="Universally Unique Identifier" \
 	           --release="$$D" --date="OSSP uuid $$V1" $(srcdir)/uuid-config.pod | \
 	sed -e "s;UUID_VERSION_STR;$$V2;" >uuid-config.1
 uuid.1: uuid_cli.pod
