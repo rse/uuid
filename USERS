@@ -28,3 +28,15 @@
     http://www.saurik.com/
     http://svn.saurik.com/repos/menes/trunk/
 
+  o OpenAether OAPR
+    C++ wrapper for NSPR
+    http://www.openaether.org/oapr.html
+
+  o Gauche Scheme Interpreter, UUID extension
+    http://cvs.sourceforge.jp/cgi-bin/viewcvs.cgi/gauche/Gauche-uuid/
+    http://www.shiro.dreamhost.com/scheme/gauche/
+
+  o CGI::Session::ID::UUID
+    UUID based ID generator backend for CGI::Session
+    http://www.cpan.org/modules/by-authors/id/RSE/ 
+

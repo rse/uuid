@@ -27,14 +27,14 @@
 ##  uuid.ts: Perl Binding (Perl test suite part)
 ##
 
-use Test::More tests => 31;
+use Test::More tests => 35;
 
 ##
 ##  Module Loading
 ##
 
 BEGIN {
-    use_ok('OSSP::uuid')
+    use_ok('OSSP::uuid');
 };
 BEGIN {
     use OSSP::uuid qw(:all);
@@ -141,4 +141,27 @@ ok((    defined($ptr)
 
 undef $uuid;
 undef $uuid_ns;
+
+##
+##  TIE API
+##
+
+$uuid = new OSSP::uuid;
+
+tie my $var, 'OSSP::uuid::tie';
+
+my $val_get1 = $var;
+my $val_get2 = $var;
+ok($val_get1 ne $val_get2, "subsequent generation");
+
+$uuid->import("str", $val_get1);
+my $val_cmp1 = $uuid->export("str");
+$uuid->import("str", $val_get2);
+my $val_cmp2 = $uuid->export("str");
+ok($val_get1 eq $val_cmp1, "validity comparison 1");
+ok($val_get2 eq $val_cmp2, "validity comparison 2");
+
+$var = [ "v3", "ns:URL", "http://www.ossp.org/" ];
+$val_get1 = $var;
+ok($val_get1 eq "02d9e6d5-9467-382e-8f9b-9300a64ac3cd", "generation of UUID v3");
 

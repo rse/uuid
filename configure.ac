@@ -29,10 +29,12 @@ dnl ##
 
 AC_PREREQ(2.53)
 AC_INIT
-UUID_VERSION_STR=`$ac_confdir/shtool version -l c -d long uuid_vers.h`
-UUID_VERSION_HEX=`$ac_confdir/shtool version -l c -d hex  uuid_vers.h`
+UUID_VERSION_RAW=`$ac_confdir/shtool version -l c -d short uuid_vers.h`
+UUID_VERSION_STR=`$ac_confdir/shtool version -l c -d long  uuid_vers.h`
+UUID_VERSION_HEX=`$ac_confdir/shtool version -l c -d hex   uuid_vers.h`
 $ac_confdir/shtool echo -e \
     "Configuring %BOSSP uuid%b (Universally Unique Identifier), version %B${UUID_VERSION_STR}%b"
+AC_SUBST(UUID_VERSION_RAW)
 AC_SUBST(UUID_VERSION_STR)
 AC_SUBST(UUID_VERSION_HEX)
 
@@ -48,7 +50,7 @@ sinclude(uuid.ac)
 UUID_CHECK_ALL
 
 AC_CONFIG_HEADERS(config.h)
-AC_CONFIG_FILES([Makefile uuid-config uuid.h])
+AC_CONFIG_FILES([Makefile uuid-config uuid.pc uuid.h])
 AC_CONFIG_COMMANDS([adjustment], [chmod a-w uuid.h; chmod a+x uuid-config])
 AC_OUTPUT
 

@@ -2,6 +2,7 @@
 ##  OSSP uuid - Universally Unique Identifier
 ##  Copyright (c) 2004-2005 Ralf S. Engelschall <rse@engelschall.com>
 ##  Copyright (c) 2004-2005 The OSSP Project <http://www.ossp.org/>
+##  Copyright (c) 2004 Piotr Roszatycki <dexter@debian.org>
 ##
 ##  This file is part of OSSP uuid, a library for the generation
 ##  of UUIDs which can found at http://www.ossp.org/pkg/lib/uuid/
@@ -24,13 +25,7 @@
 ##  OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 ##  SUCH DAMAGE.
 ##
-##  compat.pm: Backward Compatibility Perl Binding
-##
-
-##
-##  This is a Data::UUID backward compatibility API for OSSP::uuid
-##  Copyright (c) 2004 Piotr Roszatycki <dexter@debian.org>
-##  This software is on license as Perl itself.
+##  uuid_compat.pm: Data::UUID Backward Compatibility Perl API
 ##
 
 package Data::UUID;
@@ -47,7 +42,7 @@ require Exporter;
 our @ISA     = qw(Exporter);
 our @EXPORT  = qw(NameSpace_DNS NameSpace_OID NameSpace_URL NameSpace_X500);
 
-our $VERSION = '0.11';
+our $VERSION = do { my @v = ('1.3.0' =~ m/\d+/g); sprintf("%d.".("%02d"x$#v), @v); };
 
 sub new {
     my $class = shift;

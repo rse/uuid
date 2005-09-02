@@ -39,12 +39,15 @@ OSSP uuid UUID_VERSION_STR
 
 =head1 DESCRIPTION
 
-B<OSSP uuid> is a ISO-C and Perl application programming interface (API)
-and corresponding command line interface (CLI) for the generation of DCE
-1.1 and ISO/IEC 11578:1996 compliant I<Universally Unique Identifier>
-(UUID). It supports DCE 1.1 variant UUIDs of version 1 (time and node
-based), version 3 (name based, MD5), version 4 (random number based) and
-version 5 (name based, SHA-1).
+B<OSSP uuid> is a ISO-C:1999 application programming interface (API)
+and corresponding command line interface (CLI) for the generation of
+DCE 1.1, ISO/IEC 11578:1996 and RFC 4122 compliant I<Universally Unique
+Identifier> (UUID). It supports DCE 1.1 variant UUIDs of version 1 (time
+and node based), version 3 (name based, MD5), version 4 (random number
+based) and version 5 (name based, SHA-1). Additional API bindings are
+provided for the languages ISO-C++:1998, Perl:5 and PHP:4/5. Optional
+backward compatibility exists for the ISO-C DCE-1.1 and Perl Data::UUID
+APIs.
 
 UUIDs are 128 bit numbers which are intended to have a high likelihood
 of uniqueness over space and time and are computationally difficult
@@ -58,9 +61,9 @@ This is the ISO-C application programming interface (API) of B<OSSP uuid>.
 
 =head2 UUID Binary Representation
 
-According to the DCE 1.1 and ISO/IEC 11578:1996 standards, a DCE 1.1
-variant UUID is a 128 bit number defined out of 7 fields, each field a
-multiple of an octet in size and stored in network byte order:
+According to the DCE 1.1, ISO/IEC 11578:1996 and RFC 4122 standards, a
+DCE 1.1 variant UUID is a 128 bit number defined out of 7 fields, each
+field a multiple of an octet in size and stored in network byte order:
 
   0                   1                   2                   3
    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -82,12 +85,12 @@ under C<UUID_FMT_BIN>.
 
 =head2 UUID ASCII String Representation
 
-According to the DCE 1.1 and ISO/IEC 11578:1996 standards, a DCE
-1.1 variant UUID is represented as an ASCII string consisting
-of 8 hexadecimal digits followed by a hyphen, then three groups
-of 4 hexadecimal digits each followed by a hyphen, then 12
-hexadecimal digits. Formally, the string representation is defined by
-the following grammar:
+According to the DCE 1.1, ISO/IEC 11578:1996 and RFC 4122 standards,
+a DCE 1.1 variant UUID is represented as an ASCII string consisting
+of 8 hexadecimal digits followed by a hyphen, then three groups of
+4 hexadecimal digits each followed by a hyphen, then 12 hexadecimal
+digits. Formally, the string representation is defined by the following
+grammar:
 
  uuid                   = <time_low> "-" <time_mid> "-"
                           <time_high_and_version> "-"
@@ -246,13 +249,17 @@ timestamp information. The initial UUID is the I<Nil> UUID.
 
 Destroy UUID object I<uuid>.
 
-=item uuid_rc_t B<uuid_isnil>(uuid_t *I<uuid>, int *I<result>);
+=item uuid_rc_t B<uuid_clone>(const uuid_t *I<uuid>, uuid_t **I<uuid_clone>);
+
+Clone UUID object I<uuid> and store new UUID object in I<uuid_clone>.
+
+=item uuid_rc_t B<uuid_isnil>(const uuid_t *I<uuid>, int *I<result>);
 
 Checks whether the UUID in I<uuid> is the I<Nil> UUID.
 If this is the case, it returns I<true> in C<*>I<result>.
 Else it returns I<false> in C<*>I<result>.
 
-=item uuid_rc_t B<uuid_compare>(uuid_t *I<uuid>, uuid_t *I<uuid2>, int *I<result>);
+=item uuid_rc_t B<uuid_compare>(const uuid_t *I<uuid>, const uuid_t *I<uuid2>, int *I<result>);
 
 Compares the order of the two UUIDs in I<uuid1> and I<uuid2>
 and returns the result in C<*>I<result>: C<-1> if I<uuid1> is
@@ -269,7 +276,7 @@ The format of the external representation is specified by I<fmt> and the
 minimum expected length in I<data_len> depends on it. Valid values for
 I<fmt> are B<UUID_FMT_BIN> and B<UUID_FMT_STR>.
 
-=item uuid_rc_t B<uuid_export>(uuid_t *I<uuid>, uuid_fmt_t I<fmt>, void **I<data_ptr>, size_t *I<data_len>);
+=item uuid_rc_t B<uuid_export>(const uuid_t *I<uuid>, uuid_fmt_t I<fmt>, void **I<data_ptr>, size_t *I<data_len>);
 
 Exports a UUID I<uuid> into an external representation of format I<fmt>.
 The data is written to the buffer at C<*>I<data_ptr> which has to
@@ -391,11 +398,10 @@ The following are references to B<UUID> documentation and specifications:
 
 =item
 
-B<UUIDs and GUIDs>,
-IETF Internet Draft (expired),
-Paul J. Leach, Rich Salz,
-February 1998, 27 pages,
-http://www.opengroup.org/dce/info/draft-leach-uuids-guids-01.txt
+B<A Universally Unique IDentifier (UUID) URN Namespace>,
+P. Leach, M. Mealling, R. Salz,
+IETF Request for Comments: RFC 4122,
+July 2005, 32 pages,
 
 =item
 
@@ -431,14 +437,6 @@ section B<6.4.1 Node Field Generation Without the IEEE 802 Address>,
 IETF RFC 2518,
 February 1999, 94 pages,
 http://www.ietf.org/rfc/rfc2518.txt
-
-=item
-
-B<A UUID URN Namespace>,
-P. Leach, M. Mealling, R. Salz,
-IETF Internet Draft draft-mealling-uuid-urn-05,
-December 2004, 31 pages,
-http://www.ietf.org/internet-drafts/draft-mealling-uuid-urn-05.txt
 
 =item
 

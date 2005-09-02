@@ -92,35 +92,40 @@ struct uuid_st {
 /* create UUID object */
 uuid_rc_t uuid_create(uuid_t **uuid)
 {
+    uuid_t *obj;
+
     /* argument sanity check */
     if (uuid == NULL)
         return UUID_RC_ARG;
 
     /* allocate UUID object */
-    if ((*uuid = (uuid_t *)malloc(sizeof(uuid_t))) == NULL)
+    if ((obj = (uuid_t *)malloc(sizeof(uuid_t))) == NULL)
         return UUID_RC_MEM;
 
-    /* set UUID object initially to "Nil UUID" */
-    uuid_load(*uuid, "nil");
+    /* create PRNG, MD5 and SHA1 sub-objects */
+    if (prng_create(&obj->prng) != PRNG_RC_OK)
+        return UUID_RC_INT;
+    if (md5_create(&obj->md5) != MD5_RC_OK)
+        return UUID_RC_INT;
+    if (sha1_create(&obj->sha1) != SHA1_RC_OK)
+        return UUID_RC_INT;
 
-    /* create PRNG and MD5 sub-objects */
-    if (prng_create(&(*uuid)->prng) != PRNG_RC_OK)
-        return UUID_RC_INT;
-    if (md5_create(&(*uuid)->md5) != MD5_RC_OK)
-        return UUID_RC_INT;
-    if (sha1_create(&(*uuid)->sha1) != SHA1_RC_OK)
-        return UUID_RC_INT;
+    /* set UUID object initially to "Nil UUID" */
+    uuid_load(obj, "nil");
 
     /* resolve MAC address for insertion into node field of UUIDs */
-    if (!mac_address((unsigned char *)((*uuid)->mac), sizeof((*uuid)->mac))) {
-        memset((*uuid)->mac, '\0', sizeof((*uuid)->mac));
-        (*uuid)->mac[0] = BM_OCTET(1,0,0,0,0,0,0,0);
+    if (!mac_address((unsigned char *)(obj->mac), sizeof(obj->mac))) {
+        memset(obj->mac, '\0', sizeof(obj->mac));
+        obj->mac[0] = BM_OCTET(1,0,0,0,0,0,0,0);
     }
 
     /* initialize time attributes */
-    (*uuid)->time_last.tv_sec  = 0;
-    (*uuid)->time_last.tv_usec = 0;
-    (*uuid)->time_seq = 0;
+    obj->time_last.tv_sec  = 0;
+    obj->time_last.tv_usec = 0;
+    obj->time_seq = 0;
+
+    /* store result object */
+    *uuid = obj;
 
     return UUID_RC_OK;
 }
@@ -139,6 +144,36 @@ uuid_rc_t uuid_destroy(uuid_t *uuid)
 
     /* free UUID object */
     free(uuid);
+
+    return UUID_RC_OK;
+}
+
+/* clone UUID object */
+uuid_rc_t uuid_clone(const uuid_t *uuid, uuid_t **clone)
+{
+    uuid_t *obj;
+
+    /* argument sanity check */
+    if (uuid == NULL || uuid_clone == NULL)
+        return UUID_RC_ARG;
+
+    /* allocate UUID object */
+    if ((obj = (uuid_t *)malloc(sizeof(uuid_t))) == NULL)
+        return UUID_RC_MEM;
+
+    /* clone entire internal state */
+    memcpy(obj, uuid, sizeof(uuid_t));
+
+    /* re-initialize with new PRNG, MD5 and SHA1 sub-objects */
+    if (prng_create(&obj->prng) != PRNG_RC_OK)
+        return UUID_RC_INT;
+    if (md5_create(&obj->md5) != MD5_RC_OK)
+        return UUID_RC_INT;
+    if (sha1_create(&obj->sha1) != SHA1_RC_OK)
+        return UUID_RC_INT;
+
+    /* store result object */
+    *clone = obj;
 
     return UUID_RC_OK;
 }
@@ -834,13 +869,13 @@ static struct {
 } uuid_value_table[] = {
     { "nil",     /* 00000000-0000-0000-0000-000000000000 ("Nil UUID") */
       { 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00 } },
-    { "ns:DNS",  /* 6ba7b810-9dad-11d1-80b4-00c04fd430c8 (see draft-leach-uuids-guids-01.txt) */
+    { "ns:DNS",  /* 6ba7b810-9dad-11d1-80b4-00c04fd430c8 (see RFC 4122) */
       { 0x6b,0xa7,0xb8,0x10,0x9d,0xad,0x11,0xd1,0x80,0xb4,0x00,0xc0,0x4f,0xd4,0x30,0xc8 } },
-    { "ns:URL",  /* 6ba7b811-9dad-11d1-80b4-00c04fd430c8 (see draft-leach-uuids-guids-01.txt) */
+    { "ns:URL",  /* 6ba7b811-9dad-11d1-80b4-00c04fd430c8 (see RFC 4122) */
       { 0x6b,0xa7,0xb8,0x11,0x9d,0xad,0x11,0xd1,0x80,0xb4,0x00,0xc0,0x4f,0xd4,0x30,0xc8 } },
-    { "ns:OID",  /* 6ba7b812-9dad-11d1-80b4-00c04fd430c8 (see draft-leach-uuids-guids-01.txt) */
+    { "ns:OID",  /* 6ba7b812-9dad-11d1-80b4-00c04fd430c8 (see RFC 4122) */
       { 0x6b,0xa7,0xb8,0x12,0x9d,0xad,0x11,0xd1,0x80,0xb4,0x00,0xc0,0x4f,0xd4,0x30,0xc8 } },
-    { "ns:X500", /* 6ba7b814-9dad-11d1-80b4-00c04fd430c8 (see draft-leach-uuids-guids-01.txt) */
+    { "ns:X500", /* 6ba7b814-9dad-11d1-80b4-00c04fd430c8 (see RFC 4122) */
       { 0x6b,0xa7,0xb8,0x14,0x9d,0xad,0x11,0xd1,0x80,0xb4,0x00,0xc0,0x4f,0xd4,0x30,0xc8 } }
 };
 

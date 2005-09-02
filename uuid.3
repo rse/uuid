@@ -129,20 +129,23 @@
 .\" ========================================================================
 .\"
 .IX Title ".::uuid 3"
-.TH .::uuid 3 "OSSP uuid 1.2.1" "30-Aug-2005" "Universally Unique Identifier"
+.TH .::uuid 3 "OSSP uuid 1.3.0" "02-Sep-2005" "Universally Unique Identifier"
 .SH "NAME"
 \&\fBOSSP uuid\fR \- \fBUniversally Unique Identifier\fR
 .SH "VERSION"
 .IX Header "VERSION"
-\&\s-1OSSP\s0 uuid \s-11.2.1 (30-Aug-2005)\s0
+\&\s-1OSSP\s0 uuid \s-11.3.0 (02-Sep-2005)\s0
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
-\&\fB\s-1OSSP\s0 uuid\fR is a ISO-C and Perl application programming interface (\s-1API\s0)
-and corresponding command line interface (\s-1CLI\s0) for the generation of \s-1DCE\s0
-1.1 and \s-1ISO/IEC\s0 11578:1996 compliant \fIUniversally Unique Identifier\fR
-(\s-1UUID\s0). It supports \s-1DCE\s0 1.1 variant UUIDs of version 1 (time and node
-based), version 3 (name based, \s-1MD5\s0), version 4 (random number based) and
-version 5 (name based, \s-1SHA\-1\s0).
+\&\fB\s-1OSSP\s0 uuid\fR is a \s-1ISO\-C:1999\s0 application programming interface (\s-1API\s0)
+and corresponding command line interface (\s-1CLI\s0) for the generation of
+\&\s-1DCE\s0 1.1, \s-1ISO/IEC\s0 11578:1996 and \s-1RFC\s0 4122 compliant \fIUniversally Unique
+Identifier\fR (\s-1UUID\s0). It supports \s-1DCE\s0 1.1 variant UUIDs of version 1 (time
+and node based), version 3 (name based, \s-1MD5\s0), version 4 (random number
+based) and version 5 (name based, \s-1SHA\-1\s0). Additional \s-1API\s0 bindings are
+provided for the languages \s-1ISO\-\*(C+:1998\s0, Perl:5 and \s-1PHP:4/5\s0. Optional
+backward compatibility exists for the ISO-C \s-1DCE\-1\s0.1 and Perl Data::UUID
+APIs.
 .PP
 UUIDs are 128 bit numbers which are intended to have a high likelihood
 of uniqueness over space and time and are computationally difficult
@@ -155,9 +158,9 @@ persistent objects across a network.
 This is the ISO-C application programming interface (\s-1API\s0) of \fB\s-1OSSP\s0 uuid\fR.
 .Sh "\s-1UUID\s0 Binary Representation"
 .IX Subsection "UUID Binary Representation"
-According to the \s-1DCE\s0 1.1 and \s-1ISO/IEC\s0 11578:1996 standards, a \s-1DCE\s0 1.1
-variant \s-1UUID\s0 is a 128 bit number defined out of 7 fields, each field a
-multiple of an octet in size and stored in network byte order:
+According to the \s-1DCE\s0 1.1, \s-1ISO/IEC\s0 11578:1996 and \s-1RFC\s0 4122 standards, a
+\&\s-1DCE\s0 1.1 variant \s-1UUID\s0 is a 128 bit number defined out of 7 fields, each
+field a multiple of an octet in size and stored in network byte order:
 .PP
 .Vb 11
 \&  0                   1                   2                   3
@@ -180,12 +183,12 @@ uuid\fR \s-1API\s0 functions \fBuuid_import\fR() and \fBuuid_export\fR() deal wi
 under \f(CW\*(C`UUID_FMT_BIN\*(C'\fR.
 .Sh "\s-1UUID\s0 \s-1ASCII\s0 String Representation"
 .IX Subsection "UUID ASCII String Representation"
-According to the \s-1DCE\s0 1.1 and \s-1ISO/IEC\s0 11578:1996 standards, a \s-1DCE\s0
-1.1 variant \s-1UUID\s0 is represented as an \s-1ASCII\s0 string consisting
-of 8 hexadecimal digits followed by a hyphen, then three groups
-of 4 hexadecimal digits each followed by a hyphen, then 12
-hexadecimal digits. Formally, the string representation is defined by
-the following grammar:
+According to the \s-1DCE\s0 1.1, \s-1ISO/IEC\s0 11578:1996 and \s-1RFC\s0 4122 standards,
+a \s-1DCE\s0 1.1 variant \s-1UUID\s0 is represented as an \s-1ASCII\s0 string consisting
+of 8 hexadecimal digits followed by a hyphen, then three groups of
+4 hexadecimal digits each followed by a hyphen, then 12 hexadecimal
+digits. Formally, the string representation is defined by the following
+grammar:
 .PP
 .Vb 14
 \& uuid                   = <time_low> "-" <time_mid> "-"
@@ -318,13 +321,16 @@ timestamp information. The initial \s-1UUID\s0 is the \fINil\fR \s-1UUID\s0.
 .IP "uuid_rc_t \fBuuid_destroy\fR(uuid_t *\fIuuid\fR);" 4
 .IX Item "uuid_rc_t uuid_destroy(uuid_t *uuid);"
 Destroy \s-1UUID\s0 object \fIuuid\fR.
-.IP "uuid_rc_t \fBuuid_isnil\fR(uuid_t *\fIuuid\fR, int *\fIresult\fR);" 4
-.IX Item "uuid_rc_t uuid_isnil(uuid_t *uuid, int *result);"
+.IP "uuid_rc_t \fBuuid_clone\fR(const uuid_t *\fIuuid\fR, uuid_t **\fIuuid_clone\fR);" 4
+.IX Item "uuid_rc_t uuid_clone(const uuid_t *uuid, uuid_t **uuid_clone);"
+Clone \s-1UUID\s0 object \fIuuid\fR and store new \s-1UUID\s0 object in \fIuuid_clone\fR.
+.IP "uuid_rc_t \fBuuid_isnil\fR(const uuid_t *\fIuuid\fR, int *\fIresult\fR);" 4
+.IX Item "uuid_rc_t uuid_isnil(const uuid_t *uuid, int *result);"
 Checks whether the \s-1UUID\s0 in \fIuuid\fR is the \fINil\fR \s-1UUID\s0.
 If this is the case, it returns \fItrue\fR in \f(CW\*(C`*\*(C'\fR\fIresult\fR.
 Else it returns \fIfalse\fR in \f(CW\*(C`*\*(C'\fR\fIresult\fR.
-.IP "uuid_rc_t \fBuuid_compare\fR(uuid_t *\fIuuid\fR, uuid_t *\fIuuid2\fR, int *\fIresult\fR);" 4
-.IX Item "uuid_rc_t uuid_compare(uuid_t *uuid, uuid_t *uuid2, int *result);"
+.IP "uuid_rc_t \fBuuid_compare\fR(const uuid_t *\fIuuid\fR, const uuid_t *\fIuuid2\fR, int *\fIresult\fR);" 4
+.IX Item "uuid_rc_t uuid_compare(const uuid_t *uuid, const uuid_t *uuid2, int *result);"
 Compares the order of the two UUIDs in \fIuuid1\fR and \fIuuid2\fR
 and returns the result in \f(CW\*(C`*\*(C'\fR\fIresult\fR: \f(CW\*(C`\-1\*(C'\fR if \fIuuid1\fR is
 smaller than \fIuuid2\fR, \f(CW0\fR if \fIuuid1\fR is equal to \fIuuid2\fR
@@ -338,8 +344,8 @@ The data is read from the buffer at \fIdata_ptr\fR which contains at least
 The format of the external representation is specified by \fIfmt\fR and the
 minimum expected length in \fIdata_len\fR depends on it. Valid values for
 \&\fIfmt\fR are \fB\s-1UUID_FMT_BIN\s0\fR and \fB\s-1UUID_FMT_STR\s0\fR.
-.IP "uuid_rc_t \fBuuid_export\fR(uuid_t *\fIuuid\fR, uuid_fmt_t \fIfmt\fR, void **\fIdata_ptr\fR, size_t *\fIdata_len\fR);" 4
-.IX Item "uuid_rc_t uuid_export(uuid_t *uuid, uuid_fmt_t fmt, void **data_ptr, size_t *data_len);"
+.IP "uuid_rc_t \fBuuid_export\fR(const uuid_t *\fIuuid\fR, uuid_fmt_t \fIfmt\fR, void **\fIdata_ptr\fR, size_t *\fIdata_len\fR);" 4
+.IX Item "uuid_rc_t uuid_export(const uuid_t *uuid, uuid_fmt_t fmt, void **data_ptr, size_t *data_len);"
 Exports a \s-1UUID\s0 \fIuuid\fR into an external representation of format \fIfmt\fR.
 The data is written to the buffer at \f(CW\*(C`*\*(C'\fR\fIdata_ptr\fR which has to
 be room for at least \f(CW\*(C`*\*(C'\fR\fIdata_len\fR bytes. If \f(CW\*(C`*\*(C'\fR\fIdata_ptr\fR is
@@ -458,11 +464,10 @@ code.
 .IX Header "SEE ALSO"
 The following are references to \fB\s-1UUID\s0\fR documentation and specifications:
 .IP "\(bu" 4
-\&\fBUUIDs and GUIDs\fR,
-\&\s-1IETF\s0 Internet Draft (expired),
-Paul J. Leach, Rich Salz,
-February 1998, 27 pages,
-http://www.opengroup.org/dce/info/draft\-leach\-uuids\-guids\-01.txt
+\&\fBA Universally Unique IDentifier (\s-1UUID\s0) \s-1URN\s0 Namespace\fR,
+P. Leach, M. Mealling, R. Salz,
+\&\s-1IETF\s0 Request for Comments: \s-1RFC\s0 4122,
+July 2005, 32 pages,
 .IP "\(bu" 4
 \&\fB\s-1DCE\s0 1.1: Remote Procedure Call\fR,
 appendix \fBUniversally Unique Identifier\fR,
@@ -490,12 +495,6 @@ section \fB6.4.1 Node Field Generation Without the \s-1IEEE\s0 802 Address\fR,
 \&\s-1IETF\s0 \s-1RFC\s0 2518,
 February 1999, 94 pages,
 http://www.ietf.org/rfc/rfc2518.txt
-.IP "\(bu" 4
-\&\fBA \s-1UUID\s0 \s-1URN\s0 Namespace\fR,
-P. Leach, M. Mealling, R. Salz,
-\&\s-1IETF\s0 Internet Draft draft\-mealling\-uuid\-urn\-05,
-December 2004, 31 pages,
-http://www.ietf.org/internet\-drafts/draft\-mealling\-uuid\-urn\-05.txt
 .IP "\(bu" 4
 \&\fB\s-1DCE\s0 1.1 compliant \s-1UUID\s0 functions\fR,
 FreeBSD manual pages \fIuuid\fR\|(3) and \fIuuidgen\fR\|(2),

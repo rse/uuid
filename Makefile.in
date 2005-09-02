@@ -42,8 +42,10 @@ includedir  = @includedir@
 mandir      = @mandir@
 
 CC          = @CC@
-CPPFLAGS    = -I. -I$(srcdir) @CPPFLAGS@
-CFLAGS      = @DEFS@ @CFLAGS@
+CXX         = @CXX@
+CPPFLAGS    = -I. -I$(srcdir) @CPPFLAGS@ @DEFS@
+CFLAGS      = @CFLAGS@
+CXXFLAGS    = @CXXFLAGS@
 LDFLAGS     = @LDFLAGS@
 LIBS        = @LIBS@
 RM          = rm -f
@@ -54,36 +56,52 @@ LIBTOOL     = ./libtool
 TRUE        = true
 POD2MAN     = pod2man
 PERL        = @PERL@
+PHP         = @PHP@
 
 LIB_NAME    = libuuid.la
 LIB_OBJS    = uuid.lo uuid_md5.lo uuid_sha1.lo uuid_prng.lo uuid_mac.lo uuid_ui64.lo uuid_str.lo
 
 DCE_NAME    = libuuid_dce.la
-DCE_OBJS    = $(LIB_OBJS) uuid_dce.lo
+DCE_OBJS    = uuid_dce.lo $(LIB_OBJS)
+
+CXX_NAME    = libuuid++.la
+CXX_OBJS    = uuid++.lo $(LIB_OBJS)
 
 PRG_NAME    = uuid
 PRG_OBJS    = uuid_cli.o
 
-MAN_NAME    = uuid.3 uuid.1
+MAN_NAME    = uuid.3 uuid++.3 uuid.1
 
 PERL_NAME   = perl/blib/lib/OSSP/uuid.pm
 PERL_OBJS   = perl/uuid.pm
 
-TARGETS     = $(LIB_NAME) @DCE_NAME@ $(PRG_NAME) @PERL_NAME@
+PHP_NAME    = php/modules/uuid.so
+PHP_OBJS    = php/uuid.c
 
-WITH_DCE    = @WITH_DCE@
-WITH_PERL   = @WITH_PERL@
+TARGETS     = $(LIB_NAME) @DCE_NAME@ @CXX_NAME@ $(PRG_NAME) @PERL_NAME@ @PHP_NAME@
+
+WITH_DCE         = @WITH_DCE@
+WITH_CXX         = @WITH_CXX@
+WITH_PERL        = @WITH_PERL@
+WITH_PERL_COMPAT = @WITH_PERL_COMPAT@
+WITH_PHP         = @WITH_PHP@
 
 .SUFFIXES:
-.SUFFIXES: .c .o .lo
+.SUFFIXES: .c .cc .o .lo
 
 all: $(TARGETS)
 
 .c.o:
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c $<
 
+.cc.o:
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $<
+
 .c.lo:
 	@$(LIBTOOL) --mode=compile $(CC) $(CPPFLAGS) $(CFLAGS) -c $<
+
+.cc.lo:
+	@$(LIBTOOL) --mode=compile $(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $<
 
 $(LIB_NAME): $(LIB_OBJS)
 	@$(LIBTOOL) --mode=link $(CC) -o $(LIB_NAME) $(LIB_OBJS) -rpath $(libdir) \
@@ -93,12 +111,20 @@ $(DCE_NAME): $(DCE_OBJS)
 	@$(LIBTOOL) --mode=link $(CC) -o $(DCE_NAME) $(DCE_OBJS) -rpath $(libdir) \
 	    -version-info `$(SHTOOL) version -l c -d libtool $(top_srcdir)/uuid_vers.h`
 
+$(CXX_NAME): $(CXX_OBJS)
+	@$(LIBTOOL) --mode=link $(CXX) -o $(CXX_NAME) $(CXX_OBJS) -rpath $(libdir) \
+	    -version-info `$(SHTOOL) version -l c -d libtool $(top_srcdir)/uuid_vers.h`
+
 $(PRG_NAME): $(PRG_OBJS) $(LIB_NAME)
 	@$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) -o $(PRG_NAME) $(PRG_OBJS) $(LIB_NAME) $(LIBS)
 
 $(PERL_NAME): $(PERL_OBJS) $(LIB_NAME)
-	@cd perl && $(PERL) Makefile.PL PREFIX=$(prefix) && $(MAKE) $(MFLAGS) all
+	@cd perl && $(PERL) Makefile.PL PREFIX=$(prefix) COMPAT=$(WITH_PERL_COMPAT) && $(MAKE) $(MFLAGS) all
 	@touch $(PERL_NAME)
+
+$(PHP_NAME): $(PHP_OBJS) $(LIB_NAME)
+	@cd php && $(MAKE) $(MFLAGS) -f Makefile.local PHP=$(PHP)
+	@touch $(PHP_NAME)
 
 uuid.lo: uuid.c config.h uuid.h uuid_md5.h uuid_sha1.h uuid_prng.h uuid_mac.h uuid_ui64.h uuid_str.h uuid_bm.h uuid_ac.h
 uuid_mac.lo: uuid_mac.c config.h uuid_mac.h
@@ -109,8 +135,9 @@ uuid_str.lo: uuid_str.c config.h uuid_str.h
 uuid_ui64.lo: uuid_ui64.c uuid_ui64.h
 uuid_dce.lo: uuid_dce.c uuid.h uuid_dce.h
 uuid_cli.o: uuid_cli.c uuid.h
+uuid++.lo: uuid++.cc uuid++.hh
 
-man: uuid.3 uuid-config.1 uuid.1
+man: uuid.3 uuid++.3 uuid-config.1 uuid.1
 uuid.3: uuid.pod
 	V1=`$(SHTOOL) version -l c -d short $(top_srcdir)/uuid_vers.h`; \
 	V2=`$(SHTOOL) version -l c -d long $(top_srcdir)/uuid_vers.h`; \
@@ -119,6 +146,14 @@ uuid.3: uuid.pod
 	           --section=3 --center="Universally Unique Identifier" \
 	           --release="$$D" --date="OSSP uuid $$V1" $(srcdir)/uuid.pod | \
 	sed -e "s;UUID_VERSION_STR;$$V2;" >uuid.3
+uuid++.3: uuid++.pod
+	V1=`$(SHTOOL) version -l c -d short $(top_srcdir)/uuid_vers.h`; \
+	V2=`$(SHTOOL) version -l c -d long $(top_srcdir)/uuid_vers.h`; \
+	D=`$(SHTOOL) version -l c -d long $(top_srcdir)/uuid_vers.h | sed -e 's;.*(;;' -e 's;).*;;'`; \
+	$(POD2MAN) --quotes=none \
+	           --section=3 --center="Universally Unique Identifier" \
+	           --release="$$D" --date="OSSP uuid $$V1" $(srcdir)/uuid++.pod | \
+	sed -e "s;UUID_VERSION_STR;$$V2;" >uuid++.3
 uuid-config.1: uuid-config.pod
 	V1=`$(SHTOOL) version -l c -d short $(top_srcdir)/uuid_vers.h`; \
 	V2=`$(SHTOOL) version -l c -d long $(top_srcdir)/uuid_vers.h`; \
@@ -164,30 +199,49 @@ check: all
 	    echo "==== Perl bindings to C API"; \
 	    (cd perl && $(MAKE) $(MFLAGS) test); \
 	fi
+	-@if [ ".$(WITH_PHP)" = .yes ]; then \
+	    echo "==== PHP bindings to C API"; \
+	    (cd php && $(MAKE) $(MFLAGS) -f Makefile.local test PHP=$(PHP)); \
+	fi
 
 install:
 	$(SHTOOL) mkdir -f -p -m 755 $(DESTDIR)$(prefix)
 	$(SHTOOL) mkdir -f -p -m 755 $(DESTDIR)$(bindir)
 	$(SHTOOL) mkdir -f -p -m 755 $(DESTDIR)$(includedir)
-	$(SHTOOL) mkdir -f -p -m 755 $(DESTDIR)$(libdir)
+	$(SHTOOL) mkdir -f -p -m 755 $(DESTDIR)$(libdir)/pkgconfig
 	$(SHTOOL) mkdir -f -p -m 755 $(DESTDIR)$(mandir)/man3
 	$(SHTOOL) mkdir -f -p -m 755 $(DESTDIR)$(mandir)/man1
 	$(SHTOOL) install -c -m 755 ./uuid-config $(DESTDIR)$(bindir)/
 	$(SHTOOL) install -c -m 644 $(srcdir)/uuid-config.1 $(DESTDIR)$(mandir)/man1/
+	$(SHTOOL) install -c -m 644 $(srcdir)/uuid.pc $(DESTDIR)$(libdir)/pkgconfig/
 	$(SHTOOL) install -c -m 644 ./uuid.h $(DESTDIR)$(includedir)/
 	-@if [ ".$(WITH_DCE)" = .yes ]; then \
 	    echo "$(SHTOOL) install -c -m 644 $(srcdir)/uuid_dce.h $(DESTDIR)$(includedir)/"; \
 	    $(SHTOOL) install -c -m 644 $(srcdir)/uuid_dce.h $(DESTDIR)$(includedir)/; \
 	fi
+	-@if [ ".$(WITH_CXX)" = .yes ]; then \
+	    echo "$(SHTOOL) install -c -m 644 $(srcdir)/uuid++.hh $(DESTDIR)$(includedir)/"; \
+	    $(SHTOOL) install -c -m 644 $(srcdir)/uuid++.hh $(DESTDIR)$(includedir)/; \
+	fi
 	$(SHTOOL) install -c -m 644 $(srcdir)/uuid.3 $(DESTDIR)$(mandir)/man3/
+	-@if [ ".$(WITH_CXX)" = .yes ]; then \
+	    echo "$(SHTOOL) install -c -m 644 $(srcdir)/uuid++.3 $(DESTDIR)$(mandir)/man3/"; \
+	    $(SHTOOL) install -c -m 644 $(srcdir)/uuid++.3 $(DESTDIR)$(mandir)/man3/; \
+	fi
 	@$(LIBTOOL) --mode=install $(SHTOOL) install -c -m 644 libuuid.la $(DESTDIR)$(libdir)/
 	-@if [ ".$(WITH_DCE)" = .yes ]; then \
 	    $(LIBTOOL) --mode=install $(SHTOOL) install -c -m 644 libuuid_dce.la $(DESTDIR)$(libdir)/; \
 	fi
+	-@if [ ".$(WITH_CXX)" = .yes ]; then \
+	    $(LIBTOOL) --mode=install $(SHTOOL) install -c -m 644 libuuid++.la $(DESTDIR)$(libdir)/; \
+	fi
 	@$(LIBTOOL) --mode=install $(SHTOOL) install -c -s -m 755 uuid $(DESTDIR)$(bindir)/
 	$(SHTOOL) install -c -m 644 $(srcdir)/uuid.1 $(DESTDIR)$(mandir)/man1/
 	-@if [ ".$(WITH_PERL)" = .yes ]; then \
-	    (cd perl && $(MAKE) $(MFLAGS) install); \
+	    (cd perl && $(MAKE) $(MFLAGS) install DESTDIR=$(DESTDIR)); \
+	fi
+	-@if [ ".$(WITH_PHP)" = .yes ]; then \
+	    (cd php && $(MAKE) $(MFLAGS) -f Makefile.local install EXTDIR=$(prefix)/lib/php PHP=$(PHP) DESTDIR=$(DESTDIR)); \
 	fi
 
 uninstall:
@@ -197,17 +251,30 @@ uninstall:
 	-@if [ ".$(WITH_DCE)" = .yes ]; then \
 	    $(LIBTOOL) --mode=uninstall $(RM) $(DESTDIR)$(libdir)/libuuid_dce.la; \
 	fi
+	-@if [ ".$(WITH_CXX)" = .yes ]; then \
+	    $(LIBTOOL) --mode=uninstall $(RM) $(DESTDIR)$(libdir)/libuuid++.la; \
+	fi
 	-$(RM) $(DESTDIR)$(mandir)/man3/uuid.3
+	-@if [ ".$(WITH_CXX)" = .yes ]; then \
+	    echo "$(RM) $(DESTDIR)$(mandir)/man3/uuid++.3"; \
+	    $(RM) $(DESTDIR)$(mandir)/man3/uuid++.3; \
+	fi
 	-$(RM) $(DESTDIR)$(includedir)/uuid.h
 	-@if [ ".$(WITH_DCE)" = .yes ]; then \
 	    echo "$(RM) $(DESTDIR)$(includedir)/uuid_dce.h"; \
 	    $(RM) $(DESTDIR)$(includedir)/uuid_dce.h; \
 	fi
+	-@if [ ".$(WITH_CXX)" = .yes ]; then \
+	    echo "$(RM) $(DESTDIR)$(includedir)/uuid++.hh"; \
+	    $(RM) $(DESTDIR)$(includedir)/uuid++.hh; \
+	fi
+	-$(RM) $(DESTDIR)$(libdir)/pkgconfig/uuid.pc
 	-$(RM) $(DESTDIR)$(mandir)/man1/uuid-config.1
 	-$(RM) $(DESTDIR)$(bindir)/uuid-config
 	-$(RMDIR) $(DESTDIR)$(mandir)/man1 >/dev/null 2>&1 || $(TRUE)
 	-$(RMDIR) $(DESTDIR)$(mandir)/man3 >/dev/null 2>&1 || $(TRUE)
 	-$(RMDIR) $(DESTDIR)$(mandir) >/dev/null 2>&1 || $(TRUE)
+	-$(RMDIR) $(DESTDIR)$(libdir)/pkgconfig >/dev/null 2>&1 || $(TRUE)
 	-$(RMDIR) $(DESTDIR)$(libdir) >/dev/null 2>&1 || $(TRUE)
 	-$(RMDIR) $(DESTDIR)$(includedir) >/dev/null 2>&1 || $(TRUE)
 	-$(RMDIR) $(DESTDIR)$(bindir) >/dev/null 2>&1 || $(TRUE)
@@ -219,11 +286,18 @@ clean:
 	    echo "$(RM) $(DCE_NAME) $(DCE_OBJS)"; \
 	    $(RM) $(DCE_NAME) $(DCE_OBJS); \
 	fi
+	-@if [ ".$(WITH_CXX)" = .yes ]; then \
+	    echo "$(RM) $(CXX_NAME) $(CXX_OBJS)"; \
+	    $(RM) $(CXX_NAME) $(CXX_OBJS); \
+	fi
 	-$(RM) $(PRG_NAME) $(PRG_OBJS)
 	-$(RM) -r .libs >/dev/null 2>&1 || $(TRUE)
 	-$(RM) *.o *.lo
 	-@if [ ".$(WITH_PERL)" = .yes ]; then \
 	    (cd perl && $(MAKE) $(MFLAGS) clean || true); \
+	fi
+	-@if [ ".$(WITH_PHP)" = .yes ]; then \
+	    (cd php && $(MAKE) $(MFLAGS) -f Makefile.local clean || true); \
 	fi
 
 distclean: clean
@@ -233,10 +307,16 @@ distclean: clean
 	-@if [ ".$(WITH_PERL)" = .yes ]; then \
 	    (cd perl && $(MAKE) $(MFLAGS) distclean || true; rm -f Makefile.old); \
 	fi
+	-@if [ ".$(WITH_PHP)" = .yes ]; then \
+	    (cd php && $(MAKE) $(MFLAGS) -f Makefile.local distclean || true); \
+	fi
 
 realclean: distclean
 	-$(RM) uuid.3 uuid.1
 	-$(RM) configure config.h.in
 	-$(RM) shtool
 	-$(RM) ltmain.sh libtool.m4 config.guess config.sub
+	-@if [ ".$(WITH_PHP)" = .yes ]; then \
+	    (cd php && $(MAKE) $(MFLAGS) -f Makefile.local realclean || true); \
+	fi
 

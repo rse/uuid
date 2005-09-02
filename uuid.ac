@@ -86,11 +86,32 @@ AC_DEFUN(UUID_CHECK_ALL,[
     AC_SUBST(WITH_DCE)
     AC_SUBST(DCE_NAME)
 
+    dnl #   configure option --with-cxx
+    AC_ARG_WITH([cxx],
+        AS_HELP_STRING([--with-cxx], [build C++ bindings to C API]),
+        [ac_cv_with_cxx=$withval], [ac_cv_with_cxx=no])
+    AC_CACHE_CHECK([whether to build C++ bindings to C API], [ac_cv_with_cxx], [ac_cv_with_cxx=no])
+    if test ".$ac_cv_with_cxx" = ".yes"; then
+        AC_DEFINE(WITH_CXX, 1, [whether to build C++ bindings to C API])
+        WITH_CXX='yes'
+        CXX_NAME='$(CXX_NAME)'
+        AC_PROG_CXX
+    else
+        WITH_CXX='no'
+        CXX_NAME=''
+    fi
+    AC_SUBST(CXX_NAME)
+    AC_SUBST(WITH_CXX)
+
     dnl #   configure option --with-perl
     AC_ARG_WITH([perl],
         AS_HELP_STRING([--with-perl], [build Perl bindings to C API]),
         [ac_cv_with_perl=$withval], [ac_cv_with_perl=no])
     AC_CACHE_CHECK([whether to build Perl bindings to C API], [ac_cv_with_perl], [ac_cv_with_perl=no])
+    AC_ARG_WITH([perl-compat],
+        AS_HELP_STRING([--with-perl-compat], [build Perl compatibility API]),
+        [ac_cv_with_perl_compat=$withval], [ac_cv_with_perl_compat=no])
+    AC_CACHE_CHECK([whether to build Perl compatibility API], [ac_cv_with_perl_compat], [ac_cv_with_perl_compat=no])
     if test ".$ac_cv_with_perl" = ".yes"; then
         AC_DEFINE(WITH_PERL, 1, [whether to build Perl bindings to C API])
         WITH_PERL='yes'
@@ -99,11 +120,41 @@ AC_DEFUN(UUID_CHECK_ALL,[
         WITH_PERL='no'
         PERL_NAME=''
     fi
-    AC_SUBST(WITH_PERL)
+    if test ".$ac_cv_with_perl_compat" = ".yes"; then
+        AC_DEFINE(WITH_PERL_COMPAT, 1, [whether to build Perl compatibility API])
+        WITH_PERL_COMPAT=1
+    else
+        WITH_PERL_COMPAT=0
+    fi
     AC_SUBST(PERL_NAME)
+    AC_SUBST(WITH_PERL)
+    AC_SUBST(WITH_PERL_COMPAT)
     AC_PATH_PROG(PERL, perl, NA)
     if test ".$ac_cv_with_perl" = ".yes" -a ".$PERL" = ".NA"; then
         AC_ERROR([required Perl interpreter not found in \$PATH])
+    fi
+    
+    dnl #   configure option --with-php
+    AC_ARG_WITH([php],
+        AS_HELP_STRING([--with-php], [build PHP bindings to C API]),
+        [ac_cv_with_php=$withval], [ac_cv_with_php=no])
+    AC_CACHE_CHECK([whether to build PHP bindings to C API], [ac_cv_with_php], [ac_cv_with_php=no])
+    if test ".$ac_cv_with_php" = ".yes"; then
+        AC_DEFINE(WITH_PHP, 1, [whether to build PHP bindings to C API])
+        WITH_PHP='yes'
+        PHP_NAME='$(PHP_NAME)'
+    else
+        WITH_PHP='no'
+        PHP_NAME=''
+    fi
+    AC_SUBST(PHP_NAME)
+    AC_SUBST(WITH_PHP)
+    AC_PATH_PROGS(PHP, php5 php, NA)
+    if test ".$ac_cv_with_php" = ".yes" -a ".$PHP" = ".NA"; then
+        AC_ERROR([required PHP interpreter not found in \$PATH])
+    fi
+    if test ".$ac_cv_with_php" = ".yes"; then
+        (cd php && make -f Makefile.local config PHP=$PHP)
     fi
 ])
 

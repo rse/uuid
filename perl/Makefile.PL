@@ -31,6 +31,9 @@ use 5.008;
 use Config;
 use ExtUtils::MakeMaker;
 
+my $compat = 0;
+@ARGV = grep { $_ =~ m/^COMPAT=(\d+)$/i ? ($compat = $1, 0) : 1 } @ARGV;
+
 WriteMakefile(
     NAME              => 'OSSP::uuid',
     VERSION_FROM      => 'uuid.pm',
@@ -39,10 +42,14 @@ WriteMakefile(
     LIBS              => [ '-L../.libs -luuid' ],
     DEFINE            => '',
     INC               => '-I. -I..',
-    PM                => { 'uuid.pm'  => '$(INST_LIBDIR)/uuid.pm',
-                           'uuid.pod' => '$(INST_LIBDIR)/uuid.pod' },
+    PM                => { 'uuid.pm'   => '$(INST_LIBDIR)/uuid.pm',
+                           'uuid.pod'  => '$(INST_LIBDIR)/uuid.pod',
+                           ($compat ? ('uuid_compat.pm'  => '$(INST_LIBDIR)/../Data/UUID.pm')  : ()),
+                           ($compat ? ('uuid_compat.pod' => '$(INST_LIBDIR)/../Data/UUID.pod') : ()), },
+    MAN3PODS          => { 'uuid.pod' => '$(INST_MAN3DIR)/OSSP::uuid.3',
+                           ($compat ? ('uuid_compat.pod' => '$(INST_MAN3DIR)/Data::UUID.3') : ()), },
     TYPEMAPS          => [ 'uuid.tm' ],
-    test              => { TESTS => 'uuid.ts' },
+    test              => { TESTS => 'uuid.ts' . ($compat ? ' uuid_compat.ts' : '') },
     NO_META           => 1,
     #    cruel hack to workaround the conflict between OSSP uuid's
     #    uuid_create() function and one from FreeBSD's libc

@@ -35,21 +35,42 @@ OSSP::uuid - B<OSSP uuid> Perl Binding
 
 =head1 DESCRIPTION
 
-B<OSSP::uuid> is the Perl binding to the B<OSSP uuid> API.
-
-B<OSSP uuid> is an ISO-C and Perl application programming interface
-(API) and corresponding command line interface (CLI) for the generation
-of DCE 1.1 and ISO/IEC 11578:1996 compliant I<Universally Unique
+B<OSSP uuid> is a ISO-C:1999 application programming interface (API)
+and corresponding command line interface (CLI) for the generation of
+DCE 1.1, ISO/IEC 11578:1996 and RFC 4122 compliant I<Universally Unique
 Identifier> (UUID). It supports DCE 1.1 variant UUIDs of version 1 (time
 and node based), version 3 (name based, MD5), version 4 (random number
-based) and version 5 (name based, SHA-1).
+based) and version 5 (name based, SHA-1). Additional API bindings are
+provided for the languages ISO-C++:1998, Perl:5 and PHP:4/5. Optional
+backward compatibility exists for the ISO-C DCE-1.1 and Perl Data::UUID
+APIs.
 
-B<OSSP::uuid> provides two Perl APIs:
+B<OSSP::uuid> is the Perl binding to the B<OSSP uuid> API.
+Three variants are provided:
+
+=head2 TIE-STYLE API
+
+The TIE-style API is a functionality-reduced wrapper around the OO-style
+API and intended for very high-level convenience programming:
+
+=over 4
+
+=item C<use OSSP::uuid;>
+
+=item B<tie>C< my $uuid, 'OSSP::uuid::tie', $mode, ...;>
+
+=item C<$uuid = [ $mode, ... ];>
+
+=item C<print "UUID=$uuid\n";>
+
+=item C<untie $uuid;>
+
+=back
 
 =head2 OO-STYLE API
 
 The OO-style API is a wrapper around the C-style API and intended for
-high-level and regular programming.
+high-level regular programming.
 
 =over 4
 
@@ -140,6 +161,15 @@ The following two examples create the version 3 UUID
 C<02d9e6d5-9467-382e-8f9b-9300a64ac3cd>, both via the OO-style and the
 C-style API. Error handling is omitted here for easier reading, but has
 to be added for production-quality code.
+
+  #   TIE-style API (very high-level)
+  use OSSP::uuid;
+  tie my $uuid, 'OSSP::uuid::tie';
+  $uuid = [ "v1" ];
+  print "UUIDs: $uuid, $uuid, $uuid\n";
+  $uuid = [ "v3", "ns:URL", "http://www.ossp.org/" ];
+  print "UUIDs: $uuid, $uuid, $uuid\n";
+  untie $uuid;
 
   #   OO-style API (high-level)
   use OSSP::uuid;

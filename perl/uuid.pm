@@ -27,6 +27,87 @@
 ##  uuid.pm: Perl Binding (Perl part)
 ##
 
+##
+##  High-Level Perl Module TIE-style API
+##  (just a functionality-reduced TIE wrapper around the OO-style API)
+##
+
+package OSSP::uuid::tie;
+
+use 5.008;
+use strict;
+use warnings;
+use Carp;
+
+#   inhert from Tie::Scalar
+require Tie::Scalar;
+our @ISA = qw(Tie::Scalar);
+
+#   helper function
+sub mode_sanity {
+    my ($mode) = @_;
+    if (not (    defined($mode)
+             and ref($mode) eq 'ARRAY'
+             and (   (@{$mode} == 1 and $mode->[0] =~ m|^v[14]$|)
+                  or (@{$mode} == 3 and $mode->[0] =~ m|^v[35]$|)))) {
+        return (undef, "invalid UUID generation mode specification");
+    }
+    if ($mode->[0] =~ m|^v[35]$|) {
+        my $uuid_ns = new OSSP::uuid;
+        $uuid_ns->load($mode->[1])
+            or return (undef, "failed to load UUID $mode->[0] namespace");
+        $mode->[1] = $uuid_ns;
+    }
+    return ($mode, undef);
+}
+
+#   constructor
+sub TIESCALAR {
+    my ($class, @args) = @_;
+    my $self = {};
+    bless ($self, $class);
+    $self->{-uuid} = new OSSP::uuid
+       or croak "failed to create OSSP::uuid object";
+    my ($mode, $error) = mode_sanity(defined($args[0]) ? [ @args ] : [ "v1" ]);
+    croak $error if defined($error);
+    $self->{-mode} = $mode;
+    return $self;
+}
+
+#   destructor
+sub DESTROY {
+    my ($self) = @_;
+    delete $self->{-uuid};
+    delete $self->{-mode};
+    return;
+}
+
+#   fetch value from scalar
+#   (applied semantic: export UUID in string format)
+sub FETCH {
+    my ($self) = @_;
+    $self->{-uuid}->make(@{$self->{-mode}})
+       or croak "failed to generate new UUID";
+    my $value = $self->{-uuid}->export("str")
+       or croak "failed to export new UUID";
+    return $value;
+}
+
+#   store value into scalar
+#   (applied semantic: configure new UUID generation mode)
+sub STORE {
+    my ($self, $value) = @_;
+    my ($mode, $error) = mode_sanity($value);
+    croak $error if defined($error);
+    $self->{-mode} = $mode;
+    return;
+}
+
+##
+##  High-Level Perl Module OO-style API
+##  (just an OO wrapper around the C-style API)
+##
+
 package OSSP::uuid;
 
 use 5.008;
@@ -36,12 +117,8 @@ use Carp;
 use XSLoader;
 use Exporter;
 
-##
-##  API Definition
-##
-
 #   API version
-our $VERSION = do { my @v = ('1.2.1' =~ m/\d+/g); sprintf("%d.".("%02d"x$#v), @v); };
+our $VERSION = do { my @v = ('1.3.0' =~ m/\d+/g); sprintf("%d.".("%02d"x$#v), @v); };
 
 #   API inheritance
 our @ISA = qw(Exporter);
@@ -89,11 +166,6 @@ our %EXPORT_TAGS = (
 );
 our @EXPORT_OK = @{$EXPORT_TAGS{'all'}};
 our @EXPORT    = ();
-
-##
-##  High-Level Perl Module OO-style API
-##  (just an OO wrapper around the C-style API)
-##
 
 #   constructor
 sub new {

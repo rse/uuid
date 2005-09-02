@@ -11,6 +11,44 @@
   This is a list of all changes to OSSP uuid.
   For a more brief summary please have a look at the NEWS file.
 
+  Changes between 1.2.1 and 1.3.0 (30-Aug-2005 to 02-Sep-2005)
+
+   o Add an experimental PHP 4/5 language API binding which
+     can be enabled under build-time with opption --with-php.
+     [Ralf S. Engelschall]
+   
+   o Upgrade to GNU libtool 1.5.20
+     [Ralf S. Engelschall]
+
+   o Add missing "const" in manual page.
+     [Ralf S. Engelschall]
+
+   o Add an experimental C++ API binding which can be 
+     enabled under build-time with option --with-cxx.
+     [Ralf S. Engelschall]
+
+   o Cleanup the internals of the uuid_create() function and
+     add a new corresponding uuid_clone() API function.
+     [Ralf S. Engelschall]
+
+   o Cleanup some Makefile parts.
+     [Ralf S. Engelschall]
+
+   o Added a pkg-config(1) specification uuid.pc which is also
+     installed by default in addition to the old-style uuid-config tool.
+     [Ralf S. Engelschall]
+
+   o Added optional Data::UUID backward compatibility Perl API which can
+     be enabled with the build-time option --with-perl-compat.
+     [Piotr Roszatycki <dexter@debian.org>, Ralf S. Engelschall]
+
+   o Add a functionality-reduced TIE-style Perl API OSSP::uuid::tie,
+     intended for very high-level convenience programming.
+     [Ralf S. Engelschall]
+
+   o Reference the new officially published RFC 4122.
+     [Ralf S. Engelschall]
+
   Changes between 1.2.0 and 1.2.1 (23-Jan-2005 to 30-Aug-2005)
 
    o Add SEEALSO document which references all known

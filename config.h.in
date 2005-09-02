@@ -132,8 +132,17 @@
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
+/* whether to build C++ bindings to C API */
+#undef WITH_CXX
+
 /* whether to build DCE 1.1 backward compatibility API */
 #undef WITH_DCE
 
 /* whether to build Perl bindings to C API */
 #undef WITH_PERL
+
+/* whether to build Perl compatibility API */
+#undef WITH_PERL_COMPAT
+
+/* whether to build PHP bindings to C API */
+#undef WITH_PHP
