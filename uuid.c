@@ -440,7 +440,7 @@ static uuid_rc_t uuid_export_str(const uuid_t *uuid, void **data_ptr, size_t *da
 
     /* determine output buffer */
     if (*data_ptr == NULL) {
-        if ((data_buf = (void *)malloc(UUID_LEN_STR+1)) == NULL)
+        if ((data_buf = (char *)malloc(UUID_LEN_STR+1)) == NULL)
             return UUID_RC_MEM;
         if (data_len != NULL)
             *data_len = UUID_LEN_STR+1;

@@ -141,7 +141,7 @@ prng_rc_t prng_data(prng_t *prng, void *data_ptr, size_t data_len)
         /* store MD5 engine state as PRN output */
         md5_ptr = md5_buf;
         md5_len = sizeof(md5_buf);
-        if (md5_store(prng->md5, (void *)&md5_ptr, &md5_len) != MD5_RC_OK)
+        if (md5_store(prng->md5, (void **)(void *)&md5_ptr, &md5_len) != MD5_RC_OK)
             return PRNG_RC_INT;
         for (i = 0; i < MD5_LEN_BIN && n > 0; i++, n--)
             *p++ ^= md5_buf[i]; /* intentionally no assignment because arbitrary
@@ -160,6 +160,9 @@ prng_rc_t prng_destroy(prng_t *prng)
     /* close PRNG device */
     if (prng->dev != -1)
         close(prng->dev);
+
+    /* destroy MD5 engine */
+    md5_destroy(prng->md5);
 
     /* free object */
     free(prng);

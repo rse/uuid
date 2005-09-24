@@ -27,21 +27,29 @@
 ##  Makefile.PL: Perl MakeMaker build source procedure
 ##
 
-use 5.008;
+require 5.008;
+
 use Config;
 use ExtUtils::MakeMaker;
 
+#   determine source directory
+my ($srcdir) = map { my $d = $_; $d =~ s/\/libuuid\.la$//; $d }
+               grep { -f $_ } ("../libuuid.la", glob("../*/libuuid.la"))
+    or die "no source directory found (where libuuid.la is located)";
+
+#   determine extra build options
 my $compat = 0;
 @ARGV = grep { $_ =~ m/^COMPAT=(\d+)$/i ? ($compat = $1, 0) : 1 } @ARGV;
 
+#   generate Makefile
 WriteMakefile(
     NAME              => 'OSSP::uuid',
     VERSION_FROM      => 'uuid.pm',
     ABSTRACT_FROM     => 'uuid.pod',
     PREREQ_PM         => {},
-    LIBS              => [ '-L../.libs -luuid' ],
+    LIBS              => [ "-L$srcdir/.libs -L$srcdir -luuid" ],
     DEFINE            => '',
-    INC               => '-I. -I..',
+    INC               => "-I. -I$srcdir",
     PM                => { 'uuid.pm'   => '$(INST_LIBDIR)/uuid.pm',
                            'uuid.pod'  => '$(INST_LIBDIR)/uuid.pod',
                            ($compat ? ('uuid_compat.pm'  => '$(INST_LIBDIR)/../Data/UUID.pm')  : ()),

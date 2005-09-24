@@ -32,6 +32,7 @@
 #endif
 
 #include "php.h"
+#include "ext/standard/info.h"
 #include "uuid.h"
 
 /* context structure */
