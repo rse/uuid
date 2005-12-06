@@ -50,6 +50,7 @@ uuid::uuid(const uuid &obj)
     uuid_rc_t rc;
     if ((rc = uuid_clone(obj.ctx, &ctx)) != UUID_RC_OK)
         throw uuid_error_t(rc);
+    return;
 }
 
 /*  extra constructor via C API object */
@@ -60,6 +61,7 @@ uuid::uuid(const uuid_t *obj)
         throw uuid_error_t(UUID_RC_ARG);
     if ((rc = uuid_clone(obj, &ctx)) != UUID_RC_OK)
         throw uuid_error_t(rc);
+    return;
 }
 
 /*  extra constructor via binary representation */
@@ -71,6 +73,7 @@ uuid::uuid(const void *bin)
     if ((rc = uuid_create(&ctx)) != UUID_RC_OK)
         throw uuid_error_t(rc);
     import(bin);
+    return;
 }
 
 /*  extra constructor via string representation */
@@ -82,12 +85,14 @@ uuid::uuid(const char *str)
     if ((rc = uuid_create(&ctx)) != UUID_RC_OK)
         throw uuid_error_t(rc);
     import(str);
+    return;
 }
 
 /*  standard destructor */
 uuid::~uuid()
 {
     uuid_destroy(ctx);
+    return;
 }
 
 /*  assignment operator: import of other C++ API object */
@@ -235,6 +240,7 @@ void uuid::import(const void *bin)
     uuid_rc_t rc;
     if ((rc = uuid_import(ctx, UUID_FMT_BIN, bin, UUID_LEN_BIN)) != UUID_RC_OK)
         throw uuid_error_t(rc);
+    return;
 }
 
 /*  method: import string representation */
@@ -243,6 +249,7 @@ void uuid::import(const char *str)
     uuid_rc_t rc;
     if ((rc = uuid_import(ctx, UUID_FMT_STR, str, UUID_LEN_STR)) != UUID_RC_OK)
         throw uuid_error_t(rc);
+    return;
 }
 
 /*  method: export binary representation */
