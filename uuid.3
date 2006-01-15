@@ -129,12 +129,12 @@
 .\" ========================================================================
 .\"
 .IX Title ".::uuid 3"
-.TH .::uuid 3 "OSSP uuid 1.3.2" "06-Dec-2005" "Universally Unique Identifier"
+.TH .::uuid 3 "OSSP uuid 1.4.0" "15-Jan-2006" "Universally Unique Identifier"
 .SH "NAME"
 \&\fBOSSP uuid\fR \- \fBUniversally Unique Identifier\fR
 .SH "VERSION"
 .IX Header "VERSION"
-\&\s-1OSSP\s0 uuid \s-11.3.2 (06-Dec-2005)\s0
+\&\s-1OSSP\s0 uuid \s-11.4.0 (15-Jan-2006)\s0
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
 \&\fB\s-1OSSP\s0 uuid\fR is a \s-1ISO\-C:1999\s0 application programming interface (\s-1API\s0)
@@ -396,12 +396,10 @@ system time, a 12\-bit clock sequence and the 48\-bit \s-1MAC\s0 address.
 .Sp
 If \fImode\fR contains the \f(CW\*(C`UUID_MAKE_V3\*(C'\fR or \f(CW\*(C`UUID_MAKE_V5\*(C'\fR bit, a \s-1DCE\s0
 1.1 variant \s-1UUID\s0 of version 3 or 5 is generated and two additional
-\&\f(CW\*(C`NUL\*(C'\fR\-terminated string arguments of type "\f(CW\*(C`const char *\*(C'\fR\*(L" are
-expected: first a namespace, given as an internally pre-defined id
-(currently known are ids \*(R"\f(CW\*(C`DNS\*(C'\fR\*(L", \*(R"\f(CW\*(C`URL\*(C'\fR\*(L", \*(R"\f(CW\*(C`OID\*(C'\fR\*(L", and \*(R"\f(CW\*(C`X500\*(C'\fR")
-or a \s-1UUID\s0 in string representation. Second, a name string of arbitrary
-length. The \s-1UUID\s0 is generated out of the 128\-bit \s-1MD5\s0 or 160\-bit \s-1SHA\-1\s0
-from the concatenated octet stream of namespace \s-1UUID\s0 and name string.
+arguments are expected: first, a namespace \s-1UUID\s0 object (\f(CW\*(C`uuid_t *\*(C'\fR).
+Second, a name string of arbitrary length (\f(CW\*(C`const char *\*(C'\fR). The \s-1UUID\s0 is
+generated out of the 128\-bit \s-1MD5\s0 or 160\-bit \s-1SHA\-1\s0 from the concatenated
+octet stream of namespace \s-1UUID\s0 and name string.
 .Sp
 If \fImode\fR contains the \f(CW\*(C`UUID_MAKE_V4\*(C'\fR bit, a \s-1DCE\s0 1.1 variant \s-1UUID\s0
 of version 4 is generated. The \s-1UUID\s0 is generated out of 128\-bit random
@@ -468,6 +466,7 @@ The following are references to \fB\s-1UUID\s0\fR documentation and specificatio
 P. Leach, M. Mealling, R. Salz,
 \&\s-1IETF\s0 Request for Comments: \s-1RFC\s0 4122,
 July 2005, 32 pages,
+http://www.ietf.org/rfc/rfc4122.txt
 .IP "\(bu" 4
 \&\fB\s-1DCE\s0 1.1: Remote Procedure Call\fR,
 appendix \fBUniversally Unique Identifier\fR,
@@ -492,13 +491,13 @@ December 2004, 25 pages.
 .IP "\(bu" 4
 \&\fB\s-1HTTP\s0 Extensions for Distributed Authoring (WebDAV)\fR,
 section \fB6.4.1 Node Field Generation Without the \s-1IEEE\s0 802 Address\fR,
-\&\s-1IETF\s0 \s-1RFC\s0 2518,
+\&\s-1IETF\s0 Request for Comments: \s-1RFC\s0 2518,
 February 1999, 94 pages,
 http://www.ietf.org/rfc/rfc2518.txt
 .IP "\(bu" 4
 \&\fB\s-1DCE\s0 1.1 compliant \s-1UUID\s0 functions\fR,
 FreeBSD manual pages \fIuuid\fR\|(3) and \fIuuidgen\fR\|(2),
-http://www.freebsd.org/cgi/man.cgi?query=uuid&manpath=FreeBSD+6.0\-current
+http://www.freebsd.org/cgi/man.cgi?query=uuid&manpath=FreeBSD+6.0\-RELEASE
 .SH "HISTORY"
 .IX Header "HISTORY"
 \&\fB\s-1OSSP\s0 uuid\fR was implemented in January 2004 by Ralf S. Engelschall

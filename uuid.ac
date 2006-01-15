@@ -1,7 +1,7 @@
 dnl ##
 dnl ##  OSSP uuid - Universally Unique Identifier
-dnl ##  Copyright (c) 2004-2005 Ralf S. Engelschall <rse@engelschall.com>
-dnl ##  Copyright (c) 2004-2005 The OSSP Project <http://www.ossp.org/>
+dnl ##  Copyright (c) 2004-2006 Ralf S. Engelschall <rse@engelschall.com>
+dnl ##  Copyright (c) 2004-2006 The OSSP Project <http://www.ossp.org/>
 dnl ##
 dnl ##  This file is part of OSSP uuid, a library for the generation
 dnl ##  of UUIDs which can found at http://www.ossp.org/pkg/lib/uuid/
@@ -155,6 +155,29 @@ AC_DEFUN(UUID_CHECK_ALL,[
     fi
     if test ".$ac_cv_with_php" = ".yes"; then
         (cd php && make -f Makefile.local config PHP=$PHP)
+    fi
+
+    dnl #   configure option --with-pgsql
+    AC_ARG_WITH([pgsql],
+        AS_HELP_STRING([--with-pgsql], [build PostgreSQL bindings to C API]),
+        [ac_cv_with_pgsql=$withval], [ac_cv_with_pgsql=no])
+    AC_CACHE_CHECK([whether to build PostgreSQL bindings to C API], [ac_cv_with_pgsql], [ac_cv_with_pgsql=no])
+    if test ".$ac_cv_with_pgsql" = ".yes"; then
+        AC_DEFINE(WITH_PGSQL, 1, [whether to build PostgreSQL bindings to C API])
+        WITH_PGSQL='yes'
+        PGSQL_NAME='$(PGSQL_NAME)'
+    else
+        WITH_PGSQL='no'
+        PGSQL_NAME=''
+    fi
+    AC_SUBST(PGSQL_NAME)
+    AC_SUBST(WITH_PGSQL)
+    AC_PATH_PROGS(PG_CONFIG, pg_config, NA)
+    if test ".$ac_cv_with_pgsql" = ".yes" -a ".$PG_CONFIG" = ".NA"; then
+        AC_ERROR([required PostgreSQL pg_config utility not found in \$PATH])
+    fi
+    if test ".$ac_cv_with_pgsql" = ".yes" -a ".`${MAKE-make} -v 2>/dev/null | grep GNU`" = .; then
+        AC_ERROR([PostgreSQL bindings require GNU make to build])
     fi
 ])
 

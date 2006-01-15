@@ -8,7 +8,7 @@
 #ifndef _UUID_VERS_H_
 #define _UUID_VERS_H_
 
-#define _UUID_VERSION 0x103202
+#define _UUID_VERSION 0x104200
 
 typedef struct {
     const int   v_hex;
@@ -32,14 +32,14 @@ extern _uuid_version_t _uuid_version;
 #undef  _UUID_VERS_H_AS_HEADER_
 
 _uuid_version_t _uuid_version = {
-    0x103202,
-    "1.3.2",
-    "1.3.2 (06-Dec-2005)",
-    "This is OSSP uuid, Version 1.3.2 (06-Dec-2005)",
-    "OSSP uuid 1.3.2 (06-Dec-2005)",
-    "OSSP uuid/1.3.2",
-    "@(#)OSSP uuid 1.3.2 (06-Dec-2005)",
-    "$Id: OSSP uuid 1.3.2 (06-Dec-2005) $"
+    0x104200,
+    "1.4.0",
+    "1.4.0 (15-Jan-2006)",
+    "This is OSSP uuid, Version 1.4.0 (15-Jan-2006)",
+    "OSSP uuid 1.4.0 (15-Jan-2006)",
+    "OSSP uuid/1.4.0",
+    "@(#)OSSP uuid 1.4.0 (15-Jan-2006)",
+    "$Id: OSSP uuid 1.4.0 (15-Jan-2006) $"
 };
 
 #endif /* _UUID_VERS_H_AS_HEADER_ */

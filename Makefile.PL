@@ -1,7 +1,7 @@
 ##
 ##  OSSP uuid - Universally Unique Identifier
-##  Copyright (c) 2004-2005 Ralf S. Engelschall <rse@engelschall.com>
-##  Copyright (c) 2004-2005 The OSSP Project <http://www.ossp.org/>
+##  Copyright (c) 2004-2006 Ralf S. Engelschall <rse@engelschall.com>
+##  Copyright (c) 2004-2006 The OSSP Project <http://www.ossp.org/>
 ##
 ##  This file is part of OSSP uuid, a library for the generation
 ##  of UUIDs which can found at http://www.ossp.org/pkg/lib/uuid/
@@ -24,32 +24,44 @@
 ##  OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 ##  SUCH DAMAGE.
 ##
-##  uuid_compat.pod: Data::UUID Backward Compatibility Perl API (Perl/POD part)
+##  Makefile.PL: top-level Perl ExtUtils::MakeMaker wrapper script
 ##
 
-=pod
+require 5.008;
+use IO::File;
 
-=head1 NAME
+my $ARGS = join(" ", @ARGV);
 
-Data::UUID - B<OSSP uuid> Backward Compatibility Perl Binding
+print "++ writing Makefile\n";
 
-=head1 DESCRIPTION
+my $mk = new IO::File ">Makefile" or die;
+$mk->print(<< "EOF");
 
-B<Data::UUID> is the B<OSSP uuid> backward compatibility Perl binding
-to the API of the original B<Data::UUID> module. It allows other
-B<Data::UUID> based Perl modules to run with B<OSSP::uuid> without
-changes.
+PERL     = $^X
+FULLPERL = $^X
+ARGS     = $ARGS
 
-=head1 SEE ALSO
+all pure_all:
+	\@if [ ! -d build ]; then mkdir build; fi
+	\@if [ ! -f build/Makefile ]; then (cd build && ../configure --disable-shared); fi
+	\@if [ ! -f build/libuuid.la ]; then (cd build && \$(MAKE) \$(MFLAGS) libuuid.la); fi
+	\@if [ ! -f perl/Makefile ]; then (cd perl && \$(PERL) Makefile.PL \$(ARGS)); fi
+	\@cd perl && \$(MAKE) \$(MFLAGS) \$\@
 
-B<OSSP::uuid>.
+install pure_install test:
+	\@cd perl && \$(MAKE) \$(MFLAGS) \$\@
 
-=head1 HISTORY
+clean:
+	\@cd build && \$(MAKE) \$(MFLAGS) \$\@
+	\@cd perl && \$(MAKE) \$(MFLAGS) \$\@
 
-The backward compatibility Perl binding B<Data::UUID> for B<OSSP
-uuid> was originally implemented in 2004 by Piotr Roszatycki
-E<lt>dexter@debian.orgE<gt>. It was later cleaned up and speed optimized
-in December 2005 by David Wheeler E<lt>david@justatheory.comE<gt>.
+distclean realclean:
+	\@cd build && \$(MAKE) \$(MFLAGS) \$\@
+	\@cd perl && \$(MAKE) \$(MFLAGS) \$\@
+	-rm -rf build || true
+	-rm -rf Makefile || true
 
-=cut
+EOF
+
+$mk->close();
 

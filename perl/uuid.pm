@@ -1,7 +1,7 @@
 ##
 ##  OSSP uuid - Universally Unique Identifier
-##  Copyright (c) 2004-2005 Ralf S. Engelschall <rse@engelschall.com>
-##  Copyright (c) 2004-2005 The OSSP Project <http://www.ossp.org/>
+##  Copyright (c) 2004-2006 Ralf S. Engelschall <rse@engelschall.com>
+##  Copyright (c) 2004-2006 The OSSP Project <http://www.ossp.org/>
 ##
 ##  This file is part of OSSP uuid, a library for the generation
 ##  of UUIDs which can found at http://www.ossp.org/pkg/lib/uuid/
@@ -118,7 +118,7 @@ use XSLoader;
 use Exporter;
 
 #   API version
-our $VERSION = do { my @v = ('1.3.2' =~ m/\d+/g); sprintf("%d.".("%02d"x$#v), @v); };
+our $VERSION = do { my @v = ('1.4.0' =~ m/\d+/g); sprintf("%d.".("%02d"x$#v), @v); };
 
 #   API inheritance
 our @ISA = qw(Exporter);

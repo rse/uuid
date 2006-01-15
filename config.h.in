@@ -144,5 +144,8 @@
 /* whether to build Perl compatibility API */
 #undef WITH_PERL_COMPAT
 
+/* whether to build PostgreSQL bindings to C API */
+#undef WITH_PGSQL
+
 /* whether to build PHP bindings to C API */
 #undef WITH_PHP

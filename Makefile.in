@@ -1,7 +1,7 @@
 ##
 ##  OSSP uuid - Universally Unique Identifier
-##  Copyright (c) 2004-2005 Ralf S. Engelschall <rse@engelschall.com>
-##  Copyright (c) 2004-2005 The OSSP Project <http://www.ossp.org/>
+##  Copyright (c) 2004-2006 Ralf S. Engelschall <rse@engelschall.com>
+##  Copyright (c) 2004-2006 The OSSP Project <http://www.ossp.org/>
 ##
 ##  This file is part of OSSP uuid, a library for the generation
 ##  of UUIDs which can found at http://www.ossp.org/pkg/lib/uuid/
@@ -59,6 +59,7 @@ TRUE        = true
 POD2MAN     = pod2man
 PERL        = @PERL@
 PHP         = @PHP@
+PG_CONFIG   = @PG_CONFIG@
 
 LIB_NAME    = libuuid.la
 LIB_OBJS    = uuid.lo uuid_md5.lo uuid_sha1.lo uuid_prng.lo uuid_mac.lo uuid_ui64.lo uuid_str.lo
@@ -80,13 +81,17 @@ PERL_OBJS   = $(S)/perl/uuid.pm
 PHP_NAME    = $(S)/php/modules/uuid.so
 PHP_OBJS    = $(S)/php/uuid.c
 
-TARGETS     = $(LIB_NAME) @DCE_NAME@ @CXX_NAME@ $(PRG_NAME) @PERL_NAME@ @PHP_NAME@
+PGSQL_NAME  = $(S)/pgsql/libuuid.so
+PGSQL_OBJS  = $(S)/pgsql/uuid.c
+
+TARGETS     = $(LIB_NAME) @DCE_NAME@ @CXX_NAME@ $(PRG_NAME) @PERL_NAME@ @PHP_NAME@ @PGSQL_NAME@
 
 WITH_DCE         = @WITH_DCE@
 WITH_CXX         = @WITH_CXX@
 WITH_PERL        = @WITH_PERL@
 WITH_PERL_COMPAT = @WITH_PERL_COMPAT@
 WITH_PHP         = @WITH_PHP@
+WITH_PGSQL       = @WITH_PGSQL@
 
 .SUFFIXES:
 .SUFFIXES: .c .cc .o .lo
@@ -127,6 +132,10 @@ $(PERL_NAME): $(PERL_OBJS) $(LIB_NAME)
 $(PHP_NAME): $(PHP_OBJS) $(LIB_NAME)
 	@cd $(S)/php && $(MAKE) $(MFLAGS) -f Makefile.local PHP=$(PHP)
 	@touch $(PHP_NAME)
+
+$(PGSQL_NAME): $(PGSQL_OBJS) $(LIB_NAME)
+	@cd $(S)/pgsql && $(MAKE) $(MFLAGS) PG_CONFIG=$(PG_CONFIG)
+	@touch $(PGSQL_NAME)
 
 uuid.lo: $(S)/uuid.c uuid.h $(S)/uuid_md5.h $(S)/uuid_sha1.h $(S)/uuid_prng.h $(S)/uuid_mac.h $(S)/uuid_ui64.h $(S)/uuid_str.h $(S)/uuid_bm.h $(S)/uuid_ac.h
 uuid_mac.lo: $(S)/uuid_mac.c $(S)/uuid_mac.h
@@ -205,6 +214,10 @@ check: all
 	    echo "==== PHP bindings to C API"; \
 	    (cd $(S)/php && $(MAKE) $(MFLAGS) -f Makefile.local test PHP=$(PHP)); \
 	fi
+	-@if [ ".$(WITH_PGSQL)" = .yes ]; then \
+	    echo "==== PGSQL bindings to C API"; \
+	    (cd $(S)/pgsql && $(MAKE) $(MFLAGS) test PG_CONFIG=$(PG_CONFIG)); \
+	fi
 
 install:
 	$(SHTOOL) mkdir -f -p -m 755 $(DESTDIR)$(prefix)
@@ -244,6 +257,9 @@ install:
 	fi
 	-@if [ ".$(WITH_PHP)" = .yes ]; then \
 	    (cd $(S)/php && $(MAKE) $(MFLAGS) -f Makefile.local install EXTDIR=$(prefix)/lib/php PHP=$(PHP) DESTDIR=$(DESTDIR)); \
+	fi
+	-@if [ ".$(WITH_PGSQL)" = .yes ]; then \
+	    (cd $(S)/pgsql && $(MAKE) $(MFLAGS) install DESTDIR=$(DESTDIR) PG_CONFIG=$(PG_CONFIG)); \
 	fi
 
 uninstall:
@@ -301,6 +317,9 @@ clean:
 	-@if [ ".$(WITH_PHP)" = .yes ]; then \
 	    (cd $(S)/php && $(MAKE) $(MFLAGS) -f Makefile.local clean || true); \
 	fi
+	-@if [ ".$(WITH_PGSQL)" = .yes ]; then \
+	    (cd $(S)/pgsql && $(MAKE) $(MFLAGS) clean PG_CONFIG=$(PG_CONFIG) || true); \
+	fi
 
 distclean: clean
 	-$(RM) config.log config.status config.cache
@@ -311,6 +330,9 @@ distclean: clean
 	fi
 	-@if [ ".$(WITH_PHP)" = .yes ]; then \
 	    (cd $(S)/php && $(MAKE) $(MFLAGS) -f Makefile.local distclean || true); \
+	fi
+	-@if [ ".$(WITH_PGSQL)" = .yes ]; then \
+	    (cd $(S)/pgsql && $(MAKE) $(MFLAGS) distclean PG_CONFIG=$(PG_CONFIG) || true); \
 	fi
 
 realclean: distclean
@@ -323,5 +345,8 @@ realclean: distclean
 	fi
 	-@if [ ".$(WITH_PHP)" = .yes ]; then \
 	    (cd $(S)/php && $(MAKE) $(MFLAGS) -f Makefile.local realclean || true); \
+	fi
+	-@if [ ".$(WITH_PGSQL)" = .yes ]; then \
+	    (cd $(S)/pgsql && $(MAKE) $(MFLAGS) realclean PG_CONFIG=$(PG_CONFIG) || true); \
 	fi
 
