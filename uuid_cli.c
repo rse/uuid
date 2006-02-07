@@ -27,14 +27,14 @@
 **  uuid_cli.c: command line tool
 */
 
+#include "uuid.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
-
-#include "uuid.h"
 
 /* error handler */
 static void

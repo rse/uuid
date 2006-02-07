@@ -27,11 +27,11 @@
 **  uuid.xs: Perl Binding (Perl/XS part)
 */
 
+#include "uuid.h"
+
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
-
-#include "uuid.h"
 
 MODULE = OSSP::uuid PACKAGE = OSSP::uuid
 

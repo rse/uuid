@@ -27,6 +27,9 @@
 **  uuid.c: PostgreSQL Binding (C part)
 */
 
+/*  own headers */
+#include "uuid.h"
+
 /*  PostgreSQL (part 1/2) headers */
 #include "postgres.h"
 
@@ -36,9 +39,6 @@
 /*  PostgreSQL (part 2/2) headers */
 #include "fmgr.h"
 #include "lib/stringinfo.h"
-
-/*  own headers */
-#include "uuid.h"
 
 /* internal UUID datum data structure */
 typedef struct {

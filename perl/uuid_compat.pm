@@ -42,7 +42,7 @@ require Exporter;
 our @ISA     = qw(Exporter);
 our @EXPORT  = qw(NameSpace_DNS NameSpace_OID NameSpace_URL NameSpace_X500);
 
-our $VERSION = do { my @v = ('1.4.0' =~ m/\d+/g); sprintf("%d.".("%02d"x$#v), @v); };
+our $VERSION = do { my @v = ('1.4.1' =~ m/\d+/g); sprintf("%d.".("%02d"x$#v), @v); };
 
 sub new {
     my $class = shift;

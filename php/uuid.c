@@ -31,9 +31,9 @@
 #include "config.h"
 #endif
 
+#include "uuid.h"
 #include "php.h"
 #include "ext/standard/info.h"
-#include "uuid.h"
 
 /* context structure */
 typedef struct {

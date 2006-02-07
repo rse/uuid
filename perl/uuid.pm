@@ -118,7 +118,7 @@ use XSLoader;
 use Exporter;
 
 #   API version
-our $VERSION = do { my @v = ('1.4.0' =~ m/\d+/g); sprintf("%d.".("%02d"x$#v), @v); };
+our $VERSION = do { my @v = ('1.4.1' =~ m/\d+/g); sprintf("%d.".("%02d"x$#v), @v); };
 
 #   API inheritance
 our @ISA = qw(Exporter);

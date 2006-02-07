@@ -27,6 +27,10 @@
 **  uuid.c: library API implementation
 */
 
+/* own headers (part 1/2) */
+#include "config.h"
+#include "uuid.h"
+
 /* system headers */
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,9 +43,7 @@
 #include <sys/time.h>
 #include <sys/types.h>
 
-/* own headers */
-#include "config.h"
-#include "uuid.h"
+/* own headers (part 2/2) */
 #include "uuid_vers.h"
 #include "uuid_md5.h"
 #include "uuid_sha1.h"
