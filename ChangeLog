@@ -11,6 +11,23 @@
   This is a list of all changes to OSSP uuid.
   For a more brief summary please have a look at the NEWS file.
 
+  Changes between 1.4.1 and 1.4.2 (07-Feb-2006 to 13-Mar-2006)
+
+   o Fix uuid_export() function by fixing the internal
+     uuid_s[ar]printf() functions which require the backup of va_list
+     arguments between subsequent processing.
+     [Ralf S. Engelschall, Thomas Lotterer <thomas@lotterer.net>]
+
+   o Fix Perl API's "export" function by not taking over NUL-termination
+     character under UUID_FMT_TXT.
+     [Thomas Lotterer <thomas@lotterer.net>]
+   
+   o Declare "install", "uninstall" and "clean" make(1) targets
+     ".PHONY". This especially workarounds problems on case insensitive
+     filesystems (like MacOS X' filesystem) where the "INSTALL" document
+     conflicts with the "install" target.
+     [Ralf S. Engelschall, David Wheeler <david@kineticode.com>]
+
   Changes between 1.4.0 and 1.4.1 (15-Jan-2006 to 07-Feb-2006)
 
    o Upgrade to GNU shtool 2.0.5

@@ -219,6 +219,7 @@ check: all
 	    (cd $(S)/pgsql && $(MAKE) $(MFLAGS) test PG_CONFIG=$(PG_CONFIG)); \
 	fi
 
+.PHONY: install
 install:
 	$(SHTOOL) mkdir -f -p -m 755 $(DESTDIR)$(prefix)
 	$(SHTOOL) mkdir -f -p -m 755 $(DESTDIR)$(bindir)
@@ -262,6 +263,7 @@ install:
 	    (cd $(S)/pgsql && $(MAKE) $(MFLAGS) install DESTDIR=$(DESTDIR) PG_CONFIG=$(PG_CONFIG)); \
 	fi
 
+.PHONY: uninstall
 uninstall:
 	-$(RM) $(DESTDIR)$(mandir)/man1/uuid.1
 	-@$(LIBTOOL) --mode=uninstall $(RM) $(DESTDIR)$(bindir)/uuid
@@ -298,6 +300,7 @@ uninstall:
 	-$(RMDIR) $(DESTDIR)$(bindir) >/dev/null 2>&1 || $(TRUE)
 	-$(RMDIR) $(DESTDIR)$(prefix) >/dev/null 2>&1 || $(TRUE)
 
+.PHONY: clean
 clean:
 	-$(RM) $(LIB_NAME) $(LIB_OBJS)
 	-@if [ ".$(WITH_DCE)" = .yes ]; then \

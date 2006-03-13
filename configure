@@ -18921,6 +18921,605 @@ fi
 
 
 
+    echo "$as_me:$LINENO: checking for va_copy() function" >&5
+echo $ECHO_N "checking for va_copy() function... $ECHO_C" >&6
+    if test "${ac_cv_va_copy+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+    ac_cv_va_copy=""
+
+
+
+    if test ".$ac_cv_va_copy" = .; then
+        if test "$cross_compiling" = yes; then
+  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&5
+echo "$as_me: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+#include <stdlib.h>
+#include <stdarg.h>
+#include <string.h>
+#define DO_VA_COPY(d, s) va_copy((d), (s))
+void test(char *str, ...)
+{
+    va_list ap, ap2;
+    int i;
+    va_start(ap, str);
+    DO_VA_COPY(ap2, ap);
+    for (i = 1; i <= 9; i++) {
+        int k = (int)va_arg(ap, int);
+        if (k != i)
+            abort();
+    }
+    DO_VA_COPY(ap, ap2);
+    for (i = 1; i <= 9; i++) {
+        int k = (int)va_arg(ap, int);
+        if (k != i)
+            abort();
+    }
+    va_end(ap);
+}
+int main(int argc, char *argv[])
+{
+    test("test", 1, 2, 3, 4, 5, 6, 7, 8, 9);
+    exit(0);
+}
+
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_va_copy="C99"
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+    fi
+
+
+
+
+    if test ".$ac_cv_va_copy" = .; then
+        if test "$cross_compiling" = yes; then
+  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&5
+echo "$as_me: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+#include <stdlib.h>
+#include <stdarg.h>
+#include <string.h>
+#define DO_VA_COPY(d, s) VA_COPY((d), (s))
+void test(char *str, ...)
+{
+    va_list ap, ap2;
+    int i;
+    va_start(ap, str);
+    DO_VA_COPY(ap2, ap);
+    for (i = 1; i <= 9; i++) {
+        int k = (int)va_arg(ap, int);
+        if (k != i)
+            abort();
+    }
+    DO_VA_COPY(ap, ap2);
+    for (i = 1; i <= 9; i++) {
+        int k = (int)va_arg(ap, int);
+        if (k != i)
+            abort();
+    }
+    va_end(ap);
+}
+int main(int argc, char *argv[])
+{
+    test("test", 1, 2, 3, 4, 5, 6, 7, 8, 9);
+    exit(0);
+}
+
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_va_copy="GCM"
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+    fi
+
+
+
+
+    if test ".$ac_cv_va_copy" = .; then
+        if test "$cross_compiling" = yes; then
+  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&5
+echo "$as_me: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+#include <stdlib.h>
+#include <stdarg.h>
+#include <string.h>
+#define DO_VA_COPY(d, s) __va_copy((d), (s))
+void test(char *str, ...)
+{
+    va_list ap, ap2;
+    int i;
+    va_start(ap, str);
+    DO_VA_COPY(ap2, ap);
+    for (i = 1; i <= 9; i++) {
+        int k = (int)va_arg(ap, int);
+        if (k != i)
+            abort();
+    }
+    DO_VA_COPY(ap, ap2);
+    for (i = 1; i <= 9; i++) {
+        int k = (int)va_arg(ap, int);
+        if (k != i)
+            abort();
+    }
+    va_end(ap);
+}
+int main(int argc, char *argv[])
+{
+    test("test", 1, 2, 3, 4, 5, 6, 7, 8, 9);
+    exit(0);
+}
+
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_va_copy="GCH"
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+    fi
+
+
+
+
+    if test ".$ac_cv_va_copy" = .; then
+        if test "$cross_compiling" = yes; then
+  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&5
+echo "$as_me: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+#include <stdlib.h>
+#include <stdarg.h>
+#include <string.h>
+#define DO_VA_COPY(d, s) __builtin_va_copy((d), (s))
+void test(char *str, ...)
+{
+    va_list ap, ap2;
+    int i;
+    va_start(ap, str);
+    DO_VA_COPY(ap2, ap);
+    for (i = 1; i <= 9; i++) {
+        int k = (int)va_arg(ap, int);
+        if (k != i)
+            abort();
+    }
+    DO_VA_COPY(ap, ap2);
+    for (i = 1; i <= 9; i++) {
+        int k = (int)va_arg(ap, int);
+        if (k != i)
+            abort();
+    }
+    va_end(ap);
+}
+int main(int argc, char *argv[])
+{
+    test("test", 1, 2, 3, 4, 5, 6, 7, 8, 9);
+    exit(0);
+}
+
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_va_copy="GCB"
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+    fi
+
+
+
+
+    if test ".$ac_cv_va_copy" = .; then
+        if test "$cross_compiling" = yes; then
+  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&5
+echo "$as_me: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+#include <stdlib.h>
+#include <stdarg.h>
+#include <string.h>
+#define DO_VA_COPY(d, s) do { (d) = (s); } while (0)
+void test(char *str, ...)
+{
+    va_list ap, ap2;
+    int i;
+    va_start(ap, str);
+    DO_VA_COPY(ap2, ap);
+    for (i = 1; i <= 9; i++) {
+        int k = (int)va_arg(ap, int);
+        if (k != i)
+            abort();
+    }
+    DO_VA_COPY(ap, ap2);
+    for (i = 1; i <= 9; i++) {
+        int k = (int)va_arg(ap, int);
+        if (k != i)
+            abort();
+    }
+    va_end(ap);
+}
+int main(int argc, char *argv[])
+{
+    test("test", 1, 2, 3, 4, 5, 6, 7, 8, 9);
+    exit(0);
+}
+
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_va_copy="ASS"
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+    fi
+
+
+
+
+    if test ".$ac_cv_va_copy" = .; then
+        if test "$cross_compiling" = yes; then
+  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&5
+echo "$as_me: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+#include <stdlib.h>
+#include <stdarg.h>
+#include <string.h>
+#define DO_VA_COPY(d, s) do { *(d) = *(s); } while (0)
+void test(char *str, ...)
+{
+    va_list ap, ap2;
+    int i;
+    va_start(ap, str);
+    DO_VA_COPY(ap2, ap);
+    for (i = 1; i <= 9; i++) {
+        int k = (int)va_arg(ap, int);
+        if (k != i)
+            abort();
+    }
+    DO_VA_COPY(ap, ap2);
+    for (i = 1; i <= 9; i++) {
+        int k = (int)va_arg(ap, int);
+        if (k != i)
+            abort();
+    }
+    va_end(ap);
+}
+int main(int argc, char *argv[])
+{
+    test("test", 1, 2, 3, 4, 5, 6, 7, 8, 9);
+    exit(0);
+}
+
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_va_copy="ASP"
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+    fi
+
+
+
+
+    if test ".$ac_cv_va_copy" = .; then
+        if test "$cross_compiling" = yes; then
+  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&5
+echo "$as_me: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+#include <stdlib.h>
+#include <stdarg.h>
+#include <string.h>
+#define DO_VA_COPY(d, s) memcpy((void *)&(d), (void *)&(s))
+void test(char *str, ...)
+{
+    va_list ap, ap2;
+    int i;
+    va_start(ap, str);
+    DO_VA_COPY(ap2, ap);
+    for (i = 1; i <= 9; i++) {
+        int k = (int)va_arg(ap, int);
+        if (k != i)
+            abort();
+    }
+    DO_VA_COPY(ap, ap2);
+    for (i = 1; i <= 9; i++) {
+        int k = (int)va_arg(ap, int);
+        if (k != i)
+            abort();
+    }
+    va_end(ap);
+}
+int main(int argc, char *argv[])
+{
+    test("test", 1, 2, 3, 4, 5, 6, 7, 8, 9);
+    exit(0);
+}
+
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_va_copy="CPS"
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+    fi
+
+
+
+
+    if test ".$ac_cv_va_copy" = .; then
+        if test "$cross_compiling" = yes; then
+  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&5
+echo "$as_me: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+#include <stdlib.h>
+#include <stdarg.h>
+#include <string.h>
+#define DO_VA_COPY(d, s) memcpy((void *)(d), (void *)(s))
+void test(char *str, ...)
+{
+    va_list ap, ap2;
+    int i;
+    va_start(ap, str);
+    DO_VA_COPY(ap2, ap);
+    for (i = 1; i <= 9; i++) {
+        int k = (int)va_arg(ap, int);
+        if (k != i)
+            abort();
+    }
+    DO_VA_COPY(ap, ap2);
+    for (i = 1; i <= 9; i++) {
+        int k = (int)va_arg(ap, int);
+        if (k != i)
+            abort();
+    }
+    va_end(ap);
+}
+int main(int argc, char *argv[])
+{
+    test("test", 1, 2, 3, 4, 5, 6, 7, 8, 9);
+    exit(0);
+}
+
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_va_copy="CPP"
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+    fi
+
+    if test ".$ac_cv_va_copy" = .; then
+        { { echo "$as_me:$LINENO: error: no working implementation found" >&5
+echo "$as_me: error: no working implementation found" >&2;}
+   { (exit 1); exit 1; }; }
+    fi
+
+fi
+
+    if test ".$ac_cv_va_copy" = ".C99"; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_VA_COPY 1
+_ACEOF
+
+  fi
+
+cat >>confdefs.h <<_ACEOF
+#define __VA_COPY_USE __VA_COPY_USE_$ac_cv_va_copy
+_ACEOF
+
+
+
+    if test ".$ac_cv_va_copy" = ".C99"; then
+      echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+  else
+      echo "$as_me:$LINENO: result: no (using fallback implementation)" >&5
+echo "${ECHO_T}no (using fallback implementation)" >&6
+  fi
+
+
+
 
 
 

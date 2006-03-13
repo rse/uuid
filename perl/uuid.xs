@@ -201,7 +201,7 @@ uuid_export(uuid,fmt,data_ptr,data_len)
         data_len = 0;
         RETVAL = uuid_export(uuid, fmt, &data_ptr, &data_len);
         if (RETVAL == UUID_RC_OK) {
-            if (fmt == UUID_FMT_STR)
+            if (fmt == UUID_FMT_STR || fmt == UUID_FMT_TXT)
                 data_len--; /* Perl doesn't wish NUL-termination on strings */
             sv_setpvn(ST(2), data_ptr, data_len);
             free(data_ptr);

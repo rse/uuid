@@ -39,6 +39,9 @@ AC_DEFUN(UUID_CHECK_ALL,[
     fi
     AC_CHECK_LIB(socket, accept)
 
+    dnl #  check for portable va_copy()
+    AC_CHECK_VA_COPY()
+
     dnl #   check for system headers
     AC_CHECK_HEADERS(sys/types.h sys/param.h sys/time.h sys/socket.h sys/sockio.h sys/ioctl.h)
     AC_CHECK_HEADERS(netdb.h ifaddrs.h net/if.h net/if_dl.h net/if_arp.h netinet/in.h arpa/inet.h,,,
