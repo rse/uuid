@@ -11,6 +11,12 @@
   This is a list of major changes to OSSP uuid. For more detailed
   change descriptions, please have a look at the ChangeLog file.
 
+  Major changes between 1.4 and 1.5
+
+    o Many internal code cleanups and fixes.
+    o Improved and fixed PostgreSQL API.
+    o Improved and fixed PHP API.
+
   Major changes between 1.3 and 1.4
 
     o Added PostgreSQL API.

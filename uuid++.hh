@@ -71,6 +71,7 @@ class uuid {
         void          import       (const char *_str);         /* regular method */
         void         *binary       (void);                     /* regular method */
         char         *string       (void);                     /* regular method */
+        char         *integer      (void);                     /* regular method */
         char         *summary      (void);                     /* regular method */
 
         unsigned long version      (void);                     /* regular method */

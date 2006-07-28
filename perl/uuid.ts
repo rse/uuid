@@ -27,7 +27,7 @@
 ##  uuid.ts: Perl Binding (Perl test suite part)
 ##
 
-use Test::More tests => 35;
+use Test::More tests => 36;
 
 ##
 ##  Module Loading
@@ -87,6 +87,10 @@ $rc = uuid_export($uuid_ns, UUID_FMT_STR, $ptr, $len);
 ok((    $rc == UUID_RC_OK
     and $ptr eq "02d9e6d5-9467-382e-8f9b-9300a64ac3cd"
     and $len == UUID_LEN_STR), "uuid_export (5)");
+$rc = uuid_export($uuid_ns, UUID_FMT_SIV, $ptr, $len);
+ok((    $rc == UUID_RC_OK
+    and $ptr eq "3789866285607910888100818383505376205"
+    and $len <= UUID_LEN_SIV), "uuid_export (6)");
 
 $rc = uuid_destroy($uuid_ns);
 ok($rc == UUID_RC_OK, "uuid_destroy (1)");

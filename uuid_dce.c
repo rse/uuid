@@ -95,7 +95,7 @@ void uuid_dce_create_nil(uuid_dce_t *uuid_dce, int *status)
 
     /* short-circuit implementation, because Nil UUID is trivial to
        create, so no need to use regular OSSP uuid API */
-    memset(uuid_dce, '\0', UUID_LEN_BIN);
+    memset(uuid_dce, 0, UUID_LEN_BIN);
 
     /* return successfully */
     if (status != NULL)

@@ -243,12 +243,13 @@ void uuid::import(const void *bin)
     return;
 }
 
-/*  method: import string representation */
+/*  method: import string or single integer value representation */
 void uuid::import(const char *str)
 {
     uuid_rc_t rc;
     if ((rc = uuid_import(ctx, UUID_FMT_STR, str, UUID_LEN_STR)) != UUID_RC_OK)
-        throw uuid_error_t(rc);
+        if ((rc = uuid_import(ctx, UUID_FMT_SIV, str, UUID_LEN_SIV)) != UUID_RC_OK)
+            throw uuid_error_t(rc);
     return;
 }
 
@@ -268,6 +269,16 @@ char *uuid::string(void)
     uuid_rc_t rc;
     char *str = NULL;
     if ((rc = uuid_export(ctx, UUID_FMT_STR, (void **)&str, NULL)) != UUID_RC_OK)
+        throw uuid_error_t(rc);
+    return str;
+}
+
+/*  method: export single integer value representation */
+char *uuid::integer(void)
+{
+    uuid_rc_t rc;
+    char *str = NULL;
+    if ((rc = uuid_export(ctx, UUID_FMT_SIV, (void **)&str, NULL)) != UUID_RC_OK)
         throw uuid_error_t(rc);
     return str;
 }

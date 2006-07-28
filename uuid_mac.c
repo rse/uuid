@@ -158,7 +158,7 @@ int mac_address(unsigned char *data_ptr, size_t data_len)
             return FALSE;
         if ((s = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0)
             return FALSE;
-        memset(&ar, '\0', sizeof(ar));
+        memset(&ar, 0, sizeof(ar));
         sa = (struct sockaddr_in *)((void *)&(ar.arp_pa));
         sa->sin_family = AF_INET;
         memcpy(&(sa->sin_addr), *(he->h_addr_list), sizeof(struct in_addr));

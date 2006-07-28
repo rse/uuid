@@ -62,8 +62,8 @@ usage(const char *str, ...)
         vfprintf(stderr, str, ap);
         fprintf(stderr, "\n");
     }
-    fprintf(stderr, "usage: uuid [-v version] [-m] [-n count] [-1] [-r] [-o filename] [namespace name]\n");
-    fprintf(stderr, "usage: uuid -d [-r] [-o filename] [uuid]\n");
+    fprintf(stderr, "usage: uuid [-v version] [-m] [-n count] [-1] [-F format] [-o filename] [namespace name]\n");
+    fprintf(stderr, "usage: uuid -d [-F format] [-o filename] [uuid]\n");
     va_end(ap);
     exit(1);
 }
@@ -73,6 +73,7 @@ int main(int argc, char *argv[])
 {
     char uuid_buf_bin[UUID_LEN_BIN];
     char uuid_buf_str[UUID_LEN_STR+1];
+    char uuid_buf_siv[UUID_LEN_SIV+1];
     uuid_t *uuid;
     uuid_t *uuid_ns;
     uuid_rc_t rc;
@@ -82,20 +83,20 @@ int main(int argc, char *argv[])
     int count;
     int i;
     int iterate;
-    int raw;
+    uuid_fmt_t fmt;
     int decode;
     void *vp;
     size_t n;
     unsigned int version;
 
     /* command line parsing */
-    count = -1;     /* no count yet */
-    fp = stdout;    /* default output file */
-    iterate = 0;    /* not one at a time */
-    raw = 0;        /* default is ASCII output */
-    decode = 0;     /* default is to encode */
+    count = -1;         /* no count yet */
+    fp = stdout;        /* default output file */
+    iterate = 0;        /* not one at a time */
+    fmt = UUID_FMT_STR; /* default is ASCII output */
+    decode = 0;         /* default is to encode */
     version = UUID_MAKE_V1;
-    while ((ch = getopt(argc, argv, "1n:rdmo:v:h")) != -1) {
+    while ((ch = getopt(argc, argv, "1n:rF:dmo:v:h")) != -1) {
         switch (ch) {
             case '1':
                 iterate = 1;
@@ -108,7 +109,17 @@ int main(int argc, char *argv[])
                     usage("invalid argument to option 'n'");
                 break;
             case 'r':
-                raw = 1;
+                fmt = UUID_FMT_BIN;
+                break;
+            case 'F':
+                if (strcasecmp(optarg, "bin") == 0)
+                    fmt = UUID_FMT_BIN;
+                else if (strcasecmp(optarg, "str") == 0)
+                    fmt = UUID_FMT_STR;
+                else if (strcasecmp(optarg, "siv") == 0)
+                    fmt = UUID_FMT_SIV;
+                else
+                    error(1, "invalid format \"%s\" (has to be \"bin\", \"str\" or \"siv\")", optarg);
                 break;
             case 'd':
                 decode = 1;
@@ -155,27 +166,39 @@ int main(int argc, char *argv[])
         if (argc != 1)
             usage("invalid number of arguments");
         if (strcmp(argv[0], "-") == 0) {
-            if (raw) {
+            if (fmt == UUID_FMT_BIN) {
                 if (fread(uuid_buf_bin, UUID_LEN_BIN, 1, stdin) != 1)
                     error(1, "fread: failed to read %d (UUID_LEN_BIN) bytes from stdin", UUID_LEN_BIN);
                 if ((rc = uuid_import(uuid, UUID_FMT_BIN, uuid_buf_bin, UUID_LEN_BIN)) != UUID_RC_OK)
                     error(1, "uuid_import: %s", uuid_error(rc));
             }
-            else {
+            else if (fmt == UUID_FMT_STR) {
                 if (fread(uuid_buf_str, UUID_LEN_STR, 1, stdin) != 1)
                     error(1, "fread: failed to read %d (UUID_LEN_STR) bytes from stdin", UUID_LEN_STR);
                 uuid_buf_str[UUID_LEN_STR] = '\0';
                 if ((rc = uuid_import(uuid, UUID_FMT_STR, uuid_buf_str, UUID_LEN_STR)) != UUID_RC_OK)
                     error(1, "uuid_import: %s", uuid_error(rc));
             }
+            else if (fmt == UUID_FMT_SIV) {
+                if (fread(uuid_buf_siv, UUID_LEN_SIV, 1, stdin) != 1)
+                    error(1, "fread: failed to read %d (UUID_LEN_SIV) bytes from stdin", UUID_LEN_SIV);
+                uuid_buf_siv[UUID_LEN_SIV] = '\0';
+                if ((rc = uuid_import(uuid, UUID_FMT_SIV, uuid_buf_siv, UUID_LEN_SIV)) != UUID_RC_OK)
+                    error(1, "uuid_import: %s", uuid_error(rc));
+            }
         }
         else {
-            if (raw)
-                error(1, "raw input mode only possible if reading from stdin");
-            if (strlen(argv[0]) != UUID_LEN_STR)
-                error(1, "invalid length of UUID string representation");
-            if ((rc = uuid_import(uuid, UUID_FMT_STR, argv[0], strlen(argv[0]))) != UUID_RC_OK)
-                error(1, "uuid_import: %s", uuid_error(rc));
+            if (fmt == UUID_FMT_BIN) {
+                error(1, "binary input mode only possible if reading from stdin");
+            }
+            else if (fmt == UUID_FMT_STR) {
+                if ((rc = uuid_import(uuid, UUID_FMT_STR, argv[0], strlen(argv[0]))) != UUID_RC_OK)
+                    error(1, "uuid_import: %s", uuid_error(rc));
+            }
+            else if (fmt == UUID_FMT_SIV) {
+                if ((rc = uuid_import(uuid, UUID_FMT_SIV, argv[0], strlen(argv[0]))) != UUID_RC_OK)
+                    error(1, "uuid_import: %s", uuid_error(rc));
+            }
         }
         vp = NULL;
         if ((rc = uuid_export(uuid, UUID_FMT_TXT, &vp, NULL)) != UUID_RC_OK)
@@ -222,16 +245,23 @@ int main(int argc, char *argv[])
                 if ((rc = uuid_make(uuid, version)) != UUID_RC_OK)
                     error(1, "uuid_make: %s", uuid_error(rc));
             }
-            if (raw) {
+            if (fmt == UUID_FMT_BIN) {
                 vp = NULL;
                 if ((rc = uuid_export(uuid, UUID_FMT_BIN, &vp, &n)) != UUID_RC_OK)
                     error(1, "uuid_export: %s", uuid_error(rc));
                 fwrite(vp, n, 1, fp);
                 free(vp);
             }
-            else {
+            else if (fmt == UUID_FMT_STR) {
                 vp = NULL;
                 if ((rc = uuid_export(uuid, UUID_FMT_STR, &vp, &n)) != UUID_RC_OK)
+                    error(1, "uuid_export: %s", uuid_error(rc));
+                fprintf(fp, "%s\n", (char *)vp);
+                free(vp);
+            }
+            else if (fmt == UUID_FMT_SIV) {
+                vp = NULL;
+                if ((rc = uuid_export(uuid, UUID_FMT_SIV, &vp, &n)) != UUID_RC_OK)
                     error(1, "uuid_export: %s", uuid_error(rc));
                 fprintf(fp, "%s\n", (char *)vp);
                 free(vp);

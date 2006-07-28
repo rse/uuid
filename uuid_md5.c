@@ -100,8 +100,8 @@ typedef struct {
 /* prototypes for internal functions */
 static void MD5Init      (MD5_CTX *_ctx);
 static void MD5Update    (MD5_CTX *_ctx, unsigned char *, unsigned int);
-static void MD5Final     (unsigned char [16], MD5_CTX *);
-static void MD5Transform (UINT4 [4], unsigned char [64]);
+static void MD5Final     (unsigned char [], MD5_CTX *);
+static void MD5Transform (UINT4 [], unsigned char []);
 static void Encode       (unsigned char *, UINT4 *, unsigned int);
 static void Decode       (UINT4 *, unsigned char *, unsigned int);
 
@@ -155,6 +155,7 @@ static void MD5Init(
     context->state[1] = 0xefcdab89;
     context->state[2] = 0x98badcfe;
     context->state[3] = 0x10325476;
+    return;
 }
 
 /* MD5 block update operation. Continues an MD5 message-digest
@@ -175,11 +176,11 @@ static void MD5Update(
         context->count[1]++;
     context->count[1] += ((UINT4)inputLen >> 29);
 
-    partLen = 64 - idx;
+    partLen = (unsigned int)64 - idx;
 
     /* Transform as many times as possible.  */
     if (inputLen >= partLen) {
-        memcpy((POINTER)&context->buffer[idx], (POINTER)input, partLen);
+        memcpy((POINTER)&context->buffer[idx], (POINTER)input, (size_t)partLen);
         MD5Transform(context->state, context->buffer);
         for (i = partLen; i + 63 < inputLen; i += 64)
             MD5Transform(context->state, &input[i]);
@@ -189,13 +190,13 @@ static void MD5Update(
         i = 0;
 
     /* Buffer remaining input */
-    memcpy((POINTER)&context->buffer[idx], (POINTER)&input[i], inputLen-i);
+    memcpy((POINTER)&context->buffer[idx], (POINTER)&input[i], (size_t)(inputLen - i));
 }
 
 /* MD5 finalization. Ends an MD5 message-digest operation, writing the
    the message digest and zeroizing the context. */
 static void MD5Final(
-    unsigned char digest[16],                        /* message digest */
+    unsigned char digest[],                                 /* message digest */
     MD5_CTX *context)                                       /* context */
 {
     unsigned char bits[8];
@@ -206,7 +207,7 @@ static void MD5Final(
 
     /* Pad out to 56 mod 64. */
     idx = (unsigned int)((context->count[0] >> 3) & 0x3f);
-    padLen = (idx < 56) ? (56 - idx) : (120 - idx);
+    padLen = (idx < 56) ? ((unsigned int)56 - idx) : ((unsigned int)120 - idx);
     MD5Update(context, PADDING, padLen);
 
     /* Append length (before padding) */
@@ -216,13 +217,13 @@ static void MD5Final(
     Encode(digest, context->state, 16);
 
     /* Zeroize sensitive information. */
-    memset((POINTER)context, '\0', sizeof (*context));
+    memset((POINTER)context, 0, sizeof(*context));
 }
 
 /* MD5 basic transformation. Transforms state based on block. */
 static void MD5Transform(
-    UINT4 state[4],
-    unsigned char block[64])
+    UINT4 state[],
+    unsigned char block[])
 {
     UINT4 a = state[0], b = state[1], c = state[2], d = state[3], x[16];
 
@@ -322,7 +323,7 @@ static void MD5Transform(
     state[3] += d;
 
     /* Zeroize sensitive information. */
-    memset((POINTER)x, '\0', sizeof (x));
+    memset((POINTER)x, 0, sizeof(x));
 }
 
 /* Encodes input (UINT4) into output (unsigned char).
@@ -340,6 +341,7 @@ static void Encode(
         output[j+2] = (unsigned char)((input[i] >> 16) & 0xff);
         output[j+3] = (unsigned char)((input[i] >> 24) & 0xff);
     }
+    return;
 }
 
 /* Decodes input (unsigned char) into output (UINT4).
@@ -356,6 +358,7 @@ static void Decode(
                     | (((UINT4)input[j+1]) << 8 )
                     | (((UINT4)input[j+2]) << 16)
                     | (((UINT4)input[j+3]) << 24);
+    return;
 }
 
 /*

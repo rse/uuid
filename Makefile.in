@@ -62,7 +62,7 @@ PHP         = @PHP@
 PG_CONFIG   = @PG_CONFIG@
 
 LIB_NAME    = libuuid.la
-LIB_OBJS    = uuid.lo uuid_md5.lo uuid_sha1.lo uuid_prng.lo uuid_mac.lo uuid_ui64.lo uuid_str.lo
+LIB_OBJS    = uuid.lo uuid_md5.lo uuid_sha1.lo uuid_prng.lo uuid_mac.lo uuid_ui64.lo uuid_ui128.lo uuid_str.lo
 
 DCE_NAME    = libuuid_dce.la
 DCE_OBJS    = uuid_dce.lo $(LIB_OBJS)
@@ -137,13 +137,14 @@ $(PGSQL_NAME): $(PGSQL_OBJS) $(LIB_NAME)
 	@cd $(S)/pgsql && $(MAKE) $(MFLAGS) PG_CONFIG=$(PG_CONFIG)
 	@touch $(PGSQL_NAME)
 
-uuid.lo: $(S)/uuid.c uuid.h $(S)/uuid_md5.h $(S)/uuid_sha1.h $(S)/uuid_prng.h $(S)/uuid_mac.h $(S)/uuid_ui64.h $(S)/uuid_str.h $(S)/uuid_bm.h $(S)/uuid_ac.h
+uuid.lo: $(S)/uuid.c uuid.h $(S)/uuid_md5.h $(S)/uuid_sha1.h $(S)/uuid_prng.h $(S)/uuid_mac.h $(S)/uuid_ui64.h $(S)/uuid_ui128.h $(S)/uuid_str.h $(S)/uuid_bm.h $(S)/uuid_ac.h
 uuid_mac.lo: $(S)/uuid_mac.c $(S)/uuid_mac.h
 uuid_md5.lo: $(S)/uuid_md5.c $(S)/uuid_md5.h
 uuid_sha1.lo: $(S)/uuid_sha1.c $(S)/uuid_sha1.h
 uuid_prng.lo: $(S)/uuid_prng.c $(S)/uuid_prng.h
 uuid_str.lo: $(S)/uuid_str.c $(S)/uuid_str.h
 uuid_ui64.lo: $(S)/uuid_ui64.c $(S)/uuid_ui64.h
+uuid_ui128.lo: $(S)/uuid_ui64.c $(S)/uuid_ui128.h
 uuid_dce.lo: $(S)/uuid_dce.c uuid.h $(S)/uuid_dce.h
 uuid_cli.o: $(S)/uuid_cli.c uuid.h
 uuid++.lo: $(S)/uuid++.cc $(S)/uuid++.hh

@@ -690,13 +690,12 @@ str_vasprintf(
 {
     char *rv;
     int n;
-    va_list ap_bak;
+    va_list ap_tmp;
 
-    va_copy(ap_bak, ap);
-    n = str_vsnprintf(NULL, 0, fmt, ap);
+    va_copy(ap_tmp, ap);
+    n = str_vsnprintf(NULL, 0, fmt, ap_tmp);
     if ((rv = (char *)malloc(n+1)) == NULL)
         return NULL;
-    va_copy(ap, ap_bak);
     str_vsnprintf(rv, n+1, fmt, ap);
     return rv;
 }
@@ -723,7 +722,7 @@ str_vrsprintf(
 {
     int rv;
     size_t n;
-    va_list ap_bak;
+    va_list ap_tmp;
 
     if (str == NULL)
         return -1;
@@ -732,12 +731,11 @@ str_vrsprintf(
         rv = strlen(*str);
     }
     else {
-        va_copy(ap_bak, ap);
+        va_copy(ap_tmp, ap);
         n = strlen(*str);
-        rv = str_vsnprintf(NULL, 0, fmt, ap);
+        rv = str_vsnprintf(NULL, 0, fmt, ap_tmp);
         if ((*str = (char *)realloc(*str, n+rv+1)) == NULL)
             return -1;
-        va_copy(ap, ap_bak);
         str_vsnprintf((*str)+n, rv+1, fmt, ap);
     }
     return rv;

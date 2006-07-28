@@ -111,7 +111,7 @@ typedef struct SHA1Context {
 /* Function Prototypes */
 static int SHA1Reset  (SHA1Context *);
 static int SHA1Input  (SHA1Context *, const sha1_uint8_t *, unsigned int);
-static int SHA1Result (SHA1Context *, sha1_uint8_t Message_Digest[SHA1HashSize]);
+static int SHA1Result (SHA1Context *, sha1_uint8_t Message_Digest[]);
 
 /* Local Function Prototyptes */
 static void SHA1PadMessage         (SHA1Context *);
@@ -152,7 +152,7 @@ static int SHA1Reset(SHA1Context *context)
  *  of hash is stored in the 0th element, the last octet of hash in the
  *  19th element.
  */
-static int SHA1Result(SHA1Context *context, sha1_uint8_t Message_Digest[SHA1HashSize])
+static int SHA1Result(SHA1Context *context, sha1_uint8_t Message_Digest[])
 {
     int i;
 
@@ -165,14 +165,14 @@ static int SHA1Result(SHA1Context *context, sha1_uint8_t Message_Digest[SHA1Hash
         SHA1PadMessage(context);
         for (i = 0; i < 64; i++) {
             /* message may be sensitive, clear it out */
-            context->Message_Block[i] = 0;
+            context->Message_Block[i] = (sha1_uint8_t)0;
         }
         context->Length_Low  = 0; /* and clear length */
         context->Length_High = 0;
         context->Computed    = 1;
     }
     for (i = 0; i < SHA1HashSize; i++)
-        Message_Digest[i] = context->Intermediate_Hash[i>>2] >> (8 * (3 - (i & 0x03)));
+        Message_Digest[i] = (sha1_uint8_t)(context->Intermediate_Hash[i>>2] >> (8 * (3 - (i & 0x03))));
 
     return shaSuccess;
 }
@@ -231,10 +231,10 @@ static void SHA1ProcessMessageBlock(SHA1Context *context)
 
     /* Initialize the first 16 words in the array W */
     for (t = 0; t < 16; t++) {
-        W[t]  = context->Message_Block[t * 4    ] << 24;
-        W[t] |= context->Message_Block[t * 4 + 1] << 16;
-        W[t] |= context->Message_Block[t * 4 + 2] << 8;
-        W[t] |= context->Message_Block[t * 4 + 3];
+        W[t]  = (sha1_uint32_t)(context->Message_Block[t * 4    ] << 24);
+        W[t] |= (sha1_uint32_t)(context->Message_Block[t * 4 + 1] << 16);
+        W[t] |= (sha1_uint32_t)(context->Message_Block[t * 4 + 2] <<  8);
+        W[t] |= (sha1_uint32_t)(context->Message_Block[t * 4 + 3]      );
     }
 
     for (t = 16; t < 80; t++)
@@ -309,28 +309,28 @@ static void SHA1PadMessage(SHA1Context *context)
        the initial padding bits and length. If so, we will pad the block,
        process it, and then continue padding into a second block. */
     if (context->Message_Block_Index > 55) {
-        context->Message_Block[context->Message_Block_Index++] = 0x80;
+        context->Message_Block[context->Message_Block_Index++] = (sha1_uint8_t)0x80;
         while (context->Message_Block_Index < 64)
-            context->Message_Block[context->Message_Block_Index++] = 0;
+            context->Message_Block[context->Message_Block_Index++] = (sha1_uint8_t)0;
         SHA1ProcessMessageBlock(context);
         while(context->Message_Block_Index < 56)
-            context->Message_Block[context->Message_Block_Index++] = 0;
+            context->Message_Block[context->Message_Block_Index++] = (sha1_uint8_t)0;
     }
     else {
-        context->Message_Block[context->Message_Block_Index++] = 0x80;
+        context->Message_Block[context->Message_Block_Index++] = (sha1_uint8_t)0x80;
         while(context->Message_Block_Index < 56)
-            context->Message_Block[context->Message_Block_Index++] = 0;
+            context->Message_Block[context->Message_Block_Index++] = (sha1_uint8_t)0;
     }
 
     /* Store the message length as the last 8 octets */
-    context->Message_Block[56] = context->Length_High >> 24;
-    context->Message_Block[57] = context->Length_High >> 16;
-    context->Message_Block[58] = context->Length_High >> 8;
-    context->Message_Block[59] = context->Length_High;
-    context->Message_Block[60] = context->Length_Low  >> 24;
-    context->Message_Block[61] = context->Length_Low  >> 16;
-    context->Message_Block[62] = context->Length_Low  >> 8;
-    context->Message_Block[63] = context->Length_Low;
+    context->Message_Block[56] = (sha1_uint8_t)(context->Length_High >> 24);
+    context->Message_Block[57] = (sha1_uint8_t)(context->Length_High >> 16);
+    context->Message_Block[58] = (sha1_uint8_t)(context->Length_High >>  8);
+    context->Message_Block[59] = (sha1_uint8_t)(context->Length_High      );
+    context->Message_Block[60] = (sha1_uint8_t)(context->Length_Low  >> 24);
+    context->Message_Block[61] = (sha1_uint8_t)(context->Length_Low  >> 16);
+    context->Message_Block[62] = (sha1_uint8_t)(context->Length_Low  >>  8);
+    context->Message_Block[63] = (sha1_uint8_t)(context->Length_Low       );
 
     SHA1ProcessMessageBlock(context);
     return;
@@ -350,7 +350,8 @@ sha1_rc_t sha1_create(sha1_t **sha1)
         return SHA1_RC_ARG;
     if ((*sha1 = (sha1_t *)malloc(sizeof(sha1_t))) == NULL)
         return SHA1_RC_MEM;
-    SHA1Reset(&((*sha1)->ctx));
+    if (SHA1Reset(&((*sha1)->ctx)) != shaSuccess)
+        return SHA1_RC_INT;
     return SHA1_RC_OK;
 }
 
@@ -358,7 +359,8 @@ sha1_rc_t sha1_init(sha1_t *sha1)
 {
     if (sha1 == NULL)
         return SHA1_RC_ARG;
-    SHA1Reset(&(sha1->ctx));
+    if (SHA1Reset(&(sha1->ctx)) != shaSuccess)
+        return SHA1_RC_INT;
     return SHA1_RC_OK;
 }
 
@@ -366,7 +368,8 @@ sha1_rc_t sha1_update(sha1_t *sha1, const void *data_ptr, size_t data_len)
 {
     if (sha1 == NULL)
         return SHA1_RC_ARG;
-    SHA1Input(&(sha1->ctx), (unsigned char *)data_ptr, (unsigned int)data_len);
+    if (SHA1Input(&(sha1->ctx), (unsigned char *)data_ptr, (unsigned int)data_len) != shaSuccess)
+        return SHA1_RC_INT;
     return SHA1_RC_OK;
 }
 
@@ -390,7 +393,8 @@ sha1_rc_t sha1_store(sha1_t *sha1, void **data_ptr, size_t *data_len)
         }
     }
     memcpy((void *)(&ctx), (void *)(&(sha1->ctx)), sizeof(SHA1Context));
-    SHA1Result(&(ctx), (unsigned char *)(*data_ptr));
+    if (SHA1Result(&(ctx), (unsigned char *)(*data_ptr)) != shaSuccess)
+        return SHA1_RC_INT;
     return SHA1_RC_OK;
 }
 

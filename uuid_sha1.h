@@ -62,7 +62,8 @@ typedef struct sha1_st sha1_t;
 typedef enum {
     SHA1_RC_OK  = 0,
     SHA1_RC_ARG = 1,
-    SHA1_RC_MEM = 2
+    SHA1_RC_MEM = 2,
+    SHA1_RC_INT = 3
 } sha1_rc_t;
 
 extern sha1_rc_t sha1_create  (sha1_t **sha1);

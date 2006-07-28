@@ -11,6 +11,51 @@
   This is a list of all changes to OSSP uuid.
   For a more brief summary please have a look at the NEWS file.
 
+  Changes between 1.4.2 and 1.5.0 (13-Mar-2006 to 28-Jul-2006)
+
+   o Fixed potential memory leak in uuid_create() as spotted by SPLINT.
+     [Ralf S. Engelschall]
+
+   o Cleanup source code according to complains by SPLINT.
+     [Ralf S. Engelschall]
+
+   o Cleanup internal uuid_mac.h header.
+     [Ralf S. Engelschall]
+   
+   o Numerous fixed to the error handling in the PostgreSQL bindings.
+     [Neil Conway <neilc@samurai.com>]
+
+   o Add Hash indexing support UUID data type of PostgreSQL bindings.
+     [Ralf S. Engelschall]
+
+   o Add comparison operators and B-Tree indexing support UUID data
+     type of PostgreSQL bindings.
+     [Roman Neuhauser <neuhauser@sigpipe.cz>]
+
+   o Fix PHP bindings: the wrong argument to uuid_create()
+     was forced to a reference
+     [Roman Neuhauser <neuhauser@sigpipe.cz>]
+
+   o Add full support for Single Integer Value (SIV) UUID representation
+     for both importing and exporting in C/C++/Perl/PHP APIs.
+     [Ralf S. Engelschall]
+   
+   o Upgrade build environment to GNU shtool 2.0.6 and GNU autoconf 2.60
+     [Ralf S. Engelschall]
+
+   o Added an "OVERVIEW" file which tries to give the "big picture"
+     about UUIDs and allows to survice during the nasty UUID bit fiddling.
+     [Ralf S. Engelschall]
+
+   o Replaced "clock_seq_and_reserved" with
+     "clock_seq_high_and_reserved" in uuid.pod to already reflect the
+     description in the forthcoming RFC.
+     [Ralf S. Engelschall]
+
+   o Speed up processing in uuid_str.c by reducing va_copy() calls from
+     two to just one per formatting.
+     [Ralf S. Engelschall]
+
   Changes between 1.4.1 and 1.4.2 (07-Feb-2006 to 13-Mar-2006)
 
    o Fix uuid_export() function by fixing the internal

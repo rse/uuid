@@ -65,23 +65,47 @@ According to the DCE 1.1, ISO/IEC 11578:1996 and RFC 4122 standards, a
 DCE 1.1 variant UUID is a 128 bit number defined out of 7 fields, each
 field a multiple of an octet in size and stored in network byte order:
 
-  0                   1                   2                   3
-   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- 0|                          time_low                             |
-  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- 1|       time_mid                |         time_hi_and_version   |
-  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- 2|clk_seq_hi_res |  clk_seq_low  |         node (0-1)            |
-  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- 3|                         node (2-5)                            |
-  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                                                    [4]
+                                                   version
+                                                 -->|  |<--
+                                                    |  |
+                                                    |  |  [16]
+                [32]                      [16]      |  |time_hi
+              time_low                  time_mid    | _and_version
+    |<---------------------------->||<------------>||<------------>|
+    | MSB                          ||              ||  |           |
+    | /                            ||              ||  |           |
+    |/                             ||              ||  |           |
 
-An example of a UUID binary representation is the octet stream "C<0xEC
-0xB9 0xF3 0x5F 0x44 0x2A 0x11 0xD8 0x8A 0x24 0x00 0x90 0x27 0x2F 0xF7
-0x25>". The binary representation format is exactly what the B<OSSP
-uuid> API functions B<uuid_import>() and B<uuid_export>() deal with
-under C<UUID_FMT_BIN>.
+    +------++------++------++------++------++------++------++------+~~
+    |  15  ||  14  ||  13  ||  12  ||  11  ||  10  |####9  ||   8  | 
+    | MSO  ||      ||      ||      ||      ||      |####   ||      |
+    +------++------++------++------++------++------++------++------+~~
+    7654321076543210765432107654321076543210765432107654321076543210
+
+  ~~+------++------++------++------++------++------++------++------+
+    ##* 7  ||   6  ||   5  ||   4  ||   3  ||   2  ||   1  ||   0  | 
+    ##*    ||      ||      ||      ||      ||      ||      ||  LSO |
+  ~~+------++------++------++------++------++------++------++------+
+    7654321076543210765432107654321076543210765432107654321076543210
+
+    | |    ||      ||                                             /|
+    | |    ||      ||                                            / |
+    | |    ||      ||                                          LSB |
+    |<---->||<---->||<-------------------------------------------->|
+    |clk_seq clk_seq                      node
+    |_hi_res _low                         [48]
+    |[5-6]    [8]
+    | |
+ -->| |<--
+  variant
+   [2-3]
+
+An example of a UUID binary representation is the octet stream C<0xF8
+0x1D 0x4F 0xAE 0x7D 0xEC 0x11 0xD0 0xA7 0x65 0x00 0xA0 0xC9 0x1E 0x6B
+0xF6>. The binary representation format is exactly what the B<OSSP uuid>
+API functions B<uuid_import>() and B<uuid_export>() deal with under
+C<UUID_FMT_BIN>.
 
 =head2 UUID ASCII String Representation
 
@@ -92,25 +116,49 @@ of 8 hexadecimal digits followed by a hyphen, then three groups of
 digits. Formally, the string representation is defined by the following
 grammar:
 
- uuid                   = <time_low> "-" <time_mid> "-"
-                          <time_high_and_version> "-"
-                          <clock_seq_and_reserved>
-                          <clock_seq_low> "-" <node>
- time_low               = 4*<hex_octet>
- time_mid               = 2*<hex_octet>
- time_high_and_version  = 2*<hex_octet>
- clock_seq_and_reserved = <hex_octet>
- clock_seq_low          = <hex_octet>
- node                   = 6*<hex_octet>
- hex_octet              = <hex_digit> <hex_digit>
- hex_digit              = "0"|"1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"
-                         |"a"|"b"|"c"|"d"|"e"|"f"
-                         |"A"|"B"|"C"|"D"|"E"|"F"
+ uuid                        = <time_low> "-"
+                               <time_mid> "-"
+                               <time_high_and_version> "-"
+                               <clock_seq_high_and_reserved>
+                               <clock_seq_low> "-"
+                               <node>
+ time_low                    = 4*<hex_octet>
+ time_mid                    = 2*<hex_octet>
+ time_high_and_version       = 2*<hex_octet>
+ clock_seq_high_and_reserved = <hex_octet>
+ clock_seq_low               = <hex_octet>
+ node                        = 6*<hex_octet>
+ hex_octet                   = <hex_digit> <hex_digit>
+ hex_digit                   = "0"|"1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"
+                              |"a"|"b"|"c"|"d"|"e"|"f"
+                              |"A"|"B"|"C"|"D"|"E"|"F"
 
 An example of a UUID string representation is the ASCII string
-"C<54531d28-402b-11d8-af12-0002a5094c23>". The string representation
+"C<f81d4fae-7dec-11d0-a765-00a0c91e6bf6>". The string representation
 format is exactly what the B<OSSP uuid> API functions B<uuid_import>()
 and B<uuid_export>() deal with under C<UUID_FMT_STR>.
+
+Notice: a corresponding URL can be generated out of a ASCII string
+representation of an UUID by prefixing with "C<urn:uuid:>" as in
+"C<urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6>".
+
+=head2 UUID Single Integer Value Representation
+
+According to the ISO/IEC 11578:1996 and ITU-T Rec. X.667 standards, a
+DCE 1.1 variant UUID can be also represented as a single integer value
+consisting of a decimal number with up to 39 digits.
+
+An example of a UUID single integer value representation is the decimal
+number "C<329800735698586629295641978511506172918>". The string
+representation format is exactly what the B<OSSP uuid> API functions
+B<uuid_import>() and B<uuid_export>() deal with under C<UUID_FMT_SIV>.
+
+Notice: a corresponding ISO OID can be generated under the
+"{joint-iso-itu-t(2) uuid(25)}" arc out of a single integer value
+representation of a UUID by prefixing with "C<2.25.>". An example OID
+is "C<2.25.329800735698586629295641978511506172918>". Additionally,
+an URL can be generated by further prefixing with "C<urn:oid:>" as in
+"C<urn:oid:2.25.329800735698586629295641978511506172918>".
 
 =head2 UUID Variants and Versions
 
@@ -203,11 +251,13 @@ Perl-style for concise description) "sprintf('0x%x%02x%d%02x', $I<v>,
 $I<r>, {qw(s 9 . 2 b 1 a 0)}->{$I<t>}, ($I<t> eq 's' ? 99 : $I<l>))",
 i.e., the version 0.9.6 is encoded as "0x009206".
 
-=item B<UUID_LEN_BIN>, B<UUID_LEN_STR>
+=item B<UUID_LEN_BIN>, B<UUID_LEN_STR>, B<UUID_LEN_SIV>
 
 The number of octets of the UUID binary and string representations.
-Notice that the lengths of the string representation does I<not> include
-the necessary C<NUL> termination character.
+Notice that the lengths of the string representation (B<UUID_LEN_STR>)
+and the lengths of the single integer value representation
+(B<UUID_LEN_SIV>) does I<not> include the necessary C<NUL> termination
+character.
 
 =item B<UUID_MAKE_V1>, B<UUID_MAKE_V3>, B<UUID_MAKE_V4>, B<UUID_MAKE_V5>, B<UUID_MAKE_MC>
 
@@ -222,13 +272,15 @@ The possible numerical return-codes of API functions.
 The C<UUID_RC_OK> indicates success, the others indicate errors.
 Use B<uuid_error>() to translate them into string versions.
 
-=item B<UUID_FMT_BIN>, B<UUID_FMT_STR>, B<UUID_FMT_TXT>
+=item B<UUID_FMT_BIN>, B<UUID_FMT_STR>, B<UUID_FMT_SIV>, B<UUID_FMT_TXT>
 
 The I<fmt> formats for use with B<uuid_import>() and B<uuid_export>().
 The B<UUID_FMT_BIN> indicates the UUID binary representation (of
 length B<UUID_LEN_BIN>), the B<UUID_FMT_STR> indicates the UUID string
-representation (of length B<UUID_LEN_STR>) and the B<UUID_FMT_TXT>
-indicates the textual description (of arbitrary length) of a UUID.
+representation (of length B<UUID_LEN_STR>), the B<UUID_FMT_SIV>
+indicates the UUID single integer value representation (of maximum
+length B<UUID_LEN_SIV>) and the B<UUID_FMT_TXT> indicates the textual
+description (of arbitrary length) of a UUID.
 
 =back
 
@@ -274,7 +326,7 @@ I<data_len> bytes.
 
 The format of the external representation is specified by I<fmt> and the
 minimum expected length in I<data_len> depends on it. Valid values for
-I<fmt> are B<UUID_FMT_BIN> and B<UUID_FMT_STR>.
+I<fmt> are B<UUID_FMT_BIN>, B<UUID_FMT_STR> and B<UUID_FMT_SIV>.
 
 =item uuid_rc_t B<uuid_export>(const uuid_t *I<uuid>, uuid_fmt_t I<fmt>, void **I<data_ptr>, size_t *I<data_len>);
 
@@ -289,7 +341,8 @@ actually written bytes are returned in C<*>I<data_len> again.
 
 The format of the external representation is specified by I<fmt> and the
 minimum required length in C<*>I<data_len> depends on it. Valid values
-for I<fmt> are B<UUID_FMT_BIN>, B<UUID_FMT_STR> and B<UUID_FMT_TXT>.
+for I<fmt> are B<UUID_FMT_BIN>, B<UUID_FMT_STR>, B<UUID_FMT_SIV> and
+B<UUID_FMT_TXT>.
 
 =item uuid_rc_t B<uuid_load>(uuid_t *I<uuid>, const char *I<name>);
 
@@ -398,9 +451,19 @@ The following are references to B<UUID> documentation and specifications:
 
 B<A Universally Unique IDentifier (UUID) URN Namespace>,
 P. Leach, M. Mealling, R. Salz,
-IETF Request for Comments: RFC 4122,
+IETF RFC 4122,
 July 2005, 32 pages,
 http://www.ietf.org/rfc/rfc4122.txt
+
+=item
+
+Information Technology -- Open Systems Interconnection (OSI),
+B<Procedures for the operation of OSI Registration Authorities:
+Generation and Registration of Universally Unique Identifiers (UUIDs)
+and their Use as ASN.1 Object Identifier Components>,
+ISO/IEC 9834-8:2004 / ITU-T Rec. X.667, 2004,
+December 2004, 25 pages,
+http://www.itu.int/ITU-T/studygroups/com17/oid/X.667-E.pdf
 
 =item
 
@@ -421,15 +484,6 @@ August 2001, 570 pages, (CHF 340,00),
 http://www.iso.ch/cate/d2229.html
 
 =item 
-
-Information technology -- Open Systems Interconnection (OSI),
-B<Procedures for the operation of OSI Registration Authorities:
-Generation and Registration of Universally Unique Identifiers (UUIDs)
-and their Use as ASN.1 Object Identifier Components>,
-ISO/IEC 9834-8:2004 / ITU-T Rec. X.667, 2004,
-December 2004, 25 pages.
-
-=item
 
 B<HTTP Extensions for Distributed Authoring (WebDAV)>,
 section B<6.4.1 Node Field Generation Without the IEEE 802 Address>,

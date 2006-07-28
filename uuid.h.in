@@ -60,6 +60,7 @@ DECLARATION_BEGIN
 /* encoding octet stream lengths */
 #define UUID_LEN_BIN  (128 /*bit*/ / 8 /*bytes*/)
 #define UUID_LEN_STR  (128 /*bit*/ / 4 /*nibbles*/ + 4 /*hyphens*/)
+#define UUID_LEN_SIV  (39  /*int(log(10,exp(2,128)-1)+1) digits*/)
 
 /* API return codes */
 typedef enum {
@@ -84,7 +85,8 @@ enum {
 typedef enum {
     UUID_FMT_BIN = 0,        /* binary representation (import/export) */
     UUID_FMT_STR = 1,        /* string representation (import/export) */
-    UUID_FMT_TXT = 2         /* textual description   (export only)   */
+    UUID_FMT_SIV = 2,        /* single integer value  (import/export) */
+    UUID_FMT_TXT = 3         /* textual description   (export only)   */
 } uuid_fmt_t;
 
 /* UUID abstract data type */

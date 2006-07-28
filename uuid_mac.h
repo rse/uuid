@@ -43,12 +43,12 @@
 #define __MAC_CONCAT(x) x
 #define MAC_CONCAT(x,y) __MAC_CONCAT(x)y
 #endif
-#define mac_address MAC_CONCAT(MAC_PREFIX,mac_create)
+#define mac_address MAC_CONCAT(MAC_PREFIX,mac_address)
 #endif
 
 #define MAC_LEN 6
 
-extern int mac_address(unsigned char *data_ptr, size_t data_len);
+extern int mac_address(unsigned char *_data_ptr, size_t _data_len);
 
 #endif /* __UUID_MAC_H__ */
 

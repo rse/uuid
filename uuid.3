@@ -129,12 +129,12 @@
 .\" ========================================================================
 .\"
 .IX Title ".::uuid 3"
-.TH .::uuid 3 "OSSP uuid 1.4.2" "13-Mar-2006" "Universally Unique Identifier"
+.TH .::uuid 3 "OSSP uuid 1.5.0" "28-Jul-2006" "Universally Unique Identifier"
 .SH "NAME"
 \&\fBOSSP uuid\fR \- \fBUniversally Unique Identifier\fR
 .SH "VERSION"
 .IX Header "VERSION"
-\&\s-1OSSP\s0 uuid \s-11.4.2 (13-Mar-2006)\s0
+\&\s-1OSSP\s0 uuid \s-11.5.0 (28-Jul-2006)\s0
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
 \&\fB\s-1OSSP\s0 uuid\fR is a \s-1ISO\-C:1999\s0 application programming interface (\s-1API\s0)
@@ -163,24 +163,54 @@ According to the \s-1DCE\s0 1.1, \s-1ISO/IEC\s0 11578:1996 and \s-1RFC\s0 4122 s
 field a multiple of an octet in size and stored in network byte order:
 .PP
 .Vb 11
-\&  0                   1                   2                   3
-\&   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-\&  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-\& 0|                          time_low                             |
-\&  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-\& 1|       time_mid                |         time_hi_and_version   |
-\&  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-\& 2|clk_seq_hi_res |  clk_seq_low  |         node (0-1)            |
-\&  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-\& 3|                         node (2-5)                            |
-\&  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+\&                                                    [4]
+\&                                                   version
+\&                                                 -->|  |<--
+\&                                                    |  |
+\&                                                    |  |  [16]
+\&                [32]                      [16]      |  |time_hi
+\&              time_low                  time_mid    | _and_version
+\&    |<---------------------------->||<------------>||<------------>|
+\&    | MSB                          ||              ||  |           |
+\&    | /                            ||              ||  |           |
+\&    |/                             ||              ||  |           |
 .Ve
 .PP
-An example of a \s-1UUID\s0 binary representation is the octet stream "\f(CW\*(C`0xEC
-0xB9 0xF3 0x5F 0x44 0x2A 0x11 0xD8 0x8A 0x24 0x00 0x90 0x27 0x2F 0xF7
-0x25\*(C'\fR". The binary representation format is exactly what the \fB\s-1OSSP\s0
-uuid\fR \s-1API\s0 functions \fBuuid_import\fR() and \fBuuid_export\fR() deal with
-under \f(CW\*(C`UUID_FMT_BIN\*(C'\fR.
+.Vb 5
+\&    +------++------++------++------++------++------++------++------+~~
+\&    |  15  ||  14  ||  13  ||  12  ||  11  ||  10  |####9  ||   8  | 
+\&    | MSO  ||      ||      ||      ||      ||      |####   ||      |
+\&    +------++------++------++------++------++------++------++------+~~
+\&    7654321076543210765432107654321076543210765432107654321076543210
+.Ve
+.PP
+.Vb 5
+\&  ~~+------++------++------++------++------++------++------++------+
+\&    ##* 7  ||   6  ||   5  ||   4  ||   3  ||   2  ||   1  ||   0  | 
+\&    ##*    ||      ||      ||      ||      ||      ||      ||  LSO |
+\&  ~~+------++------++------++------++------++------++------++------+
+\&    7654321076543210765432107654321076543210765432107654321076543210
+.Ve
+.PP
+.Vb 11
+\&    | |    ||      ||                                             /|
+\&    | |    ||      ||                                            / |
+\&    | |    ||      ||                                          LSB |
+\&    |<---->||<---->||<-------------------------------------------->|
+\&    |clk_seq clk_seq                      node
+\&    |_hi_res _low                         [48]
+\&    |[5-6]    [8]
+\&    | |
+\& -->| |<--
+\&  variant
+\&   [2-3]
+.Ve
+.PP
+An example of a \s-1UUID\s0 binary representation is the octet stream \f(CW\*(C`0xF8
+0x1D 0x4F 0xAE 0x7D 0xEC 0x11 0xD0 0xA7 0x65 0x00 0xA0 0xC9 0x1E 0x6B
+0xF6\*(C'\fR. The binary representation format is exactly what the \fB\s-1OSSP\s0 uuid\fR
+\&\s-1API\s0 functions \fBuuid_import\fR() and \fBuuid_export\fR() deal with under
+\&\f(CW\*(C`UUID_FMT_BIN\*(C'\fR.
 .Sh "\s-1UUID\s0 \s-1ASCII\s0 String Representation"
 .IX Subsection "UUID ASCII String Representation"
 According to the \s-1DCE\s0 1.1, \s-1ISO/IEC\s0 11578:1996 and \s-1RFC\s0 4122 standards,
@@ -190,27 +220,50 @@ of 8 hexadecimal digits followed by a hyphen, then three groups of
 digits. Formally, the string representation is defined by the following
 grammar:
 .PP
-.Vb 14
-\& uuid                   = <time_low> "-" <time_mid> "-"
-\&                          <time_high_and_version> "-"
-\&                          <clock_seq_and_reserved>
-\&                          <clock_seq_low> "-" <node>
-\& time_low               = 4*<hex_octet>
-\& time_mid               = 2*<hex_octet>
-\& time_high_and_version  = 2*<hex_octet>
-\& clock_seq_and_reserved = <hex_octet>
-\& clock_seq_low          = <hex_octet>
-\& node                   = 6*<hex_octet>
-\& hex_octet              = <hex_digit> <hex_digit>
-\& hex_digit              = "0"|"1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"
-\&                         |"a"|"b"|"c"|"d"|"e"|"f"
-\&                         |"A"|"B"|"C"|"D"|"E"|"F"
+.Vb 16
+\& uuid                        = <time_low> "-"
+\&                               <time_mid> "-"
+\&                               <time_high_and_version> "-"
+\&                               <clock_seq_high_and_reserved>
+\&                               <clock_seq_low> "-"
+\&                               <node>
+\& time_low                    = 4*<hex_octet>
+\& time_mid                    = 2*<hex_octet>
+\& time_high_and_version       = 2*<hex_octet>
+\& clock_seq_high_and_reserved = <hex_octet>
+\& clock_seq_low               = <hex_octet>
+\& node                        = 6*<hex_octet>
+\& hex_octet                   = <hex_digit> <hex_digit>
+\& hex_digit                   = "0"|"1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"
+\&                              |"a"|"b"|"c"|"d"|"e"|"f"
+\&                              |"A"|"B"|"C"|"D"|"E"|"F"
 .Ve
 .PP
 An example of a \s-1UUID\s0 string representation is the \s-1ASCII\s0 string
-"\f(CW\*(C`54531d28\-402b\-11d8\-af12\-0002a5094c23\*(C'\fR". The string representation
+"\f(CW\*(C`f81d4fae\-7dec\-11d0\-a765\-00a0c91e6bf6\*(C'\fR". The string representation
 format is exactly what the \fB\s-1OSSP\s0 uuid\fR \s-1API\s0 functions \fBuuid_import\fR()
 and \fBuuid_export\fR() deal with under \f(CW\*(C`UUID_FMT_STR\*(C'\fR.
+.PP
+Notice: a corresponding \s-1URL\s0 can be generated out of a \s-1ASCII\s0 string
+representation of an \s-1UUID\s0 by prefixing with "\f(CW\*(C`urn:uuid:\*(C'\fR\*(L" as in
+\&\*(R"\f(CW\*(C`urn:uuid:f81d4fae\-7dec\-11d0\-a765\-00a0c91e6bf6\*(C'\fR".
+.Sh "\s-1UUID\s0 Single Integer Value Representation"
+.IX Subsection "UUID Single Integer Value Representation"
+According to the \s-1ISO/IEC\s0 11578:1996 and ITU-T Rec. X.667 standards, a
+\&\s-1DCE\s0 1.1 variant \s-1UUID\s0 can be also represented as a single integer value
+consisting of a decimal number with up to 39 digits.
+.PP
+An example of a \s-1UUID\s0 single integer value representation is the decimal
+number "\f(CW329800735698586629295641978511506172918\fR". The string
+representation format is exactly what the \fB\s-1OSSP\s0 uuid\fR \s-1API\s0 functions
+\&\fBuuid_import\fR() and \fBuuid_export\fR() deal with under \f(CW\*(C`UUID_FMT_SIV\*(C'\fR.
+.PP
+Notice: a corresponding \s-1ISO\s0 \s-1OID\s0 can be generated under the
+\&\*(L"{\fIjoint\-iso\-itu\-t\fR\|(2) uuid(25)}\*(R" arc out of a single integer value
+representation of a \s-1UUID\s0 by prefixing with "\f(CW2.25.\fR\*(L". An example \s-1OID\s0
+is \*(R"\f(CW2.25.329800735698586629295641978511506172918\fR\*(L". Additionally,
+an \s-1URL\s0 can be generated by further prefixing with \*(R"\f(CW\*(C`urn:oid:\*(C'\fR\*(L" as in
+\&\*(R"\f(CW\*(C`urn:oid:2.25.329800735698586629295641978511506172918\*(C'\fR".
 .Sh "\s-1UUID\s0 Variants and Versions"
 .IX Subsection "UUID Variants and Versions"
 A \s-1UUID\s0 has a variant and version. The variant defines the layout of the
@@ -286,11 +339,13 @@ calculated with the \fB\s-1GNU\s0 shtool\fR \fBversion\fR command and is (in
 Perl-style for concise description) "sprintf('0x%x%02x%d%02x', $\fIv\fR,
 $\fIr\fR, {qw(s 9 . 2 b 1 a 0)}\->{$\fIt\fR}, ($\fIt\fR eq 's' ? 99 : $\fIl\fR))\*(L",
 i.e., the version 0.9.6 is encoded as \*(R"0x009206".
-.IP "\fB\s-1UUID_LEN_BIN\s0\fR, \fB\s-1UUID_LEN_STR\s0\fR" 4
-.IX Item "UUID_LEN_BIN, UUID_LEN_STR"
+.IP "\fB\s-1UUID_LEN_BIN\s0\fR, \fB\s-1UUID_LEN_STR\s0\fR, \fB\s-1UUID_LEN_SIV\s0\fR" 4
+.IX Item "UUID_LEN_BIN, UUID_LEN_STR, UUID_LEN_SIV"
 The number of octets of the \s-1UUID\s0 binary and string representations.
-Notice that the lengths of the string representation does \fInot\fR include
-the necessary \f(CW\*(C`NUL\*(C'\fR termination character.
+Notice that the lengths of the string representation (\fB\s-1UUID_LEN_STR\s0\fR)
+and the lengths of the single integer value representation
+(\fB\s-1UUID_LEN_SIV\s0\fR) does \fInot\fR include the necessary \f(CW\*(C`NUL\*(C'\fR termination
+character.
 .IP "\fB\s-1UUID_MAKE_V1\s0\fR, \fB\s-1UUID_MAKE_V3\s0\fR, \fB\s-1UUID_MAKE_V4\s0\fR, \fB\s-1UUID_MAKE_V5\s0\fR, \fB\s-1UUID_MAKE_MC\s0\fR" 4
 .IX Item "UUID_MAKE_V1, UUID_MAKE_V3, UUID_MAKE_V4, UUID_MAKE_V5, UUID_MAKE_MC"
 The \fImode\fR bits for use with \fBuuid_make\fR(). The \fB\s-1UUID_MAKE_V\s0\fR\fIN\fR
@@ -302,13 +357,15 @@ address in version 1 UUIDs.
 The possible numerical return-codes of \s-1API\s0 functions.
 The \f(CW\*(C`UUID_RC_OK\*(C'\fR indicates success, the others indicate errors.
 Use \fBuuid_error\fR() to translate them into string versions.
-.IP "\fB\s-1UUID_FMT_BIN\s0\fR, \fB\s-1UUID_FMT_STR\s0\fR, \fB\s-1UUID_FMT_TXT\s0\fR" 4
-.IX Item "UUID_FMT_BIN, UUID_FMT_STR, UUID_FMT_TXT"
+.IP "\fB\s-1UUID_FMT_BIN\s0\fR, \fB\s-1UUID_FMT_STR\s0\fR, \fB\s-1UUID_FMT_SIV\s0\fR, \fB\s-1UUID_FMT_TXT\s0\fR" 4
+.IX Item "UUID_FMT_BIN, UUID_FMT_STR, UUID_FMT_SIV, UUID_FMT_TXT"
 The \fIfmt\fR formats for use with \fBuuid_import\fR() and \fBuuid_export\fR().
 The \fB\s-1UUID_FMT_BIN\s0\fR indicates the \s-1UUID\s0 binary representation (of
 length \fB\s-1UUID_LEN_BIN\s0\fR), the \fB\s-1UUID_FMT_STR\s0\fR indicates the \s-1UUID\s0 string
-representation (of length \fB\s-1UUID_LEN_STR\s0\fR) and the \fB\s-1UUID_FMT_TXT\s0\fR
-indicates the textual description (of arbitrary length) of a \s-1UUID\s0.
+representation (of length \fB\s-1UUID_LEN_STR\s0\fR), the \fB\s-1UUID_FMT_SIV\s0\fR
+indicates the \s-1UUID\s0 single integer value representation (of maximum
+length \fB\s-1UUID_LEN_SIV\s0\fR) and the \fB\s-1UUID_FMT_TXT\s0\fR indicates the textual
+description (of arbitrary length) of a \s-1UUID\s0.
 .Sh "\s-1FUNCTIONS\s0"
 .IX Subsection "FUNCTIONS"
 The following functions are provided:
@@ -343,7 +400,7 @@ The data is read from the buffer at \fIdata_ptr\fR which contains at least
 .Sp
 The format of the external representation is specified by \fIfmt\fR and the
 minimum expected length in \fIdata_len\fR depends on it. Valid values for
-\&\fIfmt\fR are \fB\s-1UUID_FMT_BIN\s0\fR and \fB\s-1UUID_FMT_STR\s0\fR.
+\&\fIfmt\fR are \fB\s-1UUID_FMT_BIN\s0\fR, \fB\s-1UUID_FMT_STR\s0\fR and \fB\s-1UUID_FMT_SIV\s0\fR.
 .IP "uuid_rc_t \fBuuid_export\fR(const uuid_t *\fIuuid\fR, uuid_fmt_t \fIfmt\fR, void **\fIdata_ptr\fR, size_t *\fIdata_len\fR);" 4
 .IX Item "uuid_rc_t uuid_export(const uuid_t *uuid, uuid_fmt_t fmt, void **data_ptr, size_t *data_len);"
 Exports a \s-1UUID\s0 \fIuuid\fR into an external representation of format \fIfmt\fR.
@@ -357,7 +414,8 @@ actually written bytes are returned in \f(CW\*(C`*\*(C'\fR\fIdata_len\fR again.
 .Sp
 The format of the external representation is specified by \fIfmt\fR and the
 minimum required length in \f(CW\*(C`*\*(C'\fR\fIdata_len\fR depends on it. Valid values
-for \fIfmt\fR are \fB\s-1UUID_FMT_BIN\s0\fR, \fB\s-1UUID_FMT_STR\s0\fR and \fB\s-1UUID_FMT_TXT\s0\fR.
+for \fIfmt\fR are \fB\s-1UUID_FMT_BIN\s0\fR, \fB\s-1UUID_FMT_STR\s0\fR, \fB\s-1UUID_FMT_SIV\s0\fR and
+\&\fB\s-1UUID_FMT_TXT\s0\fR.
 .IP "uuid_rc_t \fBuuid_load\fR(uuid_t *\fIuuid\fR, const char *\fIname\fR);" 4
 .IX Item "uuid_rc_t uuid_load(uuid_t *uuid, const char *name);"
 Loads a pre-defined \s-1UUID\s0 value into the \s-1UUID\s0 object \fIuuid\fR. The
@@ -464,9 +522,17 @@ The following are references to \fB\s-1UUID\s0\fR documentation and specificatio
 .IP "\(bu" 4
 \&\fBA Universally Unique IDentifier (\s-1UUID\s0) \s-1URN\s0 Namespace\fR,
 P. Leach, M. Mealling, R. Salz,
-\&\s-1IETF\s0 Request for Comments: \s-1RFC\s0 4122,
+\&\s-1IETF\s0 \s-1RFC\s0 4122,
 July 2005, 32 pages,
 http://www.ietf.org/rfc/rfc4122.txt
+.IP "\(bu" 4
+Information Technology \*(-- Open Systems Interconnection (\s-1OSI\s0),
+\&\fBProcedures for the operation of \s-1OSI\s0 Registration Authorities:
+Generation and Registration of Universally Unique Identifiers (UUIDs)
+and their Use as \s-1ASN\s0.1 Object Identifier Components\fR,
+\&\s-1ISO/IEC\s0 9834\-8:2004 / ITU-T Rec. X.667, 2004,
+December 2004, 25 pages,
+http://www.itu.int/ITU\-T/studygroups/com17/oid/X.667\-E.pdf
 .IP "\(bu" 4
 \&\fB\s-1DCE\s0 1.1: Remote Procedure Call\fR,
 appendix \fBUniversally Unique Identifier\fR,
@@ -481,13 +547,6 @@ Information technology \*(-- Open Systems Interconnection (\s-1OSI\s0),
 \&\s-1ISO/IEC\s0 11578:1996,
 August 2001, 570 pages, (\s-1CHF\s0 340,00),
 http://www.iso.ch/cate/d2229.html
-.IP "\(bu" 4
-Information technology \*(-- Open Systems Interconnection (\s-1OSI\s0),
-\&\fBProcedures for the operation of \s-1OSI\s0 Registration Authorities:
-Generation and Registration of Universally Unique Identifiers (UUIDs)
-and their Use as \s-1ASN\s0.1 Object Identifier Components\fR,
-\&\s-1ISO/IEC\s0 9834\-8:2004 / ITU-T Rec. X.667, 2004,
-December 2004, 25 pages.
 .IP "\(bu" 4
 \&\fB\s-1HTTP\s0 Extensions for Distributed Authoring (WebDAV)\fR,
 section \fB6.4.1 Node Field Generation Without the \s-1IEEE\s0 802 Address\fR,

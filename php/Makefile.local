@@ -67,4 +67,5 @@ realclean: distclean
 	-rm -f config.guess config.h.in config.nice config.sub
 	-rm -f configure configure.in 
 	-rm -f install-sh libtool ltmain.sh missing mkinstalldirs
+	-rm -f run-tests.php
 

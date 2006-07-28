@@ -48,7 +48,7 @@ prng_rc_t prng_create(prng_t **prng)
     int fd = -1;
     struct timeval tv;
     pid_t pid;
-    size_t i;
+    unsigned int i;
 
     /* sanity check argument(s) */
     if (prng == NULL)
@@ -68,8 +68,10 @@ prng_rc_t prng_create(prng_t **prng)
     }
 
     /* initialize MD5 engine */
-    if (md5_create(&((*prng)->md5)) != MD5_RC_OK)
+    if (md5_create(&((*prng)->md5)) != MD5_RC_OK) {
+        free(*prng);
         return PRNG_RC_INT;
+    }
 
     /* initialize time resolution compensation counter */
     (*prng)->cnt = 0;
@@ -115,7 +117,7 @@ prng_rc_t prng_data(prng_t *prng, void *data_ptr, size_t data_len)
     if (prng->dev != -1) {
         retries = 0;
         while (n > 0) {
-            i = read(prng->dev, (void *)p, n);
+            i = (int)read(prng->dev, (void *)p, n);
             if (i <= 0) {
                 if (retries++ > 16)
                     break;
@@ -159,10 +161,10 @@ prng_rc_t prng_destroy(prng_t *prng)
 
     /* close PRNG device */
     if (prng->dev != -1)
-        close(prng->dev);
+        (void)close(prng->dev);
 
     /* destroy MD5 engine */
-    md5_destroy(prng->md5);
+    (void)md5_destroy(prng->md5);
 
     /* free object */
     free(prng);

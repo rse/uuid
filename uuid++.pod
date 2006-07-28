@@ -115,7 +115,7 @@ The assignment operator corresponding to the import constructor for binary repre
 
 =item uuid &B<uuid::operator=>(const char *_str);
 
-The assignment operator corresponding to the import constructor for string representation.
+The assignment operator corresponding to the import constructor for string and single integer value representation.
 
 =item uuid B<uuid::clone>(void);
 
@@ -176,6 +176,10 @@ Regular method corresponding to the C API function B<uuid_export> for binary rep
 =item char *B<uuid::string>(void);
 
 Regular method corresponding to the C API function B<uuid_export> for string representation usage.
+
+=item char *B<uuid::integer>(void);
+
+Regular method corresponding to the C API function B<uuid_export> for single integer value representation usage.
 
 =item char *B<uuid::summary>(void);
 

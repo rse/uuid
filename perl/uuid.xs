@@ -48,6 +48,7 @@ constant(sv)
             { "UUID_VERSION", UUID_VERSION },
             { "UUID_LEN_BIN", UUID_LEN_BIN },
             { "UUID_LEN_STR", UUID_LEN_STR },
+            { "UUID_LEN_SIV", UUID_LEN_SIV },
             { "UUID_RC_OK",   UUID_RC_OK   },
             { "UUID_RC_ARG",  UUID_RC_ARG  },
             { "UUID_RC_MEM",  UUID_RC_MEM  },
@@ -61,6 +62,7 @@ constant(sv)
             { "UUID_MAKE_MC", UUID_MAKE_MC },
             { "UUID_FMT_BIN", UUID_FMT_BIN },
             { "UUID_FMT_STR", UUID_FMT_STR },
+            { "UUID_FMT_SIV", UUID_FMT_SIV },
             { "UUID_FMT_TXT", UUID_FMT_TXT }
         };
     INPUT:
@@ -201,7 +203,9 @@ uuid_export(uuid,fmt,data_ptr,data_len)
         data_len = 0;
         RETVAL = uuid_export(uuid, fmt, &data_ptr, &data_len);
         if (RETVAL == UUID_RC_OK) {
-            if (fmt == UUID_FMT_STR || fmt == UUID_FMT_TXT)
+            if (fmt == UUID_FMT_SIV)
+                data_len = strlen((char *)data_ptr);
+            else if (fmt == UUID_FMT_STR || fmt == UUID_FMT_TXT)
                 data_len--; /* Perl doesn't wish NUL-termination on strings */
             sv_setpvn(ST(2), data_ptr, data_len);
             free(data_ptr);

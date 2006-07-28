@@ -6,7 +6,7 @@
 ##  See http://www.gnu.org/software/shtool/ for more information.
 ##  See ftp://ftp.gnu.org/gnu/shtool/ for latest version.
 ##
-##  Version:  2.0.5 (07-Feb-2006)
+##  Version:  2.0.6 (19-Apr-2006)
 ##  Contents: all available modules
 ##
 
@@ -90,7 +90,7 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 if [ ".$1" = ".-h" ] || [ ".$1" = ".--help" ]; then
-    echo "This is GNU shtool, version 2.0.5 (07-Feb-2006)"
+    echo "This is GNU shtool, version 2.0.6 (19-Apr-2006)"
     echo 'Copyright (c) 1994-2006 Ralf S. Engelschall <rse@engelschall.com>'
     echo 'Report bugs to <bug-shtool@gnu.org>'
     echo ''
@@ -157,7 +157,7 @@ if [ ".$1" = ".-h" ] || [ ".$1" = ".--help" ]; then
     exit 0
 fi
 if [ ".$1" = ".-v" ] || [ ".$1" = ".--version" ]; then
-    echo "GNU shtool 2.0.5 (07-Feb-2006)"
+    echo "GNU shtool 2.0.6 (19-Apr-2006)"
     exit 0
 fi
 if [ ".$1" = ".-r" ] || [ ".$1" = ".--recreate" ]; then
@@ -2771,12 +2771,17 @@ platform )
             #   determine architecture
             AT="${UNAME_MACHINE}"
             case "${AT}" in
-                i86pc ) AT="iX86" ;;
+                i86pc )
+                    AT="iX86"
+                    case "`(/bin/isainfo -k) 2>&1`" in
+                        amd64 ) AT="AMD64" ;;
+                    esac
+                    ;;
             esac
             AP="${AT}"
             case "${AP}" in
                 sun4[cdm] ) AP="SPARC32" ;;
-                sun4u     ) AP="SPARC64" ;;
+                sun4[uv]  ) AP="SPARC64" ;;
                 sun4*     ) AP="SPARC"   ;;
             esac
             AC="${AP}"

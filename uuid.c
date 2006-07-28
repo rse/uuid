@@ -50,6 +50,7 @@
 #include "uuid_prng.h"
 #include "uuid_mac.h"
 #include "uuid_ui64.h"
+#include "uuid_ui128.h"
 #include "uuid_str.h"
 #include "uuid_bm.h"
 #include "uuid_ac.h"
@@ -105,19 +106,34 @@ uuid_rc_t uuid_create(uuid_t **uuid)
         return UUID_RC_MEM;
 
     /* create PRNG, MD5 and SHA1 sub-objects */
-    if (prng_create(&obj->prng) != PRNG_RC_OK)
+    if (prng_create(&obj->prng) != PRNG_RC_OK) {
+        free(obj);
         return UUID_RC_INT;
-    if (md5_create(&obj->md5) != MD5_RC_OK)
+    }
+    if (md5_create(&obj->md5) != MD5_RC_OK) {
+        (void)prng_destroy(obj->prng);
+        free(obj);
         return UUID_RC_INT;
-    if (sha1_create(&obj->sha1) != SHA1_RC_OK)
+    }
+    if (sha1_create(&obj->sha1) != SHA1_RC_OK) {
+        (void)md5_destroy(obj->md5);
+        (void)prng_destroy(obj->prng);
+        free(obj);
         return UUID_RC_INT;
+    }
 
     /* set UUID object initially to "Nil UUID" */
-    uuid_load(obj, "nil");
+    if (uuid_load(obj, "nil") != UUID_RC_OK) {
+        (void)sha1_destroy(obj->sha1);
+        (void)md5_destroy(obj->md5);
+        (void)prng_destroy(obj->prng);
+        free(obj);
+        return UUID_RC_INT;
+    }
 
     /* resolve MAC address for insertion into node field of UUIDs */
     if (!mac_address((unsigned char *)(obj->mac), sizeof(obj->mac))) {
-        memset(obj->mac, '\0', sizeof(obj->mac));
+        memset(obj->mac, 0, sizeof(obj->mac));
         obj->mac[0] = BM_OCTET(1,0,0,0,0,0,0,0);
     }
 
@@ -140,9 +156,9 @@ uuid_rc_t uuid_destroy(uuid_t *uuid)
         return UUID_RC_ARG;
 
     /* destroy PRNG, MD5 and SHA-1 sub-objects */
-    prng_destroy(uuid->prng);
-    md5_destroy(uuid->md5);
-    sha1_destroy(uuid->sha1);
+    (void)prng_destroy(uuid->prng);
+    (void)md5_destroy(uuid->md5);
+    (void)sha1_destroy(uuid->sha1);
 
     /* free UUID object */
     free(uuid);
@@ -167,12 +183,21 @@ uuid_rc_t uuid_clone(const uuid_t *uuid, uuid_t **clone)
     memcpy(obj, uuid, sizeof(uuid_t));
 
     /* re-initialize with new PRNG, MD5 and SHA1 sub-objects */
-    if (prng_create(&obj->prng) != PRNG_RC_OK)
+    if (prng_create(&obj->prng) != PRNG_RC_OK) {
+        free(obj);
         return UUID_RC_INT;
-    if (md5_create(&obj->md5) != MD5_RC_OK)
+    }
+    if (md5_create(&obj->md5) != MD5_RC_OK) {
+        (void)prng_destroy(obj->prng);
+        free(obj);
         return UUID_RC_INT;
-    if (sha1_create(&obj->sha1) != SHA1_RC_OK)
+    }
+    if (sha1_create(&obj->sha1) != SHA1_RC_OK) {
+        (void)md5_destroy(obj->md5);
+        (void)prng_destroy(obj->prng);
+        free(obj);
         return UUID_RC_INT;
+    }
 
     /* store result object */
     *clone = obj;
@@ -193,7 +218,7 @@ uuid_rc_t uuid_isnil(const uuid_t *uuid, int *result)
     /* a "Nil UUID" is defined as all octets zero, so check for this case */
     *result = UUID_TRUE;
     for (i = 0, ucp = (unsigned char *)&(uuid->obj); i < UUID_LEN_BIN; i++) {
-        if (*ucp++ != '\0') {
+        if (*ucp++ != (unsigned char)'\0') {
             *result = UUID_FALSE;
             break;
         }
@@ -272,20 +297,20 @@ static uuid_rc_t uuid_import_bin(uuid_t *uuid, const void *data_ptr, size_t data
     in = (const uuid_uint8_t *)data_ptr;
 
     /* unpack "time_low" field */
-    tmp32 = *in++;
-    tmp32 = (tmp32 << 8) | *in++;
-    tmp32 = (tmp32 << 8) | *in++;
-    tmp32 = (tmp32 << 8) | *in++;
+    tmp32 = (uuid_uint32_t)(*in++);
+    tmp32 = (tmp32 << 8) | (uuid_uint32_t)(*in++);
+    tmp32 = (tmp32 << 8) | (uuid_uint32_t)(*in++);
+    tmp32 = (tmp32 << 8) | (uuid_uint32_t)(*in++);
     uuid->obj.time_low = tmp32;
 
     /* unpack "time_mid" field */
-    tmp16 = *in++;
-    tmp16 = (uuid_uint16_t)(tmp16 << 8) | *in++;
+    tmp16 = (uuid_uint16_t)(*in++);
+    tmp16 = (uuid_uint16_t)(tmp16 << 8) | (uuid_uint16_t)(*in++);
     uuid->obj.time_mid = tmp16;
 
     /* unpack "time_hi_and_version" field */
-    tmp16 = *in++;
-    tmp16 = (uuid_uint16_t)(tmp16 << 8) | *in++;
+    tmp16 = (uuid_uint16_t)*in++;
+    tmp16 = (uuid_uint16_t)(tmp16 << 8) | (uuid_uint16_t)(*in++);
     uuid->obj.time_hi_and_version = tmp16;
 
     /* unpack "clock_seq_hi_and_reserved" field */
@@ -295,7 +320,7 @@ static uuid_rc_t uuid_import_bin(uuid_t *uuid, const void *data_ptr, size_t data
     uuid->obj.clock_seq_low = *in++;
 
     /* unpack "node" field */
-    for (i = 0; i < sizeof(uuid->obj.node); i++)
+    for (i = 0; i < (unsigned int)sizeof(uuid->obj.node); i++)
         uuid->obj.node[i] = *in++;
 
     return UUID_RC_OK;
@@ -356,7 +381,7 @@ static uuid_rc_t uuid_export_bin(const uuid_t *uuid, void **data_ptr, size_t *da
     out[9] = uuid->obj.clock_seq_low;
 
     /* pack "node" field */
-    for (i = 0; i < sizeof(uuid->obj.node); i++)
+    for (i = 0; i < (unsigned int)sizeof(uuid->obj.node); i++)
         out[10+i] = uuid->obj.node[i];
 
     return UUID_RC_OK;
@@ -422,11 +447,46 @@ static uuid_rc_t uuid_import_str(uuid_t *uuid, const void *data_ptr, size_t data
     /* parse hex values of "node" part */
     cp = str+24;
     hexbuf[2] = '\0';
-    for (i = 0; i < sizeof(uuid->obj.node); i++) {
+    for (i = 0; i < (unsigned int)sizeof(uuid->obj.node); i++) {
         hexbuf[0] = *cp++;
         hexbuf[1] = *cp++;
         uuid->obj.node[i] = (uuid_uint8_t)strtoul(hexbuf, NULL, 16);
     }
+
+    return UUID_RC_OK;
+}
+
+/* INTERNAL: import UUID object from single integer value representation */
+static uuid_rc_t uuid_import_siv(uuid_t *uuid, const void *data_ptr, size_t data_len)
+{
+    const char *str;
+    uuid_uint8_t tmp_bin[UUID_LEN_BIN];
+    ui128_t ui, ui2;
+    uuid_rc_t rc;
+    int i;
+
+    /* sanity check argument(s) */
+    if (uuid == NULL || data_ptr == NULL || data_len < 1)
+        return UUID_RC_ARG;
+
+    /* check for correct UUID single integer value syntax */
+    str = (const char *)data_ptr;
+    for (i = 0; i < (int)data_len; i++)
+        if (!isdigit((int)str[i]))
+            return UUID_RC_ARG;
+
+    /* parse single integer value representation (SIV) */
+    ui = ui128_s2i(str, NULL, 10);
+
+    /* import octets into UUID binary representation */
+    for (i = 0; i < UUID_LEN_BIN; i++) {
+        ui = ui128_rol(ui, 8, &ui2);
+        tmp_bin[i] = (uuid_uint8_t)(ui128_i2n(ui2) & 0xff);
+    }
+
+    /* import into internal UUID representation */
+    if ((rc = uuid_import(uuid, UUID_FMT_BIN, (void *)&tmp_bin, UUID_LEN_BIN)) != UUID_RC_OK)
+        return rc;
 
     return UUID_RC_OK;
 }
@@ -482,15 +542,73 @@ static uuid_rc_t uuid_export_str(const uuid_t *uuid, void **data_ptr, size_t *da
     return UUID_RC_OK;
 }
 
+/* INTERNAL: export UUID object to single integer value representation */
+static uuid_rc_t uuid_export_siv(const uuid_t *uuid, void **data_ptr, size_t *data_len)
+{
+    char *data_buf;
+    void *tmp_ptr;
+    size_t tmp_len;
+    uuid_uint8_t tmp_bin[UUID_LEN_BIN];
+    ui128_t ui, ui2;
+    uuid_rc_t rc;
+    int i;
+
+    /* sanity check argument(s) */
+    if (uuid == NULL || data_ptr == NULL)
+        return UUID_RC_ARG;
+
+    /* determine output buffer */
+    if (*data_ptr == NULL) {
+        if ((data_buf = (char *)malloc(UUID_LEN_SIV+1)) == NULL)
+            return UUID_RC_MEM;
+        if (data_len != NULL)
+            *data_len = UUID_LEN_SIV+1;
+    }
+    else {
+        data_buf = (char *)(*data_ptr);
+        if (data_len == NULL)
+            return UUID_RC_ARG;
+        if (*data_len < UUID_LEN_SIV+1)
+            return UUID_RC_MEM;
+        *data_len = UUID_LEN_SIV+1;
+    }
+
+    /* export into UUID binary representation */
+    tmp_ptr = (void *)&tmp_bin;
+    tmp_len = sizeof(tmp_bin);
+    if ((rc = uuid_export(uuid, UUID_FMT_BIN, &tmp_ptr, &tmp_len)) != UUID_RC_OK) {
+        if (*data_ptr == NULL)
+            free(data_buf);
+        return rc;
+    }
+
+    /* import from UUID binary representation */
+    ui = ui128_zero();
+    for (i = 0; i < UUID_LEN_BIN; i++) {
+        ui2 = ui128_n2i((unsigned long)tmp_bin[i]);
+        ui = ui128_rol(ui, 8, NULL);
+        ui = ui128_or(ui, ui2);
+    }
+
+    /* format into single integer value representation */
+    (void)ui128_i2s(ui, data_buf, UUID_LEN_SIV+1, 10);
+
+    /* pass back new buffer if locally allocated */
+    if (*data_ptr == NULL)
+        *data_ptr = data_buf;
+
+    return UUID_RC_OK;
+}
+
 /* decoding tables */
 static struct {
     uuid_uint8_t num;
     const char *desc;
 } uuid_dectab_variant[] = {
-    { BM_OCTET(0,0,0,0,0,0,0,0), "reserved (NCS backward compatible)" },
-    { BM_OCTET(1,0,0,0,0,0,0,0), "DCE 1.1, ISO/IEC 11578:1996" },
-    { BM_OCTET(1,1,0,0,0,0,0,0), "reserved (Microsoft GUID)" },
-    { BM_OCTET(1,1,1,0,0,0,0,0), "reserved (future use)" }
+    { (uuid_uint8_t)BM_OCTET(0,0,0,0,0,0,0,0), "reserved (NCS backward compatible)" },
+    { (uuid_uint8_t)BM_OCTET(1,0,0,0,0,0,0,0), "DCE 1.1, ISO/IEC 11578:1996" },
+    { (uuid_uint8_t)BM_OCTET(1,1,0,0,0,0,0,0), "reserved (Microsoft GUID)" },
+    { (uuid_uint8_t)BM_OCTET(1,1,1,0,0,0,0,0), "reserved (future use)" }
 };
 static struct {
     int num;
@@ -518,6 +636,7 @@ static uuid_rc_t uuid_export_txt(const uuid_t *uuid, void **data_ptr, size_t *da
     uuid_uint32_t tmp32;
     uuid_uint8_t tmp_bin[UUID_LEN_BIN];
     char tmp_str[UUID_LEN_STR+1];
+    char tmp_siv[UUID_LEN_SIV+1];
     void *tmp_ptr;
     size_t tmp_len;
     ui64_t t;
@@ -541,12 +660,17 @@ static uuid_rc_t uuid_export_txt(const uuid_t *uuid, void **data_ptr, size_t *da
     if ((rc = uuid_isnil(uuid, &isnil)) != UUID_RC_OK)
         return rc;
 
-    /* decode into string representation */
+    /* decode into various representations */
     tmp_ptr = (void *)&tmp_str;
     tmp_len = sizeof(tmp_str);
     if ((rc = uuid_export(uuid, UUID_FMT_STR, &tmp_ptr, &tmp_len)) != UUID_RC_OK)
         return rc;
-    str_rsprintf(out, "UUID:    %s\n", tmp_str);
+    tmp_ptr = (void *)&tmp_siv;
+    tmp_len = sizeof(tmp_siv);
+    if ((rc = uuid_export(uuid, UUID_FMT_SIV, &tmp_ptr, &tmp_len)) != UUID_RC_OK)
+        return rc;
+    (void)str_rsprintf(out, "encode: STR:     %s\n", tmp_str);
+    (void)str_rsprintf(out, "        SIV:     %s\n", tmp_siv);
 
     /* decode UUID variant */
     tmp8 = uuid->obj.clock_seq_hi_and_reserved;
@@ -555,8 +679,8 @@ static uuid_rc_t uuid_export_txt(const uuid_t *uuid, void **data_ptr, size_t *da
     else {
         variant = "unknown";
         for (i = 7; i >= 0; i--) {
-            if ((tmp8 & BM_BIT(i,1)) == 0) {
-                tmp8 &= ~BM_MASK(i,0);
+            if ((tmp8 & (uuid_uint8_t)BM_BIT(i,1)) == 0) {
+                tmp8 &= ~(uuid_uint8_t)BM_MASK(i,0);
                 break;
             }
         }
@@ -567,10 +691,10 @@ static uuid_rc_t uuid_export_txt(const uuid_t *uuid, void **data_ptr, size_t *da
             }
         }
     }
-    str_rsprintf(out, "variant: %s\n", variant);
+    (void)str_rsprintf(out, "decode: variant: %s\n", variant);
 
     /* decode UUID version */
-    tmp16 = (BM_SHR(uuid->obj.time_hi_and_version, 12) & BM_MASK(3,0));
+    tmp16 = (BM_SHR(uuid->obj.time_hi_and_version, 12) & (uuid_uint16_t)BM_MASK(3,0));
     if (isnil)
         version = "n.a.";
     else {
@@ -582,7 +706,7 @@ static uuid_rc_t uuid_export_txt(const uuid_t *uuid, void **data_ptr, size_t *da
             }
         }
     }
-    str_rsprintf(out, "version: %d (%s)\n", (int)tmp16, version);
+    str_rsprintf(out, "        version: %d (%s)\n", (int)tmp16, version);
 
     /*
      * decode UUID content
@@ -601,16 +725,16 @@ static uuid_rc_t uuid_export_txt(const uuid_t *uuid, void **data_ptr, size_t *da
         t = ui64_divn(t, 1000000, &t_usec);
         t_sec = (time_t)ui64_i2n(t);
         tm = gmtime(&t_sec);
-        strftime(t_buf, sizeof(t_buf), "%Y-%m-%d %H:%M:%S", tm);
-        str_rsprintf(out, "content: time:  %s.%06d.%d UTC\n", t_buf, t_usec, t_nsec);
+        (void)strftime(t_buf, sizeof(t_buf), "%Y-%m-%d %H:%M:%S", tm);
+        (void)str_rsprintf(out, "        content: time:  %s.%06d.%d UTC\n", t_buf, t_usec, t_nsec);
 
         /* decode clock sequence */
         tmp32 = ((uuid->obj.clock_seq_hi_and_reserved & BM_MASK(5,0)) << 8)
                 + uuid->obj.clock_seq_low;
-        str_rsprintf(out, "         clock: %ld (usually random)\n", (long)tmp32);
+        (void)str_rsprintf(out, "                 clock: %ld (usually random)\n", (long)tmp32);
 
         /* decode node MAC address */
-        str_rsprintf(out, "         node:  %02x:%02x:%02x:%02x:%02x:%02x (%s %s)\n",
+        (void)str_rsprintf(out, "                 node:  %02x:%02x:%02x:%02x:%02x:%02x (%s %s)\n",
             (unsigned int)uuid->obj.node[0],
             (unsigned int)uuid->obj.node[1],
             (unsigned int)uuid->obj.node[2],
@@ -645,9 +769,9 @@ static uuid_rc_t uuid_export_txt(const uuid_t *uuid, void **data_ptr, size_t *da
         tmp_bin[8] &= BM_MASK(5,0);
 
         /* dump as colon-seperated hexadecimal byte-string */
-        str_rsprintf(out,
-            "content: %02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X\n"
-            "         (%s)\n",
+        (void)str_rsprintf(out,
+            "        content: %02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X\n"
+            "                 (%s)\n",
             (unsigned int)tmp_bin[0],  (unsigned int)tmp_bin[1],  (unsigned int)tmp_bin[2],
             (unsigned int)tmp_bin[3],  (unsigned int)tmp_bin[4],  (unsigned int)tmp_bin[5],
             (unsigned int)tmp_bin[6],  (unsigned int)tmp_bin[7],  (unsigned int)tmp_bin[8],
@@ -687,6 +811,7 @@ uuid_rc_t uuid_import(uuid_t *uuid, uuid_fmt_t fmt, const void *data_ptr, size_t
     switch (fmt) {
         case UUID_FMT_BIN: rc = uuid_import_bin(uuid, data_ptr, data_len); break;
         case UUID_FMT_STR: rc = uuid_import_str(uuid, data_ptr, data_len); break;
+        case UUID_FMT_SIV: rc = uuid_import_siv(uuid, data_ptr, data_len); break;
         case UUID_FMT_TXT: rc = UUID_RC_IMP; /* not implemented */ break;
         default:           rc = UUID_RC_ARG;
     }
@@ -707,6 +832,7 @@ uuid_rc_t uuid_export(const uuid_t *uuid, uuid_fmt_t fmt, void **data_ptr, size_
     switch (fmt) {
         case UUID_FMT_BIN: rc = uuid_export_bin(uuid, data_ptr, data_len); break;
         case UUID_FMT_STR: rc = uuid_export_str(uuid, data_ptr, data_len); break;
+        case UUID_FMT_SIV: rc = uuid_export_siv(uuid, data_ptr, data_len); break;
         case UUID_FMT_TXT: rc = uuid_export_txt(uuid, data_ptr, data_len); break;
         default:           rc = UUID_RC_ARG;
     }
@@ -820,8 +946,10 @@ static uuid_rc_t uuid_make_v1(uuid_t *uuid, unsigned int mode, va_list ap)
     if (   clck == 0
         || (   time_now.tv_sec < uuid->time_last.tv_sec
             || (   time_now.tv_sec == uuid->time_last.tv_sec
-                && time_now.tv_usec < uuid->time_last.tv_usec)))
-        prng_data(uuid->prng, (void *)&clck, sizeof(clck));
+                && time_now.tv_usec < uuid->time_last.tv_usec))) {
+        if (prng_data(uuid->prng, (void *)&clck, sizeof(clck)) != PRNG_RC_OK)
+            return UUID_RC_INT;
+    }
     else
         clck++;
     clck %= BM_POW2(14);
@@ -865,20 +993,25 @@ static uuid_rc_t uuid_make_v1(uuid_t *uuid, unsigned int mode, va_list ap)
 
 /* INTERNAL: pre-defined UUID values.
    (defined as network byte ordered octet stream) */
+#define UUID_MAKE(a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16) \
+    { (uuid_uint8_t)(a1),  (uuid_uint8_t)(a2),  (uuid_uint8_t)(a3),  (uuid_uint8_t)(a4),  \
+      (uuid_uint8_t)(a5),  (uuid_uint8_t)(a6),  (uuid_uint8_t)(a7),  (uuid_uint8_t)(a8),  \
+      (uuid_uint8_t)(a9),  (uuid_uint8_t)(a10), (uuid_uint8_t)(a11), (uuid_uint8_t)(a12), \
+      (uuid_uint8_t)(a13), (uuid_uint8_t)(a14), (uuid_uint8_t)(a15), (uuid_uint8_t)(a16) }
 static struct {
     char *name;
     uuid_uint8_t uuid[UUID_LEN_BIN];
 } uuid_value_table[] = {
     { "nil",     /* 00000000-0000-0000-0000-000000000000 ("Nil UUID") */
-      { 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00 } },
+      UUID_MAKE(0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00) },
     { "ns:DNS",  /* 6ba7b810-9dad-11d1-80b4-00c04fd430c8 (see RFC 4122) */
-      { 0x6b,0xa7,0xb8,0x10,0x9d,0xad,0x11,0xd1,0x80,0xb4,0x00,0xc0,0x4f,0xd4,0x30,0xc8 } },
+      UUID_MAKE(0x6b,0xa7,0xb8,0x10,0x9d,0xad,0x11,0xd1,0x80,0xb4,0x00,0xc0,0x4f,0xd4,0x30,0xc8) },
     { "ns:URL",  /* 6ba7b811-9dad-11d1-80b4-00c04fd430c8 (see RFC 4122) */
-      { 0x6b,0xa7,0xb8,0x11,0x9d,0xad,0x11,0xd1,0x80,0xb4,0x00,0xc0,0x4f,0xd4,0x30,0xc8 } },
+      UUID_MAKE(0x6b,0xa7,0xb8,0x11,0x9d,0xad,0x11,0xd1,0x80,0xb4,0x00,0xc0,0x4f,0xd4,0x30,0xc8) },
     { "ns:OID",  /* 6ba7b812-9dad-11d1-80b4-00c04fd430c8 (see RFC 4122) */
-      { 0x6b,0xa7,0xb8,0x12,0x9d,0xad,0x11,0xd1,0x80,0xb4,0x00,0xc0,0x4f,0xd4,0x30,0xc8 } },
+      UUID_MAKE(0x6b,0xa7,0xb8,0x12,0x9d,0xad,0x11,0xd1,0x80,0xb4,0x00,0xc0,0x4f,0xd4,0x30,0xc8) },
     { "ns:X500", /* 6ba7b814-9dad-11d1-80b4-00c04fd430c8 (see RFC 4122) */
-      { 0x6b,0xa7,0xb8,0x14,0x9d,0xad,0x11,0xd1,0x80,0xb4,0x00,0xc0,0x4f,0xd4,0x30,0xc8 } }
+      UUID_MAKE(0x6b,0xa7,0xb8,0x14,0x9d,0xad,0x11,0xd1,0x80,0xb4,0x00,0xc0,0x4f,0xd4,0x30,0xc8) }
 };
 
 /* load UUID object with pre-defined value */
@@ -894,7 +1027,7 @@ uuid_rc_t uuid_load(uuid_t *uuid, const char *name)
 
     /* search for UUID in table */
     uuid_octets = NULL;
-    for (i = 0; i < sizeof(uuid_value_table)/sizeof(uuid_value_table[0]); i++) {
+    for (i = 0; i < (unsigned int)sizeof(uuid_value_table)/sizeof(uuid_value_table[0]); i++) {
          if (strcmp(uuid_value_table[i].name, name) == 0) {
              uuid_octets = uuid_value_table[i].uuid;
              break;
@@ -918,6 +1051,7 @@ static uuid_rc_t uuid_make_v3(uuid_t *uuid, unsigned int mode, va_list ap)
     uuid_uint8_t uuid_buf[UUID_LEN_BIN];
     void *uuid_ptr;
     size_t uuid_len;
+    uuid_rc_t rc;
 
     /* determine namespace UUID and name string arguments */
     if ((uuid_ns = (uuid_t *)va_arg(ap, void *)) == NULL)
@@ -932,22 +1066,27 @@ static uuid_rc_t uuid_make_v3(uuid_t *uuid, unsigned int mode, va_list ap)
     /* load the namespace UUID into MD5 context */
     uuid_ptr = (void *)&uuid_buf;
     uuid_len = sizeof(uuid_buf);
-    uuid_export(uuid_ns, UUID_FMT_BIN, &uuid_ptr, &uuid_len);
-    md5_update(uuid->md5, uuid_buf, uuid_len);
+    if ((rc = uuid_export(uuid_ns, UUID_FMT_BIN, &uuid_ptr, &uuid_len)) != UUID_RC_OK)
+        return rc;
+    if (md5_update(uuid->md5, uuid_buf, uuid_len) != MD5_RC_OK)
+        return UUID_RC_INT;
 
     /* load the argument name string into MD5 context */
-    md5_update(uuid->md5, str, strlen(str));
+    if (md5_update(uuid->md5, str, strlen(str)) != MD5_RC_OK)
+        return UUID_RC_INT;
 
     /* store MD5 result into UUID
        (requires MD5_LEN_BIN space, UUID_LEN_BIN space is available,
        and both are equal in size, so we are safe!) */
     uuid_ptr = (void *)&(uuid->obj);
-    md5_store(uuid->md5, &uuid_ptr, NULL);
+    if (md5_store(uuid->md5, &uuid_ptr, NULL) != MD5_RC_OK)
+        return UUID_RC_INT;
 
     /* fulfill requirement of standard and convert UUID data into
        local/host byte order (this uses fact that uuid_import_bin() is
        able to operate in-place!) */
-    uuid_import(uuid, UUID_FMT_BIN, (void *)&(uuid->obj), UUID_LEN_BIN);
+    if ((rc = uuid_import(uuid, UUID_FMT_BIN, (void *)&(uuid->obj), UUID_LEN_BIN)) != UUID_RC_OK)
+        return rc;
 
     /* brand UUID with version and variant */
     uuid_brand(uuid, 3);
@@ -959,7 +1098,8 @@ static uuid_rc_t uuid_make_v3(uuid_t *uuid, unsigned int mode, va_list ap)
 static uuid_rc_t uuid_make_v4(uuid_t *uuid, unsigned int mode, va_list ap)
 {
     /* fill UUID with random data */
-    prng_data(uuid->prng, (void *)&(uuid->obj), sizeof(uuid->obj));
+    if (prng_data(uuid->prng, (void *)&(uuid->obj), sizeof(uuid->obj)) != PRNG_RC_OK)
+        return UUID_RC_INT;
 
     /* brand UUID with version and variant */
     uuid_brand(uuid, 4);
@@ -977,6 +1117,7 @@ static uuid_rc_t uuid_make_v5(uuid_t *uuid, unsigned int mode, va_list ap)
     size_t uuid_len;
     uuid_uint8_t sha1_buf[SHA1_LEN_BIN];
     void *sha1_ptr;
+    uuid_rc_t rc;
 
     /* determine namespace UUID and name string arguments */
     if ((uuid_ns = (uuid_t *)va_arg(ap, void *)) == NULL)
@@ -986,30 +1127,35 @@ static uuid_rc_t uuid_make_v5(uuid_t *uuid, unsigned int mode, va_list ap)
 
     /* initialize SHA-1 context */
     if (sha1_init(uuid->sha1) != SHA1_RC_OK)
-        return UUID_RC_MEM;
+        return UUID_RC_INT;
 
     /* load the namespace UUID into SHA-1 context */
     uuid_ptr = (void *)&uuid_buf;
     uuid_len = sizeof(uuid_buf);
-    uuid_export(uuid_ns, UUID_FMT_BIN, &uuid_ptr, &uuid_len);
-    sha1_update(uuid->sha1, uuid_buf, uuid_len);
+    if ((rc = uuid_export(uuid_ns, UUID_FMT_BIN, &uuid_ptr, &uuid_len)) != UUID_RC_OK)
+        return rc;
+    if (sha1_update(uuid->sha1, uuid_buf, uuid_len) != SHA1_RC_OK)
+        return UUID_RC_INT;
 
     /* load the argument name string into SHA-1 context */
-    sha1_update(uuid->sha1, str, strlen(str));
+    if (sha1_update(uuid->sha1, str, strlen(str)) != SHA1_RC_OK)
+        return UUID_RC_INT;
 
     /* store SHA-1 result into UUID
        (requires SHA1_LEN_BIN space, but UUID_LEN_BIN space is available
        only, so use a temporary buffer to store SHA-1 results and then
        use lower part only according to standard */
     sha1_ptr = (void *)sha1_buf;
-    sha1_store(uuid->sha1, &sha1_ptr, NULL);
+    if (sha1_store(uuid->sha1, &sha1_ptr, NULL) != SHA1_RC_OK)
+        return UUID_RC_INT;
     uuid_ptr = (void *)&(uuid->obj);
     memcpy(uuid_ptr, sha1_ptr, UUID_LEN_BIN);
 
     /* fulfill requirement of standard and convert UUID data into
        local/host byte order (this uses fact that uuid_import_bin() is
        able to operate in-place!) */
-    uuid_import(uuid, UUID_FMT_BIN, (void *)&(uuid->obj), UUID_LEN_BIN);
+    if ((rc = uuid_import(uuid, UUID_FMT_BIN, (void *)&(uuid->obj), UUID_LEN_BIN)) != UUID_RC_OK)
+        return rc;
 
     /* brand UUID with version and variant */
     uuid_brand(uuid, 5);

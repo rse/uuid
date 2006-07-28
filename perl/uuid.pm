@@ -118,7 +118,7 @@ use XSLoader;
 use Exporter;
 
 #   API version
-our $VERSION = do { my @v = ('1.4.2' =~ m/\d+/g); sprintf("%d.".("%02d"x$#v), @v); };
+our $VERSION = do { my @v = ('1.5.0' =~ m/\d+/g); sprintf("%d.".("%02d"x$#v), @v); };
 
 #   API inheritance
 our @ISA = qw(Exporter);
@@ -129,6 +129,7 @@ my $symbols = {
         UUID_VERSION
         UUID_LEN_BIN
         UUID_LEN_STR
+        UUID_LEN_SIV
         UUID_RC_OK
         UUID_RC_ARG
         UUID_RC_MEM
@@ -142,6 +143,7 @@ my $symbols = {
         UUID_MAKE_MC
         UUID_FMT_BIN
         UUID_FMT_STR
+        UUID_FMT_SIV
         UUID_FMT_TXT
     )],
     'func' => [qw(
@@ -256,6 +258,7 @@ sub import {
         my ($self, $fmt, $data_ptr, $data_len) = @_;
         if    ($fmt eq 'bin') { $fmt = $self->UUID_FMT_BIN; }
         elsif ($fmt eq 'str') { $fmt = $self->UUID_FMT_STR; }
+        elsif ($fmt eq 'siv') { $fmt = $self->UUID_FMT_SIV; }
         elsif ($fmt eq 'txt') { $fmt = $self->UUID_FMT_TXT; }
         else  { croak("invalid format \"$fmt\""); }
         $data_len ||= length($data_ptr); # functional redudant, but Perl dislikes undef value here
@@ -283,6 +286,7 @@ sub export {
         my $data_ptr;
         if    ($fmt eq 'bin') { $fmt = $self->UUID_FMT_BIN; }
         elsif ($fmt eq 'str') { $fmt = $self->UUID_FMT_STR; }
+        elsif ($fmt eq 'siv') { $fmt = $self->UUID_FMT_SIV; }
         elsif ($fmt eq 'txt') { $fmt = $self->UUID_FMT_TXT; }
         else  { croak("invalid format \"$fmt\""); }
         $self->{-rc} = uuid_export($self->{-uuid}, $fmt, $data_ptr, undef);
