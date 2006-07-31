@@ -245,12 +245,12 @@ install:
 	    echo "$(SHTOOL) install -c -m 644 $(S)/uuid++.3 $(DESTDIR)$(mandir)/man3/"; \
 	    $(SHTOOL) install -c -m 644 $(S)/uuid++.3 $(DESTDIR)$(mandir)/man3/; \
 	fi
-	@$(LIBTOOL) --mode=install $(SHTOOL) install -c -m 644 libuuid.la $(DESTDIR)$(libdir)/
+	@$(LIBTOOL) --mode=install $(SHTOOL) install -c -m 644 $(LIB_NAME) $(DESTDIR)$(libdir)/
 	-@if [ ".$(WITH_DCE)" = .yes ]; then \
-	    $(LIBTOOL) --mode=install $(SHTOOL) install -c -m 644 libuuid_dce.la $(DESTDIR)$(libdir)/; \
+	    $(LIBTOOL) --mode=install $(SHTOOL) install -c -m 644 $(DCE_NAME) $(DESTDIR)$(libdir)/; \
 	fi
 	-@if [ ".$(WITH_CXX)" = .yes ]; then \
-	    $(LIBTOOL) --mode=install $(SHTOOL) install -c -m 644 libuuid++.la $(DESTDIR)$(libdir)/; \
+	    $(LIBTOOL) --mode=install $(SHTOOL) install -c -m 644 $(CXX_NAME) $(DESTDIR)$(libdir)/; \
 	fi
 	@$(LIBTOOL) --mode=install $(SHTOOL) install -c -s -m 755 uuid $(DESTDIR)$(bindir)/
 	$(SHTOOL) install -c -m 644 $(S)/uuid.1 $(DESTDIR)$(mandir)/man1/
@@ -268,12 +268,12 @@ install:
 uninstall:
 	-$(RM) $(DESTDIR)$(mandir)/man1/uuid.1
 	-@$(LIBTOOL) --mode=uninstall $(RM) $(DESTDIR)$(bindir)/uuid
-	-@$(LIBTOOL) --mode=uninstall $(RM) $(DESTDIR)$(libdir)/libuuid.la
+	-@$(LIBTOOL) --mode=uninstall $(RM) $(DESTDIR)$(libdir)/$(LIB_NAME)
 	-@if [ ".$(WITH_DCE)" = .yes ]; then \
-	    $(LIBTOOL) --mode=uninstall $(RM) $(DESTDIR)$(libdir)/libuuid_dce.la; \
+	    $(LIBTOOL) --mode=uninstall $(RM) $(DESTDIR)$(libdir)/$(DCE_NAME); \
 	fi
 	-@if [ ".$(WITH_CXX)" = .yes ]; then \
-	    $(LIBTOOL) --mode=uninstall $(RM) $(DESTDIR)$(libdir)/libuuid++.la; \
+	    $(LIBTOOL) --mode=uninstall $(RM) $(DESTDIR)$(libdir)/$(CXX_NAME); \
 	fi
 	-$(RM) $(DESTDIR)$(mandir)/man3/uuid.3
 	-@if [ ".$(WITH_CXX)" = .yes ]; then \

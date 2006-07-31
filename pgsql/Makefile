@@ -33,7 +33,7 @@ enable_shared     = yes
 include           $(top_builddir)/src/Makefile.shlib
 
 uuid.sql: uuid.sql.in
-	sed -e 's;@MODULE_PATHNAME@;$(DESTDIR)$(pkglibdir)/uuid$(DLSUFFIX);g' <uuid.sql.in >uuid.sql
+	sed -e 's;MODULE_PATHNAME;$(DESTDIR)$(pkglibdir)/uuid$(DLSUFFIX);g' <uuid.sql.in >uuid.sql
 
 install: all
 	$(mkinstalldirs) $(DESTDIR)$(pkglibdir)

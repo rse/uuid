@@ -55,7 +55,7 @@ clean:
 	@$(MAKE) $(MFLAGS) -f Makefile clean || true
 
 distclean: clean
-	-rm -f Makefile
+	-rm -f Makefile .deps
 	-rm -f config.status configure.lineno
 	-rm -f config.h config.log
 	-rm -f *.core *~

@@ -11,6 +11,28 @@
   This is a list of all changes to OSSP uuid.
   For a more brief summary please have a look at the NEWS file.
 
+  Changes between 1.5.0 and 1.5.1 (28-Jul-2006 to 31-Jul-2006)
+
+   o Use "MODULE_PATHNAME" instead of "@MODULE_PATHNAME@" in
+     uuid.sql.in to be more aligned to the PostgreSQL styles.
+     [Simon "janus" Dassow <janus@errornet.de>]
+
+   o Use the available variables $(LIB_NAME), $(DCE_NAME) and
+     $(CXX_NAME) more consistently in Makefile.in to allow packagers to
+     override the library name with less patching.
+     [Piotr Roszatycki <dexter@debian.org>]
+
+   o Fix the "make distclean" target of php/Makefile.local
+     to make sure the ".deps" file is not left over.
+     [Ralf S. Engelschall]
+
+   o Fix the tarball rolling procedure to make sure we
+     do not distribute binary files again. This now especially uses
+     a MANIFEST file which explicitly lists all files which form the
+     distribution tarball. We compare the tarball and the MANIFEST file
+     for differences in the "devtool dist" now.
+     [Ralf S. Engelschall]
+
   Changes between 1.4.2 and 1.5.0 (13-Mar-2006 to 28-Jul-2006)
 
    o Fixed potential memory leak in uuid_create() as spotted by SPLINT.

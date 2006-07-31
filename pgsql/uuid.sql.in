@@ -72,22 +72,22 @@ BEGIN;
 CREATE FUNCTION
     uuid_in(CSTRING) RETURNS uuid
     STRICT
-    LANGUAGE C AS '@MODULE_PATHNAME@', 'pg_uuid_in';
+    LANGUAGE C AS 'MODULE_PATHNAME', 'pg_uuid_in';
 
 CREATE FUNCTION
     uuid_out(uuid) RETURNS CSTRING
     STRICT
-    LANGUAGE C AS '@MODULE_PATHNAME@', 'pg_uuid_out';
+    LANGUAGE C AS 'MODULE_PATHNAME', 'pg_uuid_out';
 
 CREATE FUNCTION
     uuid_recv(INTERNAL) RETURNS uuid
     STRICT
-    LANGUAGE C AS '@MODULE_PATHNAME@', 'pg_uuid_in';
+    LANGUAGE C AS 'MODULE_PATHNAME', 'pg_uuid_in';
 
 CREATE FUNCTION
     uuid_send(uuid) RETURNS BYTEA
     STRICT
-    LANGUAGE C AS '@MODULE_PATHNAME@', 'pg_uuid_out';
+    LANGUAGE C AS 'MODULE_PATHNAME', 'pg_uuid_out';
 
 CREATE TYPE uuid (
     INPUT   = uuid_in,   -- for SQL input
@@ -115,17 +115,17 @@ CREATE CAST (uuid AS CSTRING)
 CREATE FUNCTION
     uuid(CSTRING) RETURNS uuid
     IMMUTABLE STRICT
-    LANGUAGE C AS '@MODULE_PATHNAME@', 'pg_uuid_in';
+    LANGUAGE C AS 'MODULE_PATHNAME', 'pg_uuid_in';
 
 CREATE FUNCTION
     uuid(INTEGER) RETURNS uuid
     VOLATILE CALLED ON NULL INPUT
-    LANGUAGE C AS '@MODULE_PATHNAME@', 'pg_uuid_make';
+    LANGUAGE C AS 'MODULE_PATHNAME', 'pg_uuid_make';
 
 CREATE FUNCTION
     uuid(INTEGER, CSTRING, CSTRING) RETURNS uuid
     VOLATILE CALLED ON NULL INPUT
-    LANGUAGE C AS '@MODULE_PATHNAME@', 'pg_uuid_make';
+    LANGUAGE C AS 'MODULE_PATHNAME', 'pg_uuid_make';
 
 --
 --  the UUID operators
@@ -134,32 +134,32 @@ CREATE FUNCTION
 CREATE FUNCTION
     uuid_eq(uuid, uuid) RETURNS BOOL
     IMMUTABLE STRICT
-    LANGUAGE C AS '@MODULE_PATHNAME@', 'pg_uuid_eq';
+    LANGUAGE C AS 'MODULE_PATHNAME', 'pg_uuid_eq';
 
 CREATE FUNCTION
     uuid_ne(uuid, uuid) RETURNS BOOL
     IMMUTABLE STRICT
-    LANGUAGE C AS '@MODULE_PATHNAME@', 'pg_uuid_ne';
+    LANGUAGE C AS 'MODULE_PATHNAME', 'pg_uuid_ne';
 
 CREATE FUNCTION
     uuid_lt(uuid, uuid) RETURNS BOOL
     IMMUTABLE STRICT
-    LANGUAGE C AS '@MODULE_PATHNAME@', 'pg_uuid_lt';
+    LANGUAGE C AS 'MODULE_PATHNAME', 'pg_uuid_lt';
 
 CREATE FUNCTION
     uuid_gt(uuid, uuid) RETURNS BOOL
     IMMUTABLE STRICT
-    LANGUAGE C AS '@MODULE_PATHNAME@', 'pg_uuid_gt';
+    LANGUAGE C AS 'MODULE_PATHNAME', 'pg_uuid_gt';
 
 CREATE FUNCTION
     uuid_le(uuid, uuid) RETURNS BOOL
     IMMUTABLE STRICT
-    LANGUAGE C AS '@MODULE_PATHNAME@', 'pg_uuid_le';
+    LANGUAGE C AS 'MODULE_PATHNAME', 'pg_uuid_le';
 
 CREATE FUNCTION
     uuid_ge(uuid, uuid) RETURNS BOOL
     IMMUTABLE STRICT
-    LANGUAGE C AS '@MODULE_PATHNAME@', 'pg_uuid_ge';
+    LANGUAGE C AS 'MODULE_PATHNAME', 'pg_uuid_ge';
 
 CREATE OPERATOR = (
     leftarg    = uuid,
@@ -214,12 +214,12 @@ CREATE OPERATOR >= (
 CREATE FUNCTION
     uuid_hash(uuid) RETURNS INTEGER
     IMMUTABLE STRICT
-    LANGUAGE C AS '@MODULE_PATHNAME@', 'pg_uuid_hash';
+    LANGUAGE C AS 'MODULE_PATHNAME', 'pg_uuid_hash';
 
 CREATE FUNCTION
     uuid_cmp(uuid, uuid) RETURNS INTEGER
     IMMUTABLE STRICT
-    LANGUAGE C AS '@MODULE_PATHNAME@', 'pg_uuid_cmp';
+    LANGUAGE C AS 'MODULE_PATHNAME', 'pg_uuid_cmp';
 
 CREATE OPERATOR CLASS uuid_ops
     DEFAULT FOR TYPE uuid USING hash AS

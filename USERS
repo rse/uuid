@@ -36,7 +36,10 @@
     http://cvs.sourceforge.jp/cgi-bin/viewcvs.cgi/gauche/Gauche-uuid/
     http://www.shiro.dreamhost.com/scheme/gauche/
 
-  o CGI::Session::ID::UUID
+  o Guile Extension Examples (GEE)
+    https://gna.org/projects/gee
+
+  o CGI::Session::ID::uuid
     UUID based ID generator backend for CGI::Session
     http://www.cpan.org/modules/by-authors/id/RSE/ 
 
