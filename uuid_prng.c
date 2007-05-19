@@ -1,7 +1,7 @@
 /*
 **  OSSP uuid - Universally Unique Identifier
-**  Copyright (c) 2004-2006 Ralf S. Engelschall <rse@engelschall.com>
-**  Copyright (c) 2004-2006 The OSSP Project <http://www.ossp.org/>
+**  Copyright (c) 2004-2007 Ralf S. Engelschall <rse@engelschall.com>
+**  Copyright (c) 2004-2007 The OSSP Project <http://www.ossp.org/>
 **
 **  This file is part of OSSP uuid, a library for the generation
 **  of UUIDs which can found at http://www.ossp.org/pkg/lib/uuid/
@@ -27,6 +27,10 @@
 **  uuid_prng.c: PRNG API implementation
 */
 
+/* own headers (part 1/2) */
+#include "uuid_ac.h"
+
+/* system headers */
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -34,6 +38,7 @@
 #include <sys/time.h>
 #include <fcntl.h>
 
+/* own headers (part 2/2) */
 #include "uuid_prng.h"
 #include "uuid_md5.h"
 

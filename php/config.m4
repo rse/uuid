@@ -1,7 +1,7 @@
 dnl
 dnl  OSSP uuid - Universally Unique Identifier
-dnl  Copyright (c) 2004-2006 Ralf S. Engelschall <rse@engelschall.com>
-dnl  Copyright (c) 2004-2006 The OSSP Project <http://www.ossp.org/>
+dnl  Copyright (c) 2004-2007 Ralf S. Engelschall <rse@engelschall.com>
+dnl  Copyright (c) 2004-2007 The OSSP Project <http://www.ossp.org/>
 dnl
 dnl  This file is part of OSSP uuid, a library for the generation
 dnl  of UUIDs which can found at http://www.ossp.org/pkg/lib/uuid/
@@ -37,7 +37,12 @@ if test "$PHP_UUID" != "no"; then
     PHP_ADD_LIBRARY([uuid],, UUID_SHARED_LIBADD)
     PHP_ADD_INCLUDE([..])
     PHP_SUBST(UUID_SHARED_LIBADD)
-    dnl  avoid conflict with libc's uuid_create(3)
-    EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-Bsymbolic"
+
+    dnl  avoid linking conflict with a potentially existing uuid_create(3) in libc
+    AC_CHECK_FUNC(uuid_create,[
+        SAVE_LDFLAGS="$LDFLAGS"
+        LDFLAGS="$LDFLAGS -Wl,-Bsymbolic"
+        AC_TRY_LINK([],[], [EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-Bsymbolic"])
+        LDFLAGS="$SAVE_LDFLAGS"])
 fi
 

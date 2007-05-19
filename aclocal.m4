@@ -223,3 +223,130 @@ AC_DEFUN(AC_CHECK_VA_COPY,[
   fi
 ])
 
+dnl ##
+dnl ##  Check for an external/extension library.
+dnl ##  - is aware of <libname>-config style scripts
+dnl ##  - searches under standard paths include, lib, etc.
+dnl ##  - searches under subareas like .libs, etc.
+dnl ##
+dnl ##  configure.in:
+dnl ##      AC_CHECK_EXTLIB(<realname>, <libname>, <func>, <header>,
+dnl ##                      [<success-action> [, <fail-action>]])
+dnl ##  Makefile.in:
+dnl ##      CFLAGS  = @CFLAGS@
+dnl ##      LDFLAGS = @LDFLAGS@
+dnl ##      LIBS    = @LIBS@
+dnl ##  shell:
+dnl ##      $ ./configure --with-<libname>[=DIR]
+dnl ##
+
+AC_DEFUN(AC_CHECK_EXTLIB,[dnl
+AC_ARG_WITH($2, [dnl
+[  --with-]m4_substr([$2[[=DIR]]                     ], 0, 19)[build with external $1 library (default=no)]], [dnl
+    if test ".$with_$2" = .yes; then
+        #   via config script in PATH
+        $2_version=`($2-config --version) 2>/dev/null`
+        if test ".$$2_version" != .; then
+            CPPFLAGS="$CPPFLAGS `$2-config --cflags`"
+            CFLAGS="$CFLAGS `$2-config --cflags`"
+            LDFLAGS="$LDFLAGS `$2-config --ldflags`"
+        fi
+    else
+        if test -d "$with_$2"; then
+            found=0
+            #   via config script
+            for dir in $with_$2/bin $with_$2; do
+                if test -f "$dir/$2-config" && test ! -f "$dir/$2-config.in"; then
+                    $2_version=`($dir/$2-config --version) 2>/dev/null`
+                    if test ".$$2_version" != .; then
+                        CPPFLAGS="$CPPFLAGS `$dir/$2-config --cflags`"
+                        CFLAGS="$CFLAGS `$dir/$2-config --cflags`"
+                        LDFLAGS="$LDFLAGS `$dir/$2-config --ldflags`"
+                        found=1
+                        break
+                    fi
+                fi
+            done
+            #   in standard sub-areas
+            if test ".$found" = .0; then
+                for dir in $with_$2/include/$2 $with_$2/include $with_$2; do
+                    if test -f "$dir/$4"; then
+                        CPPFLAGS="$CPPFLAGS -I$dir"
+                        CFLAGS="$CFLAGS -I$dir"
+                        found=1
+                        break
+                    fi
+                done
+                for dir in $with_$2/lib/$2 $with_$2/lib $with_$2; do
+                    if test -f "$dir/lib$2.la" && test -d "$dir/.libs"; then
+                        LDFLAGS="$LDFLAGS -L$dir -L$dir/.libs"
+                        found=1
+                        break
+                    elif test -f "$dir/lib$2.a" || test -f "$dir/lib$2.so"; then
+                        LDFLAGS="$LDFLAGS -L$dir"
+                        found=1
+                        break
+                    fi
+                done
+            fi
+            #   in any sub-area
+            if test ".$found" = .0; then
+changequote(, )dnl
+                for file in x `find $with_$2 -name "$4" -type f -print`; do
+                    test .$file = .x && continue
+                    dir=`echo $file | sed -e 's;[^/]*$;;' -e 's;\(.\)/$;\1;'`
+                    CPPFLAGS="$CPPFLAGS -I$dir"
+                    CFLAGS="$CFLAGS -I$dir"
+                done
+                for file in x `find $with_$2 -name "lib$2.[aso]" -type f -print`; do
+                    test .$file = .x && continue
+                    dir=`echo $file | sed -e 's;[^/]*$;;' -e 's;\(.\)/$;\1;'`
+                    LDFLAGS="$LDFLAGS -L$dir"
+                done
+changequote([, ])dnl
+            fi
+        fi
+    fi
+    AC_HAVE_HEADERS($4)
+    AC_CHECK_LIB($2, $3)
+    with_$2=yes
+    ac_var="ac_cv_header_`echo $4 | sed 'y%./+-%__p_%'`"
+    eval "ac_val=\$$ac_var"
+    if test ".$ac_val" != .yes; then
+        with_$2=no
+    fi
+    if test ".$ac_cv_lib_$2_$3" != .yes; then
+        with_$2=no
+    fi
+    if test ".$with_$2" = .no; then
+        AC_ERROR([Unable to find $1 library])
+    fi
+    ], [dnl
+if test ".$with_$2" = .; then
+    with_$2=no
+fi
+    ])dnl
+AC_MSG_CHECKING(whether to build against external $1 library)
+if test ".$with_$2" = .yes; then
+    ifelse([$5], , :, [$5])
+else
+    ifelse([$6], , :, [$6])
+fi
+AC_MSG_RESULT([$with_$2])
+])dnl
+
+dnl ##
+dnl ##  Check whether to activate Dmalloc
+dnl ##
+dnl ##  configure.in:
+dnl ##    AC_CHECK_DMALLOC
+dnl ##
+
+AC_DEFUN(AC_CHECK_DMALLOC,[dnl
+AC_CHECK_EXTLIB(Dmalloc, dmalloc, dmalloc_debug, dmalloc.h,
+                AC_DEFINE(WITH_DMALLOC, 1, [define if building with Dmalloc]))
+if test ".$with_dmalloc" = .yes; then
+    CFLAGS=`echo "X$CFLAGS" | sed -e 's;^X;;' -e 's; -Wredundant-decls;;'`
+fi
+])dnl
+

@@ -1,7 +1,7 @@
 /*
 **  OSSP uuid - Universally Unique Identifier
-**  Copyright (c) 2004-2006 Ralf S. Engelschall <rse@engelschall.com>
-**  Copyright (c) 2004-2006 The OSSP Project <http://www.ossp.org/>
+**  Copyright (c) 2004-2007 Ralf S. Engelschall <rse@engelschall.com>
+**  Copyright (c) 2004-2007 The OSSP Project <http://www.ossp.org/>
 **
 **  This file is part of OSSP uuid, a library for the generation
 **  of UUIDs which can found at http://www.ossp.org/pkg/lib/uuid/
@@ -41,6 +41,12 @@
 #include "lib/stringinfo.h"
 #include "access/hash.h"
 
+/*  PostgreSQL module magic cookie
+    (PostgreSQL >= 8.2 only) */
+#ifdef PG_MODULE_MAGIC
+PG_MODULE_MAGIC;
+#endif
+
 /* internal UUID datum data structure */
 typedef struct {
     unsigned char uuid_bin[UUID_LEN_BIN];
@@ -78,7 +84,7 @@ Datum pg_uuid_in(PG_FUNCTION_ARGS)
                 errmsg("invalid UUID string")));
     if ((len = strlen(uuid_str)) != UUID_LEN_STR)
         ereport(ERROR, (errcode(ERRCODE_DATA_EXCEPTION),
-                errmsg("invalid UUID string length %d (expected %d)", len, UUID_LEN_STR)));
+                errmsg("invalid UUID string length %d (expected %d)", (int)len, UUID_LEN_STR)));
 
     /* import as string representation */
     if ((rc = uuid_create(&uuid)) != UUID_RC_OK)

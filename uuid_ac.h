@@ -1,7 +1,7 @@
 /*
 **  OSSP uuid - Universally Unique Identifier
-**  Copyright (c) 2004-2006 Ralf S. Engelschall <rse@engelschall.com>
-**  Copyright (c) 2004-2006 The OSSP Project <http://www.ossp.org/>
+**  Copyright (c) 2004-2007 Ralf S. Engelschall <rse@engelschall.com>
+**  Copyright (c) 2004-2007 The OSSP Project <http://www.ossp.org/>
 **
 **  This file is part of OSSP uuid, a library for the generation
 **  of UUIDs which can found at http://www.ossp.org/pkg/lib/uuid/
@@ -30,7 +30,20 @@
 #ifndef __UUID_AC_H__
 #define __UUID_AC_H__
 
-#include "config.h"
+/* include GNU autoconf results */
+#include "config.h"           /* HAVE_xxx */
+
+/* include standard system headers */
+#include <stdio.h>            /* NULL, etc. */
+#include <stdlib.h>           /* malloc, NULL, etc. */
+#include <stdarg.h>           /* va_list, etc. */
+#include <string.h>           /* size_t, strlen, etc. */
+#include <unistd.h>           /* dmalloc pre-loading */
+
+/* enable optional "dmalloc" support */
+#ifdef WITH_DMALLOC
+#include <dmalloc.h>          /* malloc override, etc */
+#endif
 
 /* define boolean values */
 #define UUID_FALSE 0

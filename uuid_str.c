@@ -1,7 +1,7 @@
 /*
 **  OSSP uuid - Universally Unique Identifier
-**  Copyright (c) 2004-2006 Ralf S. Engelschall <rse@engelschall.com>
-**  Copyright (c) 2004-2006 The OSSP Project <http://www.ossp.org/>
+**  Copyright (c) 2004-2007 Ralf S. Engelschall <rse@engelschall.com>
+**  Copyright (c) 2004-2007 The OSSP Project <http://www.ossp.org/>
 **
 **  This file is part of OSSP uuid, a library for the generation
 **  of UUIDs which can found at http://www.ossp.org/pkg/lib/uuid/
@@ -48,12 +48,16 @@
  * o Ralf S. Engelschall <rse@engelschall.com> (1999, for OSSP)
  */
 
+/* own headers (part 1/2) */
+#include "uuid_ac.h"
+
+/* system headers */
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
 #include <ctype.h>
 
-#include "config.h"
+/* own headers (part 2/2) */
 #include "uuid_str.h"
 
 #if HAVE_LONG_LONG

@@ -1,7 +1,7 @@
 /*
 **  OSSP uuid - Universally Unique Identifier
-**  Copyright (c) 2004-2006 Ralf S. Engelschall <rse@engelschall.com>
-**  Copyright (c) 2004-2006 The OSSP Project <http://www.ossp.org/>
+**  Copyright (c) 2004-2007 Ralf S. Engelschall <rse@engelschall.com>
+**  Copyright (c) 2004-2007 The OSSP Project <http://www.ossp.org/>
 **
 **  This file is part of OSSP uuid, a library for the generation
 **  of UUIDs which can found at http://www.ossp.org/pkg/lib/uuid/
@@ -458,6 +458,10 @@ PHP_FUNCTION(uuid_export)
         php_error_docref(NULL TSRMLS_CC, E_WARNING, "uuid_export: %s", uuid_error(rc));
         RETURN_LONG((long)rc);
     }
+    if (fmt == UUID_FMT_SIV)
+        data_len = strlen((char *)data_ptr);
+    else if (fmt == UUID_FMT_STR || fmt == UUID_FMT_TXT)
+        data_len--; /* PHP doesn't wish NUL-termination on strings */
     ZVAL_STRINGL(z_data, data_ptr, data_len, 1);
     free(data_ptr);
 

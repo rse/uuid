@@ -1,12 +1,12 @@
 #!/bin/sh
 ##
 ##  GNU shtool -- The GNU Portable Shell Tool
-##  Copyright (c) 1994-2006 Ralf S. Engelschall <rse@engelschall.com>
+##  Copyright (c) 1994-2007 Ralf S. Engelschall <rse@engelschall.com>
 ##
 ##  See http://www.gnu.org/software/shtool/ for more information.
 ##  See ftp://ftp.gnu.org/gnu/shtool/ for latest version.
 ##
-##  Version:  2.0.6 (19-Apr-2006)
+##  Version:  2.0.7 (19-May-2007)
 ##  Contents: all available modules
 ##
 
@@ -90,8 +90,8 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 if [ ".$1" = ".-h" ] || [ ".$1" = ".--help" ]; then
-    echo "This is GNU shtool, version 2.0.6 (19-Apr-2006)"
-    echo 'Copyright (c) 1994-2006 Ralf S. Engelschall <rse@engelschall.com>'
+    echo "This is GNU shtool, version 2.0.7 (19-May-2007)"
+    echo 'Copyright (c) 1994-2007 Ralf S. Engelschall <rse@engelschall.com>'
     echo 'Report bugs to <bug-shtool@gnu.org>'
     echo ''
     echo 'Usage: shtool [<options>] [<cmd-name> [<cmd-options>] [<cmd-args>]]'
@@ -157,7 +157,7 @@ if [ ".$1" = ".-h" ] || [ ".$1" = ".--help" ]; then
     exit 0
 fi
 if [ ".$1" = ".-v" ] || [ ".$1" = ".--version" ]; then
-    echo "GNU shtool 2.0.6 (19-Apr-2006)"
+    echo "GNU shtool 2.0.7 (19-May-2007)"
     exit 0
 fi
 if [ ".$1" = ".-r" ] || [ ".$1" = ".--recreate" ]; then
@@ -647,7 +647,7 @@ case $tool in
 echo )
     ##
     ##  echo -- Print string with optional construct expansion
-    ##  Copyright (c) 1998-2006 Ralf S. Engelschall <rse@engelschall.com>
+    ##  Copyright (c) 1998-2007 Ralf S. Engelschall <rse@engelschall.com>
     ##
 
     text="$*"
@@ -768,11 +768,14 @@ echo )
                         userid=`grep "^${username}:" /etc/passwd 2>/dev/null | \
                                 sed -e 's/[^:]*:[^:]*://' -e 's/:.*$//'`
                         if [ ".$userid" = . ]; then
-                            userid=`(ypcat passwd) 2>/dev/null |
-                                    grep "^${username}:" | \
-                                    sed -e 's/[^:]*:[^:]*://' -e 's/:.*$//'`
+                            userid=`(ypmatch "${username}" passwd; nismatch "${username}" passwd) 2>/dev/null | \
+                                    sed -e 'q' | sed -e 's/[^:]*:[^:]*://' -e 's/:.*$//'`
                             if [ ".$userid" = . ]; then
-                                userid='?'
+                                userid=`(nidump passwd . | grep "^${username}:") 2>/dev/null | \
+                                        sed -e 's/[^:]*:[^:]*://' -e 's/:.*$//'`
+                                if [ ".$userid" = . ]; then
+                                    userid='?'
+                                fi
                             fi
                         fi
                     fi
@@ -797,10 +800,14 @@ echo )
                     groupid=`grep "^${username}:" /etc/passwd 2>/dev/null | \
                              sed -e 's/[^:]*:[^:]*:[^:]*://' -e 's/:.*$//'`
                     if [ ".$groupid" = . ]; then
-                        groupid=`(ypcat passwd) 2>/dev/null | grep "^${username}:" | \
-                                 sed -e 's/[^:]*:[^:]*:[^:]*://' -e 's/:.*$//'`
+                        groupid=`(ypmatch "${username}" passwd; nismatch "${username}" passwd) 2>/dev/null | \
+                                 sed -e 'q' | sed -e 's/[^:]*:[^:]*:[^:]*://' -e 's/:.*$//'`
                         if [ ".$groupid" = . ]; then
-                            groupid='?'
+                            groupid=`(nidump passwd . | grep "^${username}:") 2>/dev/null | \
+                                     sed -e 's/[^:]*:[^:]*:[^:]*://' -e 's/:.*$//'`
+                            if [ ".$groupid" = . ]; then
+                                groupid='?'
+                            fi
                         fi
                     fi
                 fi
@@ -825,11 +832,16 @@ echo )
                     groupname=`grep "^[^:]*:[^:]*:${groupid}:" /etc/group 2>/dev/null | \
                                sed -e 's/:.*$//'`
                     if [ ".$groupname" = . ]; then
-                        groupname=`(ypcat group) 2>/dev/null | \
-                                   grep "^[^:]*:[^:]*:${groupid}:" | \
+                        groupname=`(ypcat group; niscat group) 2>/dev/null | \
+                                   sed -e 'q' | grep "^[^:]*:[^:]*:${groupid}:" | \
                                    sed -e 's/:.*$//'`
                         if [ ".$groupname" = . ]; then
-                            groupname='?'
+                            groupname=`(nidump group .) 2>/dev/null | \
+                                       grep "^[^:]*:[^:]*:${groupid}:" | \
+                                       sed -e 's/:.*$//'`
+                            if [ ".$groupname" = . ]; then
+                                groupname='?'
+                            fi
                         fi
                     fi
                 fi
@@ -946,7 +958,7 @@ mdate )
     ##
     ##  mdate -- Pretty-print modification time of a file or dir
     ##  Copyright (c) 1995-1997 Free Software Foundation, Inc.
-    ##  Copyright (c) 1998-2006 Ralf S. Engelschall <rse@engelschall.com>
+    ##  Copyright (c) 1998-2007 Ralf S. Engelschall <rse@engelschall.com>
     ##
 
     fod="$1"
@@ -1074,7 +1086,7 @@ mdate )
 table )
     ##
     ##  table -- Pretty-print a field-separated list as a table
-    ##  Copyright (c) 1998-2006 Ralf S. Engelschall <rse@engelschall.com>
+    ##  Copyright (c) 1998-2007 Ralf S. Engelschall <rse@engelschall.com>
     ##
 
     if [ $opt_c -gt 4 ]; then
@@ -1139,7 +1151,7 @@ table )
 prop )
     ##
     ##  prop -- Display progress with a running propeller
-    ##  Copyright (c) 1998-2006 Ralf S. Engelschall <rse@engelschall.com>
+    ##  Copyright (c) 1998-2007 Ralf S. Engelschall <rse@engelschall.com>
     ##
 
     perl=''
@@ -1185,7 +1197,7 @@ prop )
 move )
     ##
     ##  move -- Move files with simultaneous substitution
-    ##  Copyright (c) 1999-2006 Ralf S. Engelschall <rse@engelschall.com>
+    ##  Copyright (c) 1999-2007 Ralf S. Engelschall <rse@engelschall.com>
     ##
 
     src="$1"
@@ -1277,7 +1289,7 @@ move )
 install )
     ##
     ##  install -- Install a program, script or datafile
-    ##  Copyright (c) 1997-2006 Ralf S. Engelschall <rse@engelschall.com>
+    ##  Copyright (c) 1997-2007 Ralf S. Engelschall <rse@engelschall.com>
     ##
 
     #   special case: "shtool install -d <dir> [...]" internally
@@ -1363,12 +1375,12 @@ install )
             if [ ".$opt_t" = .yes ]; then
                 echo "cp $src $dsttmp" 1>&2
             fi
-            cp $src $dsttmp || shtool_exit $?
+            cp "$src" "$dsttmp" || shtool_exit $?
         else
             if [ ".$opt_t" = .yes ]; then
                 echo "mv $src $dsttmp" 1>&2
             fi
-            mv $src $dsttmp || shtool_exit $?
+            mv "$src" "$dsttmp" || shtool_exit $?
         fi
 
         #   adjust the target file
@@ -1379,7 +1391,7 @@ install )
             do
                 sed="$sed -e '$e'"
             done
-            cp $dsttmp $dsttmp.old
+            cp "$dsttmp" "$dsttmp.old"
             chmod u+w $dsttmp
             eval "$sed <$dsttmp.old >$dsttmp" || shtool_exit $?
             rm -f $dsttmp.old
@@ -1414,7 +1426,7 @@ install )
         quick=no
         if [ ".$opt_C" = .yes ]; then
             if [ -r $dst ]; then
-                if cmp -s $src $dst; then
+                if cmp -s "$src" "$dst"; then
                     quick=yes
                 fi
             fi
@@ -1440,7 +1452,7 @@ install )
 mkdir )
     ##
     ##  mkdir -- Make one or more directories
-    ##  Copyright (c) 1996-2006 Ralf S. Engelschall <rse@engelschall.com>
+    ##  Copyright (c) 1996-2007 Ralf S. Engelschall <rse@engelschall.com>
     ##
 
     errstatus=0
@@ -1528,7 +1540,7 @@ mkdir )
 mkln )
     ##
     ##  mkln -- Make link with calculation of relative paths
-    ##  Copyright (c) 1998-2006 Ralf S. Engelschall <rse@engelschall.com>
+    ##  Copyright (c) 1998-2007 Ralf S. Engelschall <rse@engelschall.com>
     ##
 
     #   determine source(s) and destination
@@ -1633,12 +1645,17 @@ mkln )
         #   determine source prefix which is the reverse directory
         #   step-up corresponding to the destination directory
         srcpre=""
-
-        isroot=0
-        if [ ".$prefix" = . ] || [ ".$prefix" = ./ ]; then
-            isroot=1
-        fi
-        if [ $oneisabs = 0 ] || [ $isroot = 0 ]; then
+        allow_relative_srcpre=no
+        if [ ".$prefix" != . ] && [ ".$prefix" != ./ ]; then
+            allow_relative_srcpre=yes
+        fi  
+        if [ $oneisabs = 0 ]; then
+            allow_relative_srcpre=yes
+        fi  
+        if [ ".$opt_s" != .yes ]; then
+            allow_relative_srcpre=no
+        fi  
+        if [ ".$allow_relative_srcpre" = .yes ]; then
             pl="$dstdir/"
             OIFS="$IFS"; IFS='/'
             for pe in $pl; do
@@ -1679,7 +1696,7 @@ mkln )
 mkshadow )
     ##
     ##  mkshadow -- Make a shadow tree through symbolic links
-    ##  Copyright (c) 1998-2006 Ralf S. Engelschall <rse@engelschall.com>
+    ##  Copyright (c) 1998-2007 Ralf S. Engelschall <rse@engelschall.com>
     ##
 
     #   source and destination directory
@@ -1797,7 +1814,7 @@ mkshadow )
 fixperm )
     ##
     ##  fixperm -- Fix file permissions inside a source tree
-    ##  Copyright (c) 1996-2006 Ralf S. Engelschall <rse@engelschall.com>
+    ##  Copyright (c) 1996-2007 Ralf S. Engelschall <rse@engelschall.com>
     ##
 
     paths="$*"
@@ -1854,7 +1871,7 @@ fixperm )
 rotate )
     ##
     ##  rotate -- Logfile rotation
-    ##  Copyright (c) 2001-2006 Ralf S. Engelschall <rse@engelschall.com>
+    ##  Copyright (c) 2001-2007 Ralf S. Engelschall <rse@engelschall.com>
     ##
 
     #   make sure we have at least one file to rotate
@@ -2218,7 +2235,7 @@ rotate )
 tarball )
     ##
     ##  tarball -- Roll distribution tarballs
-    ##  Copyright (c) 1999-2006 Ralf S. Engelschall <rse@engelschall.com>
+    ##  Copyright (c) 1999-2007 Ralf S. Engelschall <rse@engelschall.com>
     ##
 
     srcs="$*"
@@ -2382,7 +2399,7 @@ tarball )
 subst )
     ##
     ##  subst -- Apply sed(1) substitution operations
-    ##  Copyright (c) 2001-2006 Ralf S. Engelschall <rse@engelschall.com>
+    ##  Copyright (c) 2001-2007 Ralf S. Engelschall <rse@engelschall.com>
     ##
 
     #   remember optional list of file(s)
@@ -2543,7 +2560,7 @@ subst )
 platform )
     ##
     ##  platform -- Platform Identification Utility
-    ##  Copyright (c) 2003-2006 Ralf S. Engelschall <rse@engelschall.com>
+    ##  Copyright (c) 2003-2007 Ralf S. Engelschall <rse@engelschall.com>
     ##
 
     #   option post-processing
@@ -3096,7 +3113,7 @@ platform )
 arx )
     ##
     ##  arx -- Extended archive command
-    ##  Copyright (c) 1999-2006 Ralf S. Engelschall <rse@engelschall.com>
+    ##  Copyright (c) 1999-2007 Ralf S. Engelschall <rse@engelschall.com>
     ##
 
     ar_prg="$opt_C"
@@ -3175,7 +3192,7 @@ arx )
 slo )
     ##
     ##  slo -- Separate linker options by library class
-    ##  Copyright (c) 1998-2006 Ralf S. Engelschall <rse@engelschall.com>
+    ##  Copyright (c) 1998-2007 Ralf S. Engelschall <rse@engelschall.com>
     ##
 
     DIFS="$IFS"
@@ -3334,7 +3351,7 @@ slo )
 scpp )
     ##
     ##  scpp -- Sharing C Pre-Processor
-    ##  Copyright (c) 1999-2006 Ralf S. Engelschall <rse@engelschall.com>
+    ##  Copyright (c) 1999-2007 Ralf S. Engelschall <rse@engelschall.com>
     ##
 
     srcs="$*"
@@ -3554,7 +3571,7 @@ scpp )
 version )
     ##
     ##  version -- Maintain a version information file
-    ##  Copyright (c) 1994-2006 Ralf S. Engelschall <rse@engelschall.com>
+    ##  Copyright (c) 1994-2007 Ralf S. Engelschall <rse@engelschall.com>
     ##
 
     file="$1"
@@ -3846,7 +3863,7 @@ version )
 path )
     ##
     ##  path -- Deal with program paths
-    ##  Copyright (c) 1998-2006 Ralf S. Engelschall <rse@engelschall.com>
+    ##  Copyright (c) 1998-2007 Ralf S. Engelschall <rse@engelschall.com>
     ##
 
     namelist="$*"

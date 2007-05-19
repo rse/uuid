@@ -1,7 +1,7 @@
 /*
 **  OSSP uuid - Universally Unique Identifier
-**  Copyright (c) 2004-2006 Ralf S. Engelschall <rse@engelschall.com>
-**  Copyright (c) 2004-2006 The OSSP Project <http://www.ossp.org/>
+**  Copyright (c) 2004-2007 Ralf S. Engelschall <rse@engelschall.com>
+**  Copyright (c) 2004-2007 The OSSP Project <http://www.ossp.org/>
 **
 **  This file is part of OSSP uuid, a library for the generation
 **  of UUIDs which can found at http://www.ossp.org/pkg/lib/uuid/
@@ -27,16 +27,16 @@
 **  uuid_mac.c: Media Access Control (MAC) resolver implementation
 */
 
-#include "config.h"
-#include "uuid_mac.h"
+/* own headers (part (1/2) */
+#include "uuid_ac.h"
 
+/* system headers */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <time.h>
-
 #ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif
@@ -76,6 +76,9 @@
 #ifdef HAVE_IFADDRS_H
 #include <ifaddrs.h>
 #endif
+
+/* own headers (part (1/2) */
+#include "uuid_mac.h"
 
 #ifndef FALSE
 #define FALSE 0

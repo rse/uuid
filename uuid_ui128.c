@@ -27,9 +27,14 @@
 **  ui128.c: implementation of 128-bit unsigned integer arithmetic
 */
 
+/* own headers (part 1/2) */
+#include "uuid_ac.h"
+
+/* system headers */
 #include <string.h>
 #include <ctype.h>
 
+/* own headers (part 2/2) */
 #include "uuid_ui128.h"
 
 #define UI128_BASE   256 /* 2^8 */

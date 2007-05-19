@@ -14,6 +14,7 @@
 
 PG_CONFIG         ?= pg_config
 PGXS              := $(shell $(PG_CONFIG) --pgxs)
+POSTGRES          := $(shell $(PG_CONFIG) --bindir)/postgres
 top_builddir      := $(dir $(PGXS))../..
 include           $(top_builddir)/src/Makefile.global
     
@@ -25,6 +26,7 @@ SO_MINOR_VERSION  = 0
 override CPPFLAGS := -I.. $(CPPFLAGS)
 SHLIB_LINK        := -L../.libs -luuid
 SHLIB_LINK        += $(shell test $(shell uname -s) = FreeBSD && echo "-Wl,-Bsymbolic")
+SHLIB_LINK        += $(shell test $(shell uname -s) = Darwin && echo "-bundle_loader $(POSTGRES)")
 rpath             :=
 
 all: uuid.sql all-lib

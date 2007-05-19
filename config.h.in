@@ -30,6 +30,9 @@
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 
+/* Define to 1 if you have the <dmalloc.h> header file. */
+#undef HAVE_DMALLOC_H
+
 /* Define to 1 if you have the `getifaddrs' function. */
 #undef HAVE_GETIFADDRS
 
@@ -38,6 +41,9 @@
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the `dmalloc' library (-ldmalloc). */
+#undef HAVE_LIBDMALLOC
 
 /* Define to 1 if you have the `nsl' library (-lnsl). */
 #undef HAVE_LIBNSL
@@ -165,6 +171,9 @@
 
 /* whether to build DCE 1.1 backward compatibility API */
 #undef WITH_DCE
+
+/* define if building with Dmalloc */
+#undef WITH_DMALLOC
 
 /* whether to build Perl bindings to C API */
 #undef WITH_PERL

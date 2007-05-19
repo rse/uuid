@@ -1,7 +1,7 @@
 /*
 **  OSSP uuid - Universally Unique Identifier
-**  Copyright (c) 2004-2006 Ralf S. Engelschall <rse@engelschall.com>
-**  Copyright (c) 2004-2006 The OSSP Project <http://www.ossp.org/>
+**  Copyright (c) 2004-2007 Ralf S. Engelschall <rse@engelschall.com>
+**  Copyright (c) 2004-2007 The OSSP Project <http://www.ossp.org/>
 **
 **  This file is part of OSSP uuid, a library for the generation
 **  of UUIDs which can found at http://www.ossp.org/pkg/lib/uuid/
@@ -28,8 +28,8 @@
 */
 
 /* own headers (part 1/2) */
-#include "config.h"
 #include "uuid.h"
+#include "uuid_ac.h"
 
 /* system headers */
 #include <stdio.h>
@@ -328,12 +328,16 @@ static uuid_rc_t uuid_import_bin(uuid_t *uuid, const void *data_ptr, size_t data
 
 /* INTERNAL: pack UUID object into binary representation
    (allows in-place operation for internal efficiency!) */
-static uuid_rc_t uuid_export_bin(const uuid_t *uuid, void **data_ptr, size_t *data_len)
+static uuid_rc_t uuid_export_bin(const uuid_t *uuid, void *_data_ptr, size_t *data_len)
 {
+    uuid_uint8_t **data_ptr;
     uuid_uint8_t *out;
     uuid_uint32_t tmp32;
     uuid_uint16_t tmp16;
     unsigned int i;
+
+    /* cast generic data pointer to particular pointer to pointer type */
+    data_ptr = (uuid_uint8_t **)_data_ptr;
 
     /* sanity check argument(s) */
     if (uuid == NULL || data_ptr == NULL)
@@ -341,7 +345,7 @@ static uuid_rc_t uuid_export_bin(const uuid_t *uuid, void **data_ptr, size_t *da
 
     /* optionally allocate octet data buffer */
     if (*data_ptr == NULL) {
-        if ((*data_ptr = malloc(sizeof(uuid_t))) == NULL)
+        if ((*data_ptr = (uuid_uint8_t *)malloc(sizeof(uuid_t))) == NULL)
             return UUID_RC_MEM;
         if (data_len != NULL)
             *data_len = UUID_LEN_BIN;
@@ -355,7 +359,7 @@ static uuid_rc_t uuid_export_bin(const uuid_t *uuid, void **data_ptr, size_t *da
     }
 
     /* treat output data buffer as octet stream */
-    out = (uuid_uint8_t *)(*data_ptr);
+    out = *data_ptr;
 
     /* pack "time_low" field */
     tmp32 = uuid->obj.time_low;
@@ -492,9 +496,13 @@ static uuid_rc_t uuid_import_siv(uuid_t *uuid, const void *data_ptr, size_t data
 }
 
 /* INTERNAL: export UUID object to string representation */
-static uuid_rc_t uuid_export_str(const uuid_t *uuid, void **data_ptr, size_t *data_len)
+static uuid_rc_t uuid_export_str(const uuid_t *uuid, void *_data_ptr, size_t *data_len)
 {
+    char **data_ptr;
     char *data_buf;
+
+    /* cast generic data pointer to particular pointer to pointer type */
+    data_ptr = (char **)_data_ptr;
 
     /* sanity check argument(s) */
     if (uuid == NULL || data_ptr == NULL)
@@ -543,8 +551,9 @@ static uuid_rc_t uuid_export_str(const uuid_t *uuid, void **data_ptr, size_t *da
 }
 
 /* INTERNAL: export UUID object to single integer value representation */
-static uuid_rc_t uuid_export_siv(const uuid_t *uuid, void **data_ptr, size_t *data_len)
+static uuid_rc_t uuid_export_siv(const uuid_t *uuid, void *_data_ptr, size_t *data_len)
 {
+    char **data_ptr;
     char *data_buf;
     void *tmp_ptr;
     size_t tmp_len;
@@ -552,6 +561,9 @@ static uuid_rc_t uuid_export_siv(const uuid_t *uuid, void **data_ptr, size_t *da
     ui128_t ui, ui2;
     uuid_rc_t rc;
     int i;
+
+    /* cast generic data pointer to particular pointer to pointer type */
+    data_ptr = (char **)_data_ptr;
 
     /* sanity check argument(s) */
     if (uuid == NULL || data_ptr == NULL)
@@ -621,8 +633,9 @@ static struct {
 };
 
 /* INTERNAL: dump UUID object as descriptive text */
-static uuid_rc_t uuid_export_txt(const uuid_t *uuid, void **data_ptr, size_t *data_len)
+static uuid_rc_t uuid_export_txt(const uuid_t *uuid, void *_data_ptr, size_t *data_len)
 {
+    char **data_ptr;
     uuid_rc_t rc;
     char **out;
     char *out_ptr;
@@ -647,6 +660,9 @@ static uuid_rc_t uuid_export_txt(const uuid_t *uuid, void **data_ptr, size_t *da
     char t_buf[19+1]; /* YYYY-MM-DD HH:MM:SS */
     struct tm *tm;
     int i;
+
+    /* cast generic data pointer to particular pointer to pointer type */
+    data_ptr = (char **)_data_ptr;
 
     /* sanity check argument(s) */
     if (uuid == NULL || data_ptr == NULL)
@@ -820,7 +836,7 @@ uuid_rc_t uuid_import(uuid_t *uuid, uuid_fmt_t fmt, const void *data_ptr, size_t
 }
 
 /* UUID exporting */
-uuid_rc_t uuid_export(const uuid_t *uuid, uuid_fmt_t fmt, void **data_ptr, size_t *data_len)
+uuid_rc_t uuid_export(const uuid_t *uuid, uuid_fmt_t fmt, void *data_ptr, size_t *data_len)
 {
     uuid_rc_t rc;
 

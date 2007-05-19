@@ -27,9 +27,14 @@
 **  ui64.c: implementation of 64-bit unsigned integer arithmetic
 */
 
+/* own headers (part 1/2) */
+#include "uuid_ac.h"
+
+/* system headers */
 #include <string.h>
 #include <ctype.h>
 
+/* own headers (part 2/2) */
 #include "uuid_ui64.h"
 
 #define UI64_BASE   256 /* 2^8 */

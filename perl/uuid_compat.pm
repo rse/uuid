@@ -1,7 +1,7 @@
 ##
 ##  OSSP uuid - Universally Unique Identifier
-##  Copyright (c) 2004-2006 Ralf S. Engelschall <rse@engelschall.com>
-##  Copyright (c) 2004-2006 The OSSP Project <http://www.ossp.org/>
+##  Copyright (c) 2004-2007 Ralf S. Engelschall <rse@engelschall.com>
+##  Copyright (c) 2004-2007 The OSSP Project <http://www.ossp.org/>
 ##  Copyright (c) 2004 Piotr Roszatycki <dexter@debian.org>
 ##
 ##  This file is part of OSSP uuid, a library for the generation
@@ -42,7 +42,7 @@ require Exporter;
 our @ISA     = qw(Exporter);
 our @EXPORT  = qw(NameSpace_DNS NameSpace_OID NameSpace_URL NameSpace_X500);
 
-our $VERSION = do { my @v = ('1.5.1' =~ m/\d+/g); sprintf("%d.".("%02d"x$#v), @v); };
+our $VERSION = do { my @v = ('1.6.0' =~ m/\d+/g); sprintf("%d.".("%02d"x$#v), @v); };
 
 sub new {
     my $class = shift;
@@ -84,7 +84,7 @@ sub to_hexstring {
 
 sub to_b64string {
     my ($self, $bin) = @_;
-    return MIME::Base64::encode_base64($bin);
+    return MIME::Base64::encode_base64($bin, '');
 }
 
 sub from_string {

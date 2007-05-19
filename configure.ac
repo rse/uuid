@@ -1,7 +1,7 @@
 dnl ##
 dnl ##  OSSP uuid - Universally Unique Identifier
-dnl ##  Copyright (c) 2004-2006 Ralf S. Engelschall <rse@engelschall.com>
-dnl ##  Copyright (c) 2004-2006 The OSSP Project <http://www.ossp.org/>
+dnl ##  Copyright (c) 2004-2007 Ralf S. Engelschall <rse@engelschall.com>
+dnl ##  Copyright (c) 2004-2007 The OSSP Project <http://www.ossp.org/>
 dnl ##
 dnl ##  This file is part of OSSP uuid, a library for the generation
 dnl ##  of UUIDs which can found at http://www.ossp.org/pkg/lib/uuid/
@@ -41,6 +41,7 @@ AC_SUBST(UUID_VERSION_HEX)
 AC_PROG_MAKE_SET
 AC_PROG_CC
 AC_CHECK_DEBUGGING
+AC_CHECK_DMALLOC
 
 with_tags=""
 sinclude(libtool.m4)

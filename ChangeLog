@@ -11,6 +11,89 @@
   This is a list of all changes to OSSP uuid.
   For a more brief summary please have a look at the NEWS file.
 
+  Changes between 1.5.1 and 1.6.0 (31-Jul-2006 to 19-May-2007)
+
+   o Expand unused "datarootdir" in Makefile.in and uuid-config.in to
+     make newer GNU autoconf versions happy.
+     [Ralf S. Engelschall]
+
+   o Upgrade build environment to GNU shtool 2.0.7
+     [Ralf S. Engelschall]
+
+   o Make GNU autoconf procedure of PHP binding more robust by using
+     -Wl,-Bsymbolic only on platforms where uuid_create(3) actually
+     exists and where -Wl,-Bsymbolic is really accepted by the tool
+     chain. This especially unbreaks MacOS X.
+     [Ralf S. Engelschall]
+
+   o Fix "uuid_export" function in PHP bindings under
+     UUID_FMT_SIV, UUID_FMT_STR and UUID_FMT_TXT where the
+     NUL-termination character should be not passed back to PHP.
+     [Neil Caunt <retardis@gmail.com>, Ralf S. Engelschall]
+
+   o Adjust copyright messages for new year 2007.
+     [Ralf S. Engelschall]
+
+   o Upgrade build environment to GNU autoconf 2.61
+     [Ralf S. Engelschall]
+
+   o Disable PostgreSQL "(CSTRING AS uuid)" and "(uuid AS CSTRING)"
+     CASTS as PostgreSQL 8.2 and higher explicitly disallow this.
+     [David Wheeler <david@kineticode.com>, Ralf S. Engelschall]
+
+   o Fix PostgreSQL bindings by mapping the correct DSO symbol
+     to the functions "uuid_send" and "uuid_recv".
+     [Ralf S. Engelschall]
+
+   o Silence PostgreSQL processing messages
+     [David Wheeler <david@kineticode.com>]
+
+   o Support MacOS X (aka Darwin) in PostgreSQL bindings by passing
+     a "-bundle_loader" option to the linker in order to resolve the
+     "undefined symbols" problem.
+     [David Wheeler <david@kineticode.com>, Ralf S. Engelschall]
+
+   o Pass the correct type to PostgreSQL's errmsg().
+     [David Wheeler <david@kineticode.com>, Ralf S. Engelschall]
+
+   o Added PostgreSQL 8.2 PG_MODULE_MAGIC support.
+     [David Wheeler <david@kineticode.com>]
+
+   o Fix the Data::UUID::to_b64string() function of the Perl backward
+     compatibility API: an empty string was not supplied as the EOL
+     marker to MIME::Base64::encode_base64() and hence the returned
+     string ended with a newline character (which in turn breaks many
+     applications using Data::UUID).
+     [Piotr Roszatycki <dexter@debian.org>]
+
+   o Change type of "data_ptr" argument in uuid_export() API signature
+     from "void **" to "void *" as there is unfortunately no
+     "generic pointer to pointer type" in ISO C (see also
+     http://c-faq.com/ptrs/genericpp.html) and "void **" is just a
+     "pointer to a 'void *'".
+     
+     The "void **" especially had the nasty side-effect that it breaks
+     strict pointer aliasing rules of ISO C and hence would require
+     fiddling with temporary variables on all uuid_export() calls if
+     one would be 100% correct and avoid aliasing related compiler
+     warnings. Instead, as uuid_export() internally has to cast the
+     "data_ptr" to the particular expected type anyway, it is better
+     to have "data_ptr" just be a really generic "void *" in the API
+     signature.
+     
+     Keep in mind that although this is an API change, it doesn't cause
+     any incompatibilities as the function still expects the same
+     "pointer to a pointer of a particular type". This expected pointer
+     is just now passed the more correct although less intuitive way.
+     [Hrvoje Niksic <hniksic@xemacs.org>, Ralf S. Engelschall]
+
+   o Optional DMALLOC based memory debugging support.
+     [Ralf S. Engelschall]
+
+   o Consistently include "uuid_ac.h" in all source files to have GNU
+     autoconf results and standard system defines available everywhere.
+     [Ralf S. Engelschall]
+
   Changes between 1.5.0 and 1.5.1 (28-Jul-2006 to 31-Jul-2006)
 
    o Use "MODULE_PATHNAME" instead of "@MODULE_PATHNAME@" in
