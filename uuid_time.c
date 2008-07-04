@@ -47,16 +47,28 @@
 /* own headers (part (1/2) */
 #include "uuid_time.h"
 
-/* POSIX gettimeofday(2) abstraction */
-int time_gettimeofday(struct timeval *tv, struct timezone *tz)
+/* POSIX gettimeofday(2) abstraction (without timezone) */
+int time_gettimeofday(struct timeval *tv)
 {
-#if defined(WIN32)
+#if defined(HAVE_GETTIMEOFDAY)
+    /* Unix/POSIX pass-through */
+    return gettimeofday(tv, NULL);
+#elif defined(HAVE_CLOCK_GETTIME)
+    /* POSIX emulation */
+    struct timespec ts;
+    if (clock_gettime(CLOCK_MONOTONIC, &ts) == -1)
+        return -1;
+    if (tv != NULL) {
+        tv->tv_sec = (long)ts.tv_sec;
+        tv->tv_usec = (long)ts.tv_nsec / 1000;
+    }
+    return 0;
+#elif defined(WIN32)
     /* Windows emulation */
     FILETIME ft;
     LARGE_INTEGER li;
     __int64 t;
     static int tzflag;
-
 #if !defined(__GNUC__)
 #define EPOCHFILETIME 116444736000000000i64
 #else
@@ -72,18 +84,9 @@ int time_gettimeofday(struct timeval *tv, struct timezone *tz)
         tv->tv_sec  = (long)(t / 1000000);
         tv->tv_usec = (long)(t % 1000000);
     }
-    if (tz != NULL) {
-        if (!tzflag) {
-            _tzset();
-            tzflag++;
-        }
-        tz->tz_minuteswest = _timezone / 60;
-        tz->tz_dsttime = _daylight;
-    }
     return 0;
 #else
-    /* POSIX pass-through */
-    return gettimeofday(tv, tz);
+#error neither Win32 GetSystemTimeAsFileTime() nor Unix gettimeofday() nor POSIX clock_gettime() available!
 #endif
 }
 

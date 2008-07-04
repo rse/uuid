@@ -44,15 +44,40 @@
 #include <sys/types.h>
 #endif
 
+#define TIME_PREFIX uuid_
+
+/* embedding support */
+#ifdef TIME_PREFIX
+#if defined(__STDC__) || defined(__cplusplus)
+#define __TIME_CONCAT(x,y) x ## y
+#define TIME_CONCAT(x,y) __TIME_CONCAT(x,y)
+#else
+#define __TIME_CONCAT(x) x
+#define TIME_CONCAT(x,y) __TIME_CONCAT(x)y
+#endif
+#define time_gettimeofday TIME_CONCAT(TIME_PREFIX,time_gettimeofday)
+#define time_usleep       TIME_CONCAT(TIME_PREFIX,time_usleep)
+#endif
+
+/* minimum C++ support */
+#ifdef __cplusplus
+#define DECLARATION_BEGIN extern "C" {
+#define DECLARATION_END   }
+#else
+#define DECLARATION_BEGIN
+#define DECLARATION_END
+#endif
+
+DECLARATION_BEGIN
+
 #ifndef HAVE_STRUCT_TIMEVAL
 struct timeval { long tv_sec; long tv_usec; };
 #endif
-#ifndef HAVE_STRUCT_TIMEZONE
-struct timezone { int tz_minuteswest; int tz_dsttime; };
-#endif
 
-extern int time_gettimeofday(struct timeval *, struct timezone *);
+extern int time_gettimeofday(struct timeval *);
 extern int time_usleep(long usec);
+
+DECLARATION_END
 
 #endif /* __UUID_TIME_H__ */
 

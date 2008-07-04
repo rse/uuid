@@ -11,6 +11,36 @@
   This is a list of all changes to OSSP uuid.
   For a more brief summary please have a look at the NEWS file.
 
+  Changes between 1.6.1 and 1.6.2 (21-Feb-2008 to 04-Jul-2008)
+
+   o Adjust "devtool.func" for latest GNU Libtool compatibility.
+     [Ralf S. Engelschall]
+
+   o Improve PRNG under Win32.
+     [Hiroshi Saito]
+
+   o Consistently annotate "RFC-XXXX" with "IETF" to clearly
+     indicate from which standards body this comes from.
+     [Ralf S. Engelschall]
+
+   o Resolve namespace conflicts of recently introduced time_xxx()
+     functions by using a propoer "uuid_" prefix.
+     [Ralf S. Engelschall]
+
+   o Remove unused "struct timezone" from time_gettimeofday() in
+     order to simplify portability.
+     [Ralf S. Engelschall]
+
+   o Add support for POSIX clock_gettime(3) in case the Unix/POSIX
+     gettimeofday(3) is not available.
+     [Ralf S. Engelschall]
+
+   o Upgrade build environment to GNU autoconf 2.62.
+     [Ralf S. Engelschall]
+
+   o Upgrade build environment to GNU libtool 2.2.4.
+     [Ralf S. Engelschall]
+
   Changes between 1.6.0 and 1.6.1 (19-May-2007 to 21-Feb-2008)
 
    o Port to Win32 API.

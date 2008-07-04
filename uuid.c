@@ -886,7 +886,7 @@ static uuid_rc_t uuid_make_v1(uuid_t *uuid, unsigned int mode, va_list ap)
     /* determine current system time and sequence counter */
     for (;;) {
         /* determine current system time */
-        if (time_gettimeofday(&time_now, NULL) == -1)
+        if (time_gettimeofday(&time_now) == -1)
             return UUID_RC_SYS;
 
         /* check whether system time changed since last retrieve */

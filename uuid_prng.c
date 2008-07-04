@@ -37,6 +37,11 @@
 #include <time.h>
 #include <sys/time.h>
 #include <fcntl.h>
+#if defined(WIN32)
+#define WINVER 0x0500
+#include <windows.h>
+#include <wincrypt.h>
+#endif
 
 /* own headers (part 2/2) */
 #include "uuid_time.h"
@@ -87,7 +92,7 @@ prng_rc_t prng_create(prng_t **prng)
     (*prng)->cnt = 0;
 
     /* seed the C library PRNG once */
-    (void)time_gettimeofday(&tv, NULL);
+    (void)time_gettimeofday(&tv);
     pid = getpid();
     srand((unsigned int)(
         ((unsigned int)pid << 16)
@@ -114,6 +119,9 @@ prng_rc_t prng_data(prng_t *prng, void *data_ptr, size_t data_len)
     size_t md5_len;
     int retries;
     int i;
+#if defined(WIN32)
+    HCRYPTPROV hProv;
+#endif
 
     /* sanity check argument(s) */
     if (prng == NULL || data_len == 0)
@@ -138,13 +146,19 @@ prng_rc_t prng_data(prng_t *prng, void *data_ptr, size_t data_len)
             p += (unsigned int)i;
         }
     }
+#if defined(WIN32)
+    else {
+        if (CryptAcquireContext(&hProv, NULL, NULL, PROV_RSA_FULL, 0))
+            CryptGenRandom(hProv, n, p);
+    }
+#endif
 
     /* approach 2: try to gather data via weaker libc PRNG API. */
     while (n > 0) {
         /* gather new entropy */
-        (void)time_gettimeofday(&(entropy.tv), NULL);       /* source: libc time */
-        entropy.rnd = rand();                               /* source: libc PRNG */
-        entropy.cnt = prng->cnt++;                          /* source: local counter */
+        (void)time_gettimeofday(&(entropy.tv));  /* source: libc time */
+        entropy.rnd = rand();                    /* source: libc PRNG */
+        entropy.cnt = prng->cnt++;               /* source: local counter */
 
         /* pass entropy into MD5 engine */
         if (md5_update(prng->md5, (void *)&entropy, sizeof(entropy)) != MD5_RC_OK)

@@ -11,6 +11,10 @@
   OSSP uuid is known to be used by at least the following
   Open Source software packages:
 
+  o PostgreSQL
+    Relational Database Management System (RDBMS)
+    http://www.postgresql.org/
+
   o Aegis
     Software Configuration Management (SCM) System
     http://aegis.sourceforge.net/

@@ -76,27 +76,9 @@ AC_DEFUN(UUID_CHECK_ALL,[
         AC_DEFINE(HAVE_STRUCT_TIMEVAL, 1, [define if exists "struct timeval"])
     fi
     AC_MSG_RESULT([$msg])
-    AC_MSG_CHECKING(for struct timezone)
-    AC_TRY_COMPILE([
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#endif
-#ifdef HAVE_SYS_TYPES_H
-#include <sys/types.h>
-#endif
-#ifdef HAVE_SYS_TIME_H
-#include <sys/time.h>
-#endif
-#include <time.h>
-    ],[ struct timezone tz; ],
-    [ msg="yes" ], [ msg="no" ])
-    if test ".$msg" = .yes; then
-        AC_DEFINE(HAVE_STRUCT_TIMEZONE, 1, [define if exists "struct timezone"])
-    fi
-    AC_MSG_RESULT([$msg])
 
     dnl #   check for functions
-    AC_CHECK_FUNCS(getifaddrs nanosleep Sleep)
+    AC_CHECK_FUNCS(getifaddrs nanosleep Sleep gettimeofday clock_gettime)
 
     dnl #   check size of built-in types
     AC_CHECK_TYPES([long long, long double])
