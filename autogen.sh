@@ -37,6 +37,7 @@ autoheader --force
 autoconf
 
 #   generate shtool
+shtoolize all
 
 #   remove temporary files
 rm -rf autom4te.cache
