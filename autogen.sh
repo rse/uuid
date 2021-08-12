@@ -36,6 +36,8 @@ autoheader --force
 #   generate configure
 autoconf
 
+#   generate shtool
+
 #   remove temporary files
 rm -rf autom4te.cache
 rm -f libtool
