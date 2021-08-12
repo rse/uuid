@@ -31,7 +31,7 @@
 
 =head1 NAME
 
-B<OSSP uuid> - B<Universally Unique Identifier> (C++ API)
+B<uuid++> - B<Universally Unique Identifier> (C++ API)
 
 =head1 VERSION
 

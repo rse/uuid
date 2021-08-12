@@ -31,7 +31,7 @@
 
 =head1 NAME
 
-B<OSSP uuid> - B<Universally Unique Identifier Command-Line Tool>
+B<uuid> - B<Universally Unique Identifier Command-Line Tool>
 
 =head1 VERSION
 

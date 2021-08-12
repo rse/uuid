@@ -31,7 +31,7 @@
 
 =head1 NAME
 
-B<OSSP uuid> - B<Universally Unique Identifier>
+B<uuid> - B<Universally Unique Identifier>
 
 =head1 VERSION
 
