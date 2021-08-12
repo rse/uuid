@@ -5,7 +5,7 @@
   |_|_|_|  \___/|____/____/|_|      \__,_|\__,_|_|\__,_|
 
   OSSP uuid - Universally Unique Identifier
-  Version 1.6.2 (04-Jul-2008)
+  Version 1.7.0 (2021-08-12)
 
   ABSTRACT
 
@@ -57,6 +57,6 @@
 
   The documentation and latest release can be found on
 
-  o http://github.com/rse/uuid/
-  o http://github.com/rse/uuid/releases
+  o https://github.com/rse/uuid/
+  o https://github.com/rse/uuid/releases
 
