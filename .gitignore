@@ -19,3 +19,7 @@ ltmain.sh
 config.guess
 config.sub
 install-sh
+uuid.1
+uuid.3
+uuid++.3
+uuid-config.1
