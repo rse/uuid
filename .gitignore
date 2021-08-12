@@ -13,5 +13,6 @@ uuid-config
 uuid.h
 uuid.pc
 configure
+aclocal.m4
 libtool
 ltmain.sh
