@@ -31,6 +31,7 @@
 #   generate macros
 libtoolize --copy --force --quiet
 aclocal -I. --force
+autoheader
 
 #   generate configure
 autoconf
