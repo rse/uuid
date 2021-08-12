@@ -1,7 +1,7 @@
 /*
 **  OSSP ui128 - 128-Bit Arithmetic
-**  Copyright (c) 2002-2005 Ralf S. Engelschall <rse@engelschall.com>
-**  Copyright (c) 2002-2005 The OSSP Project <http://www.ossp.org/>
+**  Copyright (c) 2004-2021 Dr. Ralf S. Engelschall <rse@engelschall.com>
+**  Copyright (c) 2004-2021 The OSSP Project <http://www.ossp.org/>
 **
 **  This file is part of OSSP ui128, a 128-bit arithmetic library
 **  which can be found at http://www.ossp.org/pkg/lib/ui128/.
