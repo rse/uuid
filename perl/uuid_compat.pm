@@ -93,7 +93,9 @@ sub from_string {
     $uuid->import('str',
           $str =~ /^0x/
         ? join '-', unpack('x2 a8 a4 a4 a4 a12', $str)
-        : $str
+        : $str =~ /-/
+        ? $str
+        : join '-', unpack('A8 A4 A4 A4 A12', $str)
     );
     return $uuid->export('bin');
 }

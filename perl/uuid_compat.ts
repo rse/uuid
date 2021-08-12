@@ -28,7 +28,7 @@
 ##  uuid_compat.ts: Data::UUID Backward Compatibility Perl API (Perl test suite part)
 ##
 
-use Test::More tests => 14;
+use Test::More tests => 16;
 
 BEGIN {
     use_ok('Data::UUID');
@@ -53,3 +53,5 @@ ok($uuid7 = NameSpace_URL);
 ok($uuid8 = $ug->from_string("6ba7b811-9dad-11d1-80b4-00c04fd430c8"));
 ok($ug->compare($uuid7, $uuid8) == 0);
 
+ok($uuid9 = $ug->from_string("6ba7b8119dad11d180b400c04fd430c8"));
+ok($ug->compare($uuid7, $uuid9) == 0);
