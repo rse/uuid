@@ -11,7 +11,20 @@
   This is a list of all changes to OSSP uuid.
   For a more brief summary please have a look at the NEWS file.
 
-  Changes between 1.6.2 and 1.6.3 (04-Jul-2008 to 12-Aug-2021)
+  Changes between 1.7.1 and 1.7.2 (12-Aug-2021 to 12-Aug-2021)
+
+   o More cleanups to Autoconf facility
+     [Ralf S. Engelschall]
+
+  Changes between 1.7.0 and 1.7.1 (12-Aug-2021 to 12-Aug-2021)
+
+   o Small bugfix for Perl bindings
+     [Ralf S. Engelschall]
+
+  Changes between 1.6.2 and 1.7.0 (04-Jul-2008 to 12-Aug-2021)
+
+   o Major revamp of the Autoconf facility to bring it up to date
+     [Ralf S. Engelschall]
 
    o Adjust URLs for new home at Github.com
      [Ralf S. Engelschall]

@@ -11,6 +11,16 @@
   This is a list of major changes to OSSP uuid. For more detailed
   change descriptions, please have a look at the ChangeLog file.
 
+  Major changes between 1.6 and 1.7
+
+    o Switched to Github.com as the hosting provider
+    o Revamped the Autoconf facility
+    o Merged in most of the Debian GNU/Linux patches
+
+  Major changes between 1.5 and 1.6
+
+    o Various changes
+
   Major changes between 1.4 and 1.5
 
     o Many internal code cleanups and fixes.
