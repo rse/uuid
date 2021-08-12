@@ -1,7 +1,7 @@
 dnl ##
 dnl ##  OSSP uuid - Universally Unique Identifier
-dnl ##  Copyright (c) 2004-2008 Ralf S. Engelschall <rse@engelschall.com>
-dnl ##  Copyright (c) 2004-2008 The OSSP Project <http://www.ossp.org/>
+dnl ##  Copyright (c) 2004-2021 Dr. Ralf S. Engelschall <rse@engelschall.com>
+dnl ##  Copyright (c) 2004-2021 The OSSP Project <http://www.ossp.org/>
 dnl ##
 dnl ##  This file is part of OSSP uuid, a library for the generation
 dnl ##  of UUIDs which can found at https://github.com/rse/uuid
