@@ -29,7 +29,7 @@
 ##
 
 #   generate macros
-libtoolize --copy --force --quiet
+libtoolize --copy --install --force --quiet
 aclocal -I. --force
 autoheader --force
 

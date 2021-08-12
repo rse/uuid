@@ -29,6 +29,7 @@ dnl ##
 
 AC_PREREQ([2.71])
 AC_CONFIG_MACRO_DIRS([.])
+AC_CONFIG_AUX_DIR([.])
 AC_INIT
 UUID_VERSION_RAW=`$ac_confdir/shtool version -l c -d short uuid_vers.h`
 UUID_VERSION_STR=`$ac_confdir/shtool version -l c -d long  uuid_vers.h`

@@ -16,3 +16,6 @@ configure
 aclocal.m4
 libtool
 ltmain.sh
+config.guess
+config.sub
+install-sh
