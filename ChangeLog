@@ -11,6 +11,11 @@
   This is a list of all changes to OSSP uuid.
   For a more brief summary please have a look at the NEWS file.
 
+  Changes between 1.6.2 and 1.6.3 (04-Jul-2008 to 12-Aug-2021)
+
+   o Adjust URLs for new home at Github.com
+     [Ralf S. Engelschall]
+
   Changes between 1.6.1 and 1.6.2 (21-Feb-2008 to 04-Jul-2008)
 
    o Adjust "devtool.func" for latest GNU Libtool compatibility.
