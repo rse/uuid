@@ -1,7 +1,7 @@
 ##
 ##  OSSP uuid - Universally Unique Identifier
-##  Copyright (c) 2004-2008 Ralf S. Engelschall <rse@engelschall.com>
-##  Copyright (c) 2004-2008 The OSSP Project <http://www.ossp.org/>
+##  Copyright (c) 2004-2021 Dr. Ralf S. Engelschall <rse@engelschall.com>
+##  Copyright (c) 2004-2021 The OSSP Project <http://www.ossp.org/>
 ##
 ##  This file is part of OSSP uuid, a library for the generation
 ##  of UUIDs which can found at https://github.com/rse/uuid
@@ -326,6 +326,7 @@ clean:
 	    (cd $(S)/pgsql && $(MAKE) $(MFLAGS) clean PG_CONFIG=$(PG_CONFIG) || true); \
 	fi
 
+.PHONY: distclean
 distclean: clean
 	-$(RM) config.log config.status config.cache
 	-$(RM) Makefile config.h uuid-config uuid.h uuid.pc
@@ -340,6 +341,7 @@ distclean: clean
 	    (cd $(S)/pgsql && $(MAKE) $(MFLAGS) distclean PG_CONFIG=$(PG_CONFIG) || true); \
 	fi
 
+.PHONY: realclean
 realclean: distclean
 	-$(RM) uuid.3 uuid.1
 	-$(RM) configure config.h.in
@@ -354,4 +356,9 @@ realclean: distclean
 	-@if [ ".$(WITH_PGSQL)" = .yes ]; then \
 	    (cd $(S)/pgsql && $(MAKE) $(MFLAGS) realclean PG_CONFIG=$(PG_CONFIG) || true); \
 	fi
+
+.PHONY: release
+release: all man distclean
+	@V=`$(SHTOOL) version -l c -d short $(S)/uuid_vers.h`; \
+	$(SHTOOL) tarball -c "gzip -9" -o uuid-$${V}.tar.gz -d uuid-$${V} -e .git .
 
