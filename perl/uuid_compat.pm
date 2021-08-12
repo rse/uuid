@@ -57,6 +57,11 @@ sub create {
     return $uuid->export('bin');
 }
 
+sub create_bin {
+    my ($self) = @_;
+    return $self->create($self);
+}
+
 sub create_from_name {
     my ($self, $nsid, $name) = @_;
     my $uuid = OSSP::uuid->new;
