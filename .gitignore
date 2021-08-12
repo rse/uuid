@@ -1,0 +1,13 @@
+*~
+*.la
+*.lo
+*.o
+.libs
+Makefile
+config.h
+config.log
+config.status
+uuid
+uuid-config
+uuid.h
+uuid.pc
