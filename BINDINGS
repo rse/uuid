@@ -16,16 +16,16 @@
     (native API)
 
   o C++
-    (addon API; part of the OSSP uuid distribution; see uuid++.* files) 
+    (addon API; part of the OSSP uuid distribution; see uuid++.* files)
 
   o Perl
-    (addon API; part of the OSSP uuid distribution; see perl/ directory) 
+    (addon API; part of the OSSP uuid distribution; see perl/ directory)
 
   o PHP
-    (addon API; part of the OSSP uuid distribution; see php/ directory) 
+    (addon API; part of the OSSP uuid distribution; see php/ directory)
 
   o PostgreSQL
-    (addon API; part of the OSSP uuid distribution; see pgsql/ directory) 
+    (addon API; part of the OSSP uuid distribution; see pgsql/ directory)
 
   o GNU Guile GEE (Scheme)
     https://gna.org/projects/gee

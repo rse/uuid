@@ -4,7 +4,7 @@
 ##  Copyright (c) 2004-2008 The OSSP Project <http://www.ossp.org/>
 ##
 ##  This file is part of OSSP uuid, a library for the generation
-##  of UUIDs which can found at http://www.ossp.org/pkg/lib/uuid/
+##  of UUIDs which can found at https://github.com/rse/uuid
 ##
 ##  Permission to use, copy, modify, and distribute this software for
 ##  any purpose with or without fee is hereby granted, provided that
@@ -35,7 +35,7 @@ libdir=${exec_prefix}/lib
 Name: OSSP uuid
 Description: Universally Unique Identifier (UUID) Library
 Version: @UUID_VERSION_RAW@
-URL: http://www.ossp.org/pkg/lib/uuid/
+URL: https://github.com/rse/uuid
 Cflags: -I${includedir}
 Libs: -L${libdir} -luuid
 Libs.private: @LIBS@

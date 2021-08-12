@@ -28,7 +28,7 @@
 
   During implementation of OSSP uuid (a flexible CLI and C API for
   generation and partial decoding of version 1, 3 and 4 UUIDs, see
-  http://www.ossp.org/pkg/lib/uuid/ for details), I discovered a nasty bug
+  https://github.com/rse/uuid for details), I discovered a nasty bug
   in the generation of random multicast MAC addresses. It is present in
   all standards and drafts (both expired ones and current ones) and was
   also inherited (until I fixed it by submitting patches to the authors

@@ -4,7 +4,7 @@ dnl ##  Copyright (c) 2004-2008 Ralf S. Engelschall <rse@engelschall.com>
 dnl ##  Copyright (c) 2004-2008 The OSSP Project <http://www.ossp.org/>
 dnl ##
 dnl ##  This file is part of OSSP uuid, a library for the generation
-dnl ##  of UUIDs which can found at http://www.ossp.org/pkg/lib/uuid/
+dnl ##  of UUIDs which can found at https://github.com/rse/uuid
 dnl ##
 dnl ##  Permission to use, copy, modify, and distribute this software for
 dnl ##  any purpose with or without fee is hereby granted, provided that

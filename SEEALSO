@@ -14,7 +14,7 @@
   implementations for platforms with an Unix/POSIX API:
 
   o OSSP uuid (ISO-C), OSSP::uuid (Perl)
-    http://www.ossp.org/pkg/lib/uuid/
+    https://github.com/rse/uuid
     http://cvs.ossp.org/ossp-pkg/uuid/
 
   o FreeBSD libc (ISO-C)
