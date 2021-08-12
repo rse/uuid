@@ -28,10 +28,10 @@ dnl ##  uuid.ac: UUID specific Autoconf checks
 dnl ##
 
 dnl #   Check for anything OSSP uuid wants to know
-dnl #   configure.in:
+dnl #   configure.ac:
 dnl #     UUID_CHECK_ALL
 
-AC_DEFUN(UUID_CHECK_ALL,[
+AC_DEFUN([UUID_CHECK_ALL],[
     dnl #   make sure libnsl and libsocket are linked in if they exist
     AC_CHECK_LIB(nsl, gethostname)
     if test ".`echo $LIBS | grep nsl`" = .; then
@@ -59,7 +59,7 @@ AC_DEFUN(UUID_CHECK_ALL,[
 
     dnl #   check for existence of particular C structures
     AC_MSG_CHECKING(for struct timeval)
-    AC_TRY_COMPILE([
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
@@ -70,7 +70,7 @@ AC_DEFUN(UUID_CHECK_ALL,[
 #include <sys/time.h>
 #endif
 #include <time.h>
-    ],[ struct timeval tv; ],
+    ]],[[ struct timeval tv; ]])],
     [ msg="yes" ], [ msg="no" ])
     if test ".$msg" = .yes; then
         AC_DEFINE(HAVE_STRUCT_TIMEVAL, 1, [define if exists "struct timeval"])
@@ -95,7 +95,7 @@ AC_DEFUN(UUID_CHECK_ALL,[
 
     dnl #   configure option --with-dce
     AC_ARG_WITH([dce],
-        AC_HELP_STRING([--with-dce], [build DCE 1.1 backward compatibility API]),
+        AS_HELP_STRING([--with-dce], [build DCE 1.1 backward compatibility API]),
         [ac_cv_with_dce=$withval], [ac_cv_with_dce=no])
     AC_CACHE_CHECK([whether to build DCE 1.1 backward compatibility API], [ac_cv_with_dce], [ac_cv_with_dce=no])
     if test ".$ac_cv_with_dce" = ".yes"; then
@@ -118,7 +118,7 @@ AC_DEFUN(UUID_CHECK_ALL,[
         AC_DEFINE(WITH_CXX, 1, [whether to build C++ bindings to C API])
         WITH_CXX='yes'
         CXX_NAME='$(CXX_NAME)'
-        AC_PROG_CXX
+        AC_REQUIRE([AC_PROG_CXX])
     else
         WITH_CXX='no'
         CXX_NAME=''
@@ -154,7 +154,7 @@ AC_DEFUN(UUID_CHECK_ALL,[
     AC_SUBST(WITH_PERL_COMPAT)
     AC_PATH_PROG(PERL, perl, NA)
     if test ".$ac_cv_with_perl" = ".yes" -a ".$PERL" = ".NA"; then
-        AC_ERROR([required Perl interpreter not found in \$PATH])
+        AC_MSG_ERROR([required Perl interpreter not found in \$PATH])
     fi
     
     dnl #   configure option --with-php
@@ -174,7 +174,7 @@ AC_DEFUN(UUID_CHECK_ALL,[
     AC_SUBST(WITH_PHP)
     AC_PATH_PROGS(PHP, php5 php, NA)
     if test ".$ac_cv_with_php" = ".yes" -a ".$PHP" = ".NA"; then
-        AC_ERROR([required PHP interpreter not found in \$PATH])
+        AC_MSG_ERROR([required PHP interpreter not found in \$PATH])
     fi
     if test ".$ac_cv_with_php" = ".yes"; then
         (cd php && make -f Makefile.local config PHP=$PHP)
@@ -197,10 +197,10 @@ AC_DEFUN(UUID_CHECK_ALL,[
     AC_SUBST(WITH_PGSQL)
     AC_PATH_PROGS(PG_CONFIG, pg_config, NA)
     if test ".$ac_cv_with_pgsql" = ".yes" -a ".$PG_CONFIG" = ".NA"; then
-        AC_ERROR([required PostgreSQL pg_config utility not found in \$PATH])
+        AC_MSG_ERROR([required PostgreSQL pg_config utility not found in \$PATH])
     fi
     if test ".$ac_cv_with_pgsql" = ".yes" -a ".`${MAKE-make} -v 2>/dev/null | grep GNU`" = .; then
-        AC_ERROR([PostgreSQL bindings require GNU make to build])
+        AC_MSG_ERROR([PostgreSQL bindings require GNU make to build])
     fi
 ])
 

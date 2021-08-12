@@ -27,7 +27,8 @@ dnl ##
 dnl ##  configure.ac: GNU Autoconf source script
 dnl ##
 
-AC_PREREQ(2.53)
+AC_PREREQ([2.71])
+AC_CONFIG_MACRO_DIRS([.])
 AC_INIT
 UUID_VERSION_RAW=`$ac_confdir/shtool version -l c -d short uuid_vers.h`
 UUID_VERSION_STR=`$ac_confdir/shtool version -l c -d long  uuid_vers.h`
@@ -40,14 +41,10 @@ AC_SUBST(UUID_VERSION_HEX)
 
 AC_PROG_MAKE_SET
 AC_PROG_CC
+AC_PROG_CXX
 AC_CHECK_DEBUGGING
 AC_CHECK_DMALLOC
-
-with_tags=""
-sinclude(libtool.m4)
-AC_PROG_LIBTOOL
-
-sinclude(uuid.ac)
+LT_INIT
 UUID_CHECK_ALL
 
 AC_CONFIG_HEADERS(config.h)

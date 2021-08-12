@@ -11,3 +11,6 @@ uuid
 uuid-config
 uuid.h
 uuid.pc
+configure
+libtool
+ltmain.sh

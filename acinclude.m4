@@ -1,11 +1,10 @@
 dnl ##
-dnl ##  SA - OSSP Socket Abstraction Library
-dnl ##  Copyright (c) 2001-2003 Ralf S. Engelschall <rse@engelschall.com>
-dnl ##  Copyright (c) 2001-2003 The OSSP Project <http://www.ossp.org/>
-dnl ##  Copyright (c) 2001-2003 Cable & Wireless Deutschland <http://www.cw.com/de/>
+dnl ##  OSSP uuid - Universally Unique Identifier
+dnl ##  Copyright (c) 2004-2008 Ralf S. Engelschall <rse@engelschall.com>
+dnl ##  Copyright (c) 2004-2008 The OSSP Project <http://www.ossp.org/>
 dnl ##
-dnl ##  This file is part of OSSP SA, a socket abstraction library which
-dnl ##  can be found at http://www.ossp.org/pkg/sa/.
+dnl ##  This file is part of OSSP uuid, a library for the generation
+dnl ##  of UUIDs which can found at https://github.com/rse/uuid
 dnl ##
 dnl ##  Permission to use, copy, modify, and distribute this software for
 dnl ##  any purpose with or without fee is hereby granted, provided that
@@ -25,7 +24,7 @@ dnl ##  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 dnl ##  OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 dnl ##  SUCH DAMAGE.
 dnl ##
-dnl ##  aclocal.m4: GNU Autoconf local macro definitions
+dnl ##  acinclude.m4: GNU Autoconf local macro definitions
 dnl ##
 
 dnl ##
@@ -36,12 +35,12 @@ dnl ##    AC_COMPILER_OPTION(<name>, <display>, <option>,
 dnl ##                       <action-success>, <action-failure>)
 dnl ##
 
-AC_DEFUN(AC_COMPILER_OPTION,[dnl
+AC_DEFUN([AC_COMPILER_OPTION],[dnl
 AC_MSG_CHECKING(whether compiler option(s) $2 work)
 AC_CACHE_VAL(ac_cv_compiler_option_$1,[
 SAVE_CFLAGS="$CFLAGS"
 CFLAGS="$CFLAGS $3"
-AC_TRY_COMPILE([],[], ac_cv_compiler_option_$1=yes, ac_cv_compiler_option_$1=no)
+AC_COMPILE_IFELSE([], ac_cv_compiler_option_$1=yes, ac_cv_compiler_option_$1=no)
 CFLAGS="$SAVE_CFLAGS"
 ])dnl
 if test ".$ac_cv_compiler_option_$1" = .yes; then
@@ -59,11 +58,11 @@ dnl ##  configure.in:
 dnl ##    AC_CHECK_DEBUGGING
 dnl ##
 
-AC_DEFUN(AC_CHECK_DEBUGGING,[dnl
+AC_DEFUN([AC_CHECK_DEBUGGING],[dnl
 AC_ARG_ENABLE(debug,dnl
 [  --enable-debug          build for debugging (default=no)],
 [dnl
-if test ".$ac_cv_prog_gcc" = ".yes"; then
+if test ".$GCC" = ".yes"; then
     case "$CFLAGS" in
         *-O* ) ;;
            * ) CFLAGS="$CFLAGS -O2" ;;
@@ -91,7 +90,7 @@ else
 fi
 msg="enabled"
 ],[
-if test ".$ac_cv_prog_gcc" = ".yes"; then
+if test ".$GCC" = ".yes"; then
 case "$CFLAGS" in
     *-pipe* ) ;;
           * ) AC_COMPILER_OPTION(pipe, -pipe, -pipe, CFLAGS="$CFLAGS -pipe") ;;
@@ -170,15 +169,15 @@ m4_define(__va_copy_check, [
 [/* Predefined possible va_copy() implementation (id: $1) */
 #define __VA_COPY_USE_$1(d, s) $2])
     if test ".$ac_cv_va_copy" = .; then
-        AC_TRY_RUN(__va_copy_test($2), [ac_cv_va_copy="$1"])
+        AC_RUN_IFELSE([AC_LANG_SOURCE([__va_copy_test($2)])], [ac_cv_va_copy="$1"])
     fi
 ])
 
 dnl #   Autoconf check for va_copy() implementation checking
-AC_DEFUN(AC_CHECK_VA_COPY,[
+AC_DEFUN([AC_CHECK_VA_COPY],[
   dnl #   provide Autoconf display check message
   AC_MSG_CHECKING(for va_copy() function)
-  dnl #   check for various implementations in priorized sequence   
+  dnl #   check for various implementations in priorized sequence
   AC_CACHE_VAL(ac_cv_va_copy, [
     ac_cv_va_copy=""
     dnl #   1. check for standardized C99 macro
@@ -198,7 +197,7 @@ AC_DEFUN(AC_CHECK_VA_COPY,[
     dnl #   8. check for memory copying approach (assuming va_list is a pointer)
     __va_copy_check(CPP, [memcpy((void *)(d), (void *)(s), sizeof(*(s)))])
     if test ".$ac_cv_va_copy" = .; then
-        AC_ERROR([no working implementation found])
+        AC_MSG_ERROR([no working implementation found])
     fi
   ])
   dnl #   optionally activate the fallback implementation
@@ -240,7 +239,7 @@ dnl ##  shell:
 dnl ##      $ ./configure --with-<libname>[=DIR]
 dnl ##
 
-AC_DEFUN(AC_CHECK_EXTLIB,[dnl
+AC_DEFUN([AC_CHECK_EXTLIB],[dnl
 AC_ARG_WITH($2, [dnl
 [  --with-]m4_substr([$2[[=DIR]]                     ], 0, 19)[build with external $1 library (default=no)]], [dnl
     if test ".$with_$2" = .yes; then
@@ -307,7 +306,7 @@ changequote([, ])dnl
             fi
         fi
     fi
-    AC_HAVE_HEADERS($4)
+    AC_CHECK_HEADERS($4)
     AC_CHECK_LIB($2, $3)
     with_$2=yes
     ac_var="ac_cv_header_`echo $4 | sed 'y%./+-%__p_%'`"
@@ -319,7 +318,7 @@ changequote([, ])dnl
         with_$2=no
     fi
     if test ".$with_$2" = .no; then
-        AC_ERROR([Unable to find $1 library])
+        AC_MSG_ERROR([Unable to find $1 library])
     fi
     ], [dnl
 if test ".$with_$2" = .; then
@@ -342,7 +341,7 @@ dnl ##  configure.in:
 dnl ##    AC_CHECK_DMALLOC
 dnl ##
 
-AC_DEFUN(AC_CHECK_DMALLOC,[dnl
+AC_DEFUN([AC_CHECK_DMALLOC],[dnl
 AC_CHECK_EXTLIB(Dmalloc, dmalloc, dmalloc_debug, dmalloc.h,
                 AC_DEFINE(WITH_DMALLOC, 1, [define if building with Dmalloc]))
 if test ".$with_dmalloc" = .yes; then
